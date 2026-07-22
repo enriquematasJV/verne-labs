@@ -519,8 +519,15 @@ const LABS_CONFIG = [
         const actionsDiv = card.querySelector('.card-actions');
         if (!actionsDiv) return;
 
-        const secondaryBtn = actionsDiv.querySelector('.button.secondary');
-        if (!secondaryBtn) return;
+        let secondaryBtn = actionsDiv.querySelector('.button.secondary');
+
+        if (!secondaryBtn) {
+          secondaryBtn = document.createElement('a');
+          secondaryBtn.className = 'button secondary';
+          secondaryBtn.href = `simulaciones/${carpeta}/unidad-didactica.html`;
+          secondaryBtn.textContent = 'Ver unidad didáctica';
+          actionsDiv.appendChild(secondaryBtn);
+        }
 
         const unitPath = `simulaciones/${carpeta}/unidad-didactica.html`;
 
