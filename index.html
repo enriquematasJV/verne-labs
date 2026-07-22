@@ -188,8 +188,8 @@
 
     .simulations-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.6rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem;
     }
 
     .simulation-card {
@@ -203,7 +203,7 @@
     }
 
     .card-header {
-      padding: 1.5rem 1.5rem 1rem;
+      padding: 1rem 1rem 0.75rem;
       border-bottom: 1px solid var(--border);
     }
 
@@ -249,31 +249,41 @@
 
     .simulation-card h3 {
       margin: 0;
-      font-size: 1.45rem;
-      letter-spacing: -0.03em;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
     }
 
     .card-body {
-      padding: 1.5rem;
+      padding: 0.9rem;
       flex: 1;
     }
 
     .card-body p {
       margin-top: 0;
+      margin-bottom: 0.8rem;
       color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
     }
 
     .features {
       padding-left: 1.2rem;
       color: var(--muted);
       margin-bottom: 0;
+      font-size: 0.85rem;
+      line-height: 1.3;
+    }
+
+    .features li {
+      margin-bottom: 0.3rem;
     }
 
     .card-actions {
-      padding: 1.25rem 1.5rem 1.5rem;
+      padding: 0.9rem;
       display: grid;
       grid-template-columns: 1fr;
-      gap: 0.75rem;
+      gap: 0.5rem;
       border-top: 1px solid var(--border);
       background: #f8fafc;
     }
@@ -282,9 +292,10 @@
       display: inline-block;
       text-align: center;
       text-decoration: none;
-      font-weight: 750;
-      border-radius: 14px;
-      padding: 0.8rem 1rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      border-radius: 12px;
+      padding: 0.6rem 0.85rem;
       transition: transform 0.15s ease, background 0.15s ease;
     }
 
@@ -462,191 +473,16 @@
   </footer>
 
 <script>
-const LABS_MANIFEST = {
-  laboratorios: [
-    {
-      id: "ecologia-poblaciones",
-      nombre: "Laboratorio de Ecología de Poblaciones",
-      carpeta: "ecologia-poblaciones",
-      html: `<article class="simulation-card" data-subject="biologia">
-  <div class="card-header">
-    <div class="tag-row">
-      <span class="tag bio">Biología</span>
-      <span class="tag js">JavaScript</span>
-    </div>
-    <h3>Laboratorio de Ecología de Poblaciones</h3>
-  </div>
-  <div class="card-body">
-    <p>Simulación interactiva para estudiar cómo evolucionan distintas poblaciones dentro de un ecosistema sencillo. Permite observar crecimiento, competencia, equilibrio, extinción y cambios derivados de modificar las condiciones iniciales.</p>
-    <ul class="features">
-      <li>Dinámica de poblaciones.</li>
-      <li>Interacciones entre organismos.</li>
-      <li>Experimentación con parámetros.</li>
-      <li>Análisis de patrones emergentes.</li>
-    </ul>
-  </div>
-  <div class="card-actions">
-    <a class="button primary" href="simulaciones/ecologia-poblaciones/index.html">Abrir simulación</a>
-    <a class="button secondary" href="simulaciones/ecologia-poblaciones/unidad-didactica.html">Ver unidad didáctica</a>
-  </div>
-</article>`
-    },
-    {
-      id: "cinematica-encuentros-alcances",
-      nombre: "Cinemática: encuentros y alcances",
-      carpeta: "cinematica-encuentros-alcances",
-      html: `<article class="simulation-card" data-subject="fisica">
-  <div class="card-header">
-    <div class="tag-row">
-      <span class="tag phys">Física</span>
-      <span class="tag js">JavaScript</span>
-    </div>
-    <h3>Cinemática: encuentros y alcances</h3>
-  </div>
-  <div class="card-body">
-    <p>Laboratorio virtual para estudiar problemas clásicos de cinemática rectilínea con dos móviles: encuentros en sentidos contrarios, alcances en la misma dirección y movimientos con velocidad constante o aceleración.</p>
-    <ul class="features">
-      <li>Resolución visual de problemas de encuentro y alcance.</li>
-      <li>Comparación entre MRU y MRUA con dos móviles.</li>
-      <li>Representación de ecuaciones de posición y condición xâ‚(t) = xâ‚‚(t).</li>
-    </ul>
-  </div>
-  <div class="card-actions">
-    <a class="button primary" href="simulaciones/cinematica-encuentros-alcances/index.html">Abrir simulación</a>
-    <a class="button secondary" href="simulaciones/cinematica-encuentros-alcances/unidad-didactica.html">Ver unidad didáctica</a>
-  </div>
-</article>`
-    },
-    {
-      id: "cinematica-2d",
-      nombre: "Cinemática 2D: tiro vertical y parabólico",
-      carpeta: "cinematica-2d",
-      html: `<article class="simulation-card" data-subject="fisica">
-  <div class="card-header">
-    <div class="tag-row">
-      <span class="tag phys">Física</span>
-      <span class="tag js">JavaScript</span>
-    </div>
-    <h3>Cinemática 2D: tiro vertical y parabólico</h3>
-  </div>
-  <div class="card-body">
-    <p>Laboratorio virtual para analizar el movimiento de una pelota en dos dimensiones, incluyendo tiro vertical, lanzamiento horizontal desde una altura y tiro parabólico completo con descomposición de velocidades.</p>
-    <ul class="features">
-      <li>Estudio del movimiento vertical con aceleración gravitatoria negativa.</li>
-      <li>Descomposición de la velocidad inicial en componentes vâ‚€x y vâ‚€y.</li>
-      <li>Análisis de altura máxima, tiempo de vuelo, alcance horizontal y velocidad de impacto.</li>
-    </ul>
-  </div>
-  <div class="card-actions">
-    <a class="button primary" href="simulaciones/cinematica-2d/index.html">Abrir simulación</a>
-    <a class="button secondary" href="simulaciones/cinematica-2d/unidad-didactica.html">Ver unidad didáctica</a>
-  </div>
-</article>`
-    },
-    {
-      id: "plano-inclinado",
-      nombre: "Dinámica en plano inclinado",
-      carpeta: "plano-inclinado",
-      html: `<article class="simulation-card" data-subject="fisica">
-  <div class="card-header">
-    <div class="tag-row">
-      <span class="tag phys">Física</span>
-      <span class="tag js">JavaScript</span>
-    </div>
-    <h3>Dinámica en plano inclinado</h3>
-  </div>
-  <div class="card-body">
-    <p>Laboratorio virtual de un bloque que desliza por una rampa con rozamiento. Calcula el peso, la normal, el rozamiento y la aceleración resultante, además del tiempo y la velocidad teóricos al final de la pendiente.</p>
-    <ul class="features">
-      <li>Descomposición del peso en componentes paralela y perpendicular.</li>
-      <li>Condición de equilibrio frente a deslizamiento (rozamiento estático).</li>
-      <li>Cálculo de la aceleración y del tiempo de bajada.</li>
-    </ul>
-  </div>
-  <div class="card-actions">
-    <a class="button primary" href="simulaciones/plano-inclinado/index.html">Abrir simulación</a>
-  </div>
-</article>`
-    },
-    {
-      id: "derivadas",
-      nombre: "Derivada como límite",
-      carpeta: "derivadas",
-      html: `<article class="simulation-card" data-subject="matematicas">
-  <div class="card-header">
-    <div class="tag-row">
-      <span class="tag math">Matemáticas</span>
-      <span class="tag js">JavaScript</span>
-    </div>
-    <h3>Derivada como límite</h3>
-  </div>
-  <div class="card-body">
-    <p>Laboratorio virtual para visualizar la derivada como límite de la pendiente de la recta secante cuando el incremento h tiende a cero, con una función definida por el propio usuario.</p>
-    <ul class="features">
-      <li>Recta secante entre x y x+h frente a la recta tangente.</li>
-      <li>Animación de h â†' 0 y lectura del cociente incremental.</li>
-      <li>Entrada de funciones personalizadas: sin(x), cos(x), exp(x)...</li>
-    </ul>
-  </div>
-  <div class="card-actions">
-    <a class="button primary" href="simulaciones/derivadas/index.html">Abrir simulación</a>
-    <a class="button secondary" href="simulaciones/derivadas/unidad-didactica.html">Ver unidad didáctica</a>
-  </div>
-</article>`
-    },
-    {
-      id: "funciones-inecuaciones",
-      nombre: "Plano XY: inecuaciones y funciones",
-      carpeta: "funciones-inecuaciones",
-      html: `<article class="simulation-card" data-subject="matematicas">
-  <div class="card-header">
-    <div class="tag-row">
-      <span class="tag math">Matemáticas</span>
-      <span class="tag js">JavaScript</span>
-    </div>
-    <h3>Plano XY: inecuaciones y funciones</h3>
-  </div>
-  <div class="card-body">
-    <p>Representación en el plano de inecuaciones (con sombreado de la región solución) o de varias funciones a la vez, introducidas como texto libre, una por línea, con color propio.</p>
-    <ul class="features">
-      <li>Modo inecuaciones: y &lt; f(x), x â‰¤ k, etc.</li>
-      <li>Modo funciones: varias curvas simultáneas.</li>
-      <li>Control de zoom y escala vertical.</li>
-    </ul>
-  </div>
-  <div class="card-actions">
-    <a class="button primary" href="simulaciones/funciones-inecuaciones/index.html">Abrir simulación</a>
-  </div>
-</article>`
-    },
-    {
-      id: "representacion-mapas-geologicos",
-      nombre: "Representación de mapas geológicos",
-      carpeta: "representación-de-mapas-geológicos",
-      html: `<article class="simulation-card" data-subject="ciencias">
-  <div class="card-header">
-    <div class="tag-row">
-      <span class="tag phys">Ciencias</span>
-      <span class="tag js">JavaScript</span>
-    </div>
-    <h3>Representación de mapas geológicos</h3>
-  </div>
-  <div class="card-body">
-    <p>Estudio interactivo de la representación e interpretación de mapas geológicos, clasificación de minerales y estructuras geológicas.</p>
-    <ul class="features">
-      <li>Interactivo y personalizable</li>
-      <li>Integración con módulos compartidos</li>
-    </ul>
-  </div>
-  <div class="card-actions">
-    <a class="button primary" href="simulaciones/representación-de-mapas-geológicos/index.html">Abrir simulación</a>
-  </div>
-</article>`
-    }
-  ]
-};
-
-  </script>
+const LABS_CONFIG = [
+  { carpeta: "ecologia-poblaciones" },
+  { carpeta: "cinematica-encuentros-alcances" },
+  { carpeta: "cinematica-2d" },
+  { carpeta: "plano-inclinado" },
+  { carpeta: "derivadas" },
+  { carpeta: "funciones-inecuaciones" },
+  { carpeta: "representación-de-mapas-geológicos" }
+];
+</script>
   <script>
     (function () {
       const gridContainer = document.getElementById('simulationsGrid');
@@ -656,20 +492,58 @@ const LABS_MANIFEST = {
       const todosChip = chips.find(chip => chip.dataset.filter === 'todos');
       const activeSubjects = new Set();
 
-      function loadCards() {
-        if (!LABS_MANIFEST || !LABS_MANIFEST.laboratorios) {
-          gridContainer.innerHTML = '<p style="color: red;">Error: LABS_MANIFEST no disponible</p>';
-          return;
-        }
+      async function loadCards() {
+        for (const lab of LABS_CONFIG) {
+          try {
+            const cardPath = `simulaciones/${lab.carpeta}/card-${lab.carpeta}.html`;
+            const response = await fetch(cardPath);
+            if (!response.ok) throw new Error(`No se pudo cargar ${cardPath}`);
+            const html = await response.text();
 
-        LABS_MANIFEST.laboratorios.forEach(lab => {
-          const temp = document.createElement('div');
-          temp.innerHTML = lab.html;
-          gridContainer.appendChild(temp.firstElementChild);
-        });
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            const card = temp.firstElementChild;
+
+            await processCardActions(card, lab.carpeta);
+            gridContainer.appendChild(card);
+          } catch (error) {
+            console.error(`Error cargando ${lab.carpeta}:`, error);
+          }
+        }
 
         setupFilters();
         applyFilters();
+      }
+
+      async function processCardActions(card, carpeta) {
+        const actionsDiv = card.querySelector('.card-actions');
+        if (!actionsDiv) return;
+
+        let secondaryBtn = actionsDiv.querySelector('.button.secondary');
+        const unitPath = `simulaciones/${carpeta}/unidad-didactica.html`;
+
+        try {
+          const response = await fetch(unitPath);
+          if (response.ok) {
+            return;
+          }
+          throw new Error('Not found');
+        } catch (error) {
+          if (!secondaryBtn) {
+            secondaryBtn = document.createElement('a');
+            secondaryBtn.className = 'button secondary';
+            actionsDiv.appendChild(secondaryBtn);
+          }
+          secondaryBtn.href = '#';
+          secondaryBtn.style.opacity = '0.6';
+          secondaryBtn.style.cursor = 'not-allowed';
+          secondaryBtn.title = 'Unidad didáctica en preparación';
+          secondaryBtn.textContent = '⚠ Unidad en prep.';
+          secondaryBtn.onclick = (e) => {
+            e.preventDefault();
+            alert('Esta unidad didáctica está en preparación.');
+          };
+        }
       }
 
       function setupFilters() {
