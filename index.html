@@ -408,13 +408,8 @@
       </div>
 
       <div class="simulations-grid" id="simulationsGrid">
-
-        <article class="simulation-card" data-subject="biologia">
-          <div class="card-header">
-            <div class="tag-row">
-              <span class="tag bio">Biología</span>
-              <span class="tag js">JavaScript</span>
-            </div>
+        <!-- Las tarjetas se cargan dinámicamente desde el manifest.json -->
+      </div>
 
             <h3>Laboratorio de Ecología de Poblaciones</h3>
           </div>
@@ -725,14 +720,68 @@
 
   <script>
     (function () {
-      const chips = Array.from(document.querySelectorAll('.chip'));
-      const todosChip = chips.find(chip => chip.dataset.filter === 'todos');
-      const cards = Array.from(document.querySelectorAll('#simulationsGrid .simulation-card'));
+      const gridContainer = document.getElementById('simulationsGrid');
       const searchInput = document.getElementById('labSearch');
       const noResults = document.getElementById('noResults');
+      const chips = Array.from(document.querySelectorAll('.chip'));
+      const todosChip = chips.find(chip => chip.dataset.filter === 'todos');
       const activeSubjects = new Set();
 
+      // Cargar el manifest.json y las tarjetas dinámicamente
+      async function loadCards() {
+        try {
+          const response = await fetch('simulaciones/manifest.json');
+          const manifest = await response.json();
+
+          // Para cada laboratorio en el manifest, cargar su tarjeta
+          for (const lab of manifest.laboratorios) {
+            const cardResponse = await fetch(`simulaciones/${lab.carpeta}/card-${lab.carpeta}.html`);
+            const cardHtml = await cardResponse.text();
+
+            // Crear un elemento temporal para parsear el HTML
+            const temp = document.createElement('div');
+            temp.innerHTML = cardHtml;
+            const cardElement = temp.firstElementChild;
+
+            gridContainer.appendChild(cardElement);
+          }
+
+          // Una vez cargadas todas las tarjetas, configurar filtros
+          setupFilters();
+          applyFilters();
+        } catch (error) {
+          console.error('Error cargando laboratorios:', error);
+          gridContainer.innerHTML = '<p style="color: red;">Error al cargar los laboratorios.</p>';
+        }
+      }
+
+      function setupFilters() {
+        chips.forEach(chip => {
+          chip.addEventListener('click', () => {
+            if (chip === todosChip) {
+              activeSubjects.clear();
+            } else {
+              if (activeSubjects.has(chip.dataset.filter)) {
+                activeSubjects.delete(chip.dataset.filter);
+              } else {
+                activeSubjects.add(chip.dataset.filter);
+              }
+            }
+
+            todosChip.classList.toggle('active', activeSubjects.size === 0);
+            chips.forEach(c => {
+              if (c !== todosChip) c.classList.toggle('active', activeSubjects.has(c.dataset.filter));
+            });
+
+            applyFilters();
+          });
+        });
+
+        searchInput.addEventListener('input', applyFilters);
+      }
+
       function applyFilters() {
+        const cards = Array.from(document.querySelectorAll('#simulationsGrid .simulation-card'));
         const query = searchInput.value.trim().toLowerCase();
         let visibleCount = 0;
 
@@ -748,28 +797,8 @@
         noResults.classList.toggle('visible', visibleCount === 0);
       }
 
-      chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-          if (chip === todosChip) {
-            activeSubjects.clear();
-          } else {
-            if (activeSubjects.has(chip.dataset.filter)) {
-              activeSubjects.delete(chip.dataset.filter);
-            } else {
-              activeSubjects.add(chip.dataset.filter);
-            }
-          }
-
-          todosChip.classList.toggle('active', activeSubjects.size === 0);
-          chips.forEach(c => {
-            if (c !== todosChip) c.classList.toggle('active', activeSubjects.has(c.dataset.filter));
-          });
-
-          applyFilters();
-        });
-      });
-
-      searchInput.addEventListener('input', applyFilters);
+      // Cargar las tarjetas cuando el DOM esté listo
+      loadCards();
     })();
   </script>
 
