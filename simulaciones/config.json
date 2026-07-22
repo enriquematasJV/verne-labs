@@ -1,8 +1,112 @@
 {
+  "version": "1.0",
+
   "etiquetas": [
-    "Biología",
-    "Física",
-    "Matemáticas",
-    "Informática / IA"
+    {
+      "nombre": "Biología",
+      "id": "biologia",
+      "color": "#ccfbf1",
+      "tagClass": "bio"
+    },
+    {
+      "nombre": "Física",
+      "id": "fisica",
+      "color": "#fee2e2",
+      "tagClass": "phys"
+    },
+    {
+      "nombre": "Matemáticas",
+      "id": "matematicas",
+      "color": "#ede9fe",
+      "tagClass": "math"
+    },
+    {
+      "nombre": "Informática / IA",
+      "id": "informatica",
+      "color": "#fef3c7",
+      "tagClass": "info"
+    }
+  ],
+
+  "modulosCompartidos": {
+    "physics": {
+      "descripcion": "Motores de física (cinemática, dinámica, fuerzas)",
+      "ruta": "../../shared/js/physics"
+    },
+    "graphics": {
+      "descripcion": "Gráficas y visualización 2D/3D",
+      "ruta": "../../shared/js/graphics"
+    },
+    "math": {
+      "descripcion": "Cálculos matemáticos avanzados",
+      "ruta": "../../shared/js/math"
+    },
+    "ui": {
+      "descripcion": "Componentes de interfaz reutilizables",
+      "ruta": "../../shared/js/ui"
+    },
+    "utils": {
+      "descripcion": "Funciones auxiliares generales",
+      "ruta": "../../shared/js/utils"
+    }
+  },
+
+  "laboratorios": [
+    {
+      "id": "ecologia-poblaciones",
+      "nombre": "Laboratorio de Ecología de Poblaciones",
+      "carpeta": "ecologia-poblaciones",
+      "categoria": "biologia",
+      "modulosRequeridos": ["graphics", "math"],
+      "estado": "publicado"
+    },
+    {
+      "id": "cinematica-encuentros-alcances",
+      "nombre": "Cinemática: encuentros y alcances",
+      "carpeta": "cinematica-encuentros-alcances",
+      "categoria": "fisica",
+      "modulosRequeridos": ["physics", "graphics"],
+      "estado": "publicado"
+    },
+    {
+      "id": "cinematica-2d",
+      "nombre": "Cinemática 2D: tiro vertical y parabólico",
+      "carpeta": "cinematica-2d",
+      "categoria": "fisica",
+      "modulosRequeridos": ["physics", "graphics"],
+      "estado": "publicado"
+    },
+    {
+      "id": "plano-inclinado",
+      "nombre": "Dinámica en plano inclinado",
+      "carpeta": "plano-inclinado",
+      "categoria": "fisica",
+      "modulosRequeridos": ["physics", "graphics"],
+      "estado": "publicado"
+    },
+    {
+      "id": "derivadas",
+      "nombre": "Derivada como límite",
+      "carpeta": "derivadas",
+      "categoria": "matematicas",
+      "modulosRequeridos": ["graphics", "math"],
+      "estado": "publicado"
+    },
+    {
+      "id": "funciones-inecuaciones",
+      "nombre": "Plano XY: inecuaciones y funciones",
+      "carpeta": "funciones-inecuaciones",
+      "categoria": "matematicas",
+      "modulosRequeridos": ["graphics", "math"],
+      "estado": "publicado"
+    },
+    {
+      "id": "representacion-mapas-geologicos",
+      "nombre": "Representación de mapas geológicos",
+      "carpeta": "representación-de-mapas-geológicos",
+      "categoria": "ciencias",
+      "modulosRequeridos": ["graphics"],
+      "estado": "publicado"
+    }
   ]
 }
