@@ -519,26 +519,20 @@ const LABS_CONFIG = [
         const actionsDiv = card.querySelector('.card-actions');
         if (!actionsDiv) return;
 
-        let secondaryBtn = actionsDiv.querySelector('.button.secondary');
+        const secondaryBtn = actionsDiv.querySelector('.button.secondary');
+        if (!secondaryBtn) return;
+
         const unitPath = `simulaciones/${carpeta}/unidad-didactica.html`;
 
         try {
           const response = await fetch(unitPath);
-          if (response.ok) {
-            return;
+          if (!response.ok) {
+            secondaryBtn.onclick = (e) => {
+              e.preventDefault();
+              alert('Esta unidad didáctica está en preparación.');
+            };
           }
-          throw new Error('Not found');
         } catch (error) {
-          if (!secondaryBtn) {
-            secondaryBtn = document.createElement('a');
-            secondaryBtn.className = 'button secondary';
-            actionsDiv.appendChild(secondaryBtn);
-          }
-          secondaryBtn.href = '#';
-          secondaryBtn.style.opacity = '0.6';
-          secondaryBtn.style.cursor = 'not-allowed';
-          secondaryBtn.title = 'Unidad didáctica en preparación';
-          secondaryBtn.textContent = '⚠ Unidad en prep.';
           secondaryBtn.onclick = (e) => {
             e.preventDefault();
             alert('Esta unidad didáctica está en preparación.');
