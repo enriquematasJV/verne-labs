@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unidad didáctica - Cinemática 2D</title>
+  <style>
+    :root {
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #d4d4d8;
+      --soft: #f8fafc;
+      --accent: #0f172a;
+      --orange: #f59e0b;
+      --purple: #7c3aed;
+      --blue: #2563eb;
+      --red: #dc2626;
+      --green: #16a34a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: #ffffff;
+      line-height: 1.6;
+    }
+
+    .page {
+      width: min(100%, 1080px);
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    header {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      margin-bottom: 24px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 44px);
+      line-height: 1.1;
+    }
+
+    h2 {
+      margin-top: 34px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: 25px;
+    }
+
+    h3 {
+      margin-top: 22px;
+      font-size: 19px;
+    }
+
+    p { margin: 10px 0; }
+
+    .subtitle {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 780px;
+    }
+
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 13px;
+      color: var(--text);
+      background: white;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    a.button.primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    a.button:hover { background: #f1f5f9; }
+    a.button.primary:hover { background: #1e293b; }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 18px 0;
+    }
+
+    .card, .situation, .note {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      background: white;
+    }
+
+    .soft { background: var(--soft); }
+
+    .situation { margin: 22px 0; }
+    .situation h3 { margin-top: 0; }
+
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 9px;
+      margin: 2px 4px 2px 0;
+      font-size: 12px;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .tag.orange { background: #fef3c7; color: #92400e; }
+    .tag.purple { background: #ede9fe; color: #5b21b6; }
+    .tag.blue { background: #dbeafe; color: #1e40af; }
+    .tag.red { background: #fee2e2; color: #991b1b; }
+    .tag.green { background: #dcfce7; color: #166534; }
+
+    .question-box {
+      border-left: 4px solid var(--accent);
+      background: var(--soft);
+      padding: 12px 14px;
+      border-radius: 0 12px 12px 0;
+      margin: 14px 0;
+    }
+
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: var(--soft); }
+
+    .note {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #78350f;
+    }
+
+    .formula {
+      font-family: "Courier New", monospace;
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    footer {
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 840px) {
+      .grid { grid-template-columns: 1fr; }
+      .header-top { flex-direction: column; }
+    }
+
+    @media print {
+      .button-row, .header-top > a.button { display: none; }
+      .page { width: 100%; padding: 0; }
+      .card, .situation, header { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1>Unidad didáctica: Cinemática 2D</h1>
+          <p class="subtitle">Laboratorio virtual con situaciones de aprendizaje para investigar tiro vertical, lanzamiento horizontal, tiro parabólico, descomposición de velocidades y movimiento bajo aceleración constante.</p>
+        </div>
+        <a class="button" href="../../index.html#simulaciones">← Volver a simulaciones</a>
+      </div>
+      <div class="button-row">
+        <a class="button primary" href="./index.html">Abrir simulación</a>
+        <a class="button" href="#situaciones">Situaciones de aprendizaje</a>
+        <a class="button" href="#producto-final">Producto final</a>
+      </div>
+    </header>
+
+    <section>
+      <h2>1. Presentación</h2>
+      <p>En esta unidad vas a utilizar una simulación interactiva para estudiar el movimiento de una pelota en dos dimensiones. Trabajarás con un laboratorio virtual donde podrás modificar la altura inicial, la velocidad, el ángulo de lanzamiento y la gravedad.</p>
+      <p>El objetivo no es simplemente observar una trayectoria, sino investigar: hacer predicciones, ejecutar la simulación, interpretar las pausas automáticas, relacionar los resultados con las ecuaciones y explicar físicamente lo que ocurre.</p>
+
+      <div class="grid">
+        <div class="card soft">
+          <h3><span class="tag orange">Vertical</span> Tiro hacia arriba</h3>
+          <p>La pelota sube, se frena, alcanza una altura máxima y cae. Permite estudiar la condición vᵧ = 0.</p>
+        </div>
+        <div class="card soft">
+          <h3><span class="tag blue">Horizontal</span> Caída desde altura</h3>
+          <p>La pelota avanza en horizontal mientras cae verticalmente. Permite observar la independencia entre X e Y.</p>
+        </div>
+        <div class="card soft">
+          <h3><span class="tag purple">Parabólico</span> Trayectoria completa</h3>
+          <p>La velocidad inicial se descompone en v₀x y v₀y. La trayectoria resultante es una parábola.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Objetivos de aprendizaje</h2>
+      <ul>
+        <li>Comprender el movimiento vertical bajo aceleración constante.</li>
+        <li>Interpretar el tiro parabólico como combinación de dos movimientos independientes.</li>
+        <li>Relacionar las ecuaciones de posición y velocidad con lo que se observa en la simulación.</li>
+        <li>Usar correctamente el convenio de signos: derecha positiva, arriba positivo y gravedad negativa.</li>
+        <li>Calcular altura máxima, tiempo de vuelo, alcance y velocidad de impacto.</li>
+        <li>Formular hipótesis, comprobarlas con la simulación y extraer conclusiones razonadas.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3. Manejo del laboratorio virtual</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Elemento</th><th>Función</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Escenario base</td><td>Carga configuraciones iniciales para estudiar tiro vertical, lanzamiento horizontal o tiro parabólico.</td></tr>
+            <tr><td>Tipo de disparo</td><td>Selecciona el modelo de movimiento que se va a analizar.</td></tr>
+            <tr><td>Altura inicial y₀</td><td>Define la posición vertical inicial respecto al suelo, que se toma como y = 0.</td></tr>
+            <tr><td>Velocidad inicial v₀</td><td>Controla la rapidez inicial de la pelota.</td></tr>
+            <tr><td>Ángulo de lanzamiento</td><td>Determina cómo se reparte la velocidad inicial entre las componentes horizontal y vertical.</td></tr>
+            <tr><td>Aceleración gravitatoria aᵧ</td><td>Representa la aceleración vertical negativa debida a la gravedad.</td></tr>
+            <tr><td>Pausas automáticas</td><td>Detienen la animación en puntos clave para analizar condiciones y cálculos.</td></tr>
+            <tr><td>Panel de resultados</td><td>Muestra tiempo de vuelo, altura máxima, alcance y velocidad de impacto.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note"><strong>Antes de ejecutar:</strong> escribe una hipótesis. Después, compara lo que esperabas con lo que realmente ocurre en la gráfica, en los vectores y en los resultados numéricos.</div>
+    </section>
+
+    <section>
+      <h2>4. Ecuaciones que vas a utilizar</h2>
+      <p>El movimiento se estudia separando el eje horizontal y el eje vertical. En este laboratorio se toma como referencia el suelo para el eje Y.</p>
+      <div class="formula">x(t) = v₀x · t</div>
+      <div class="formula">y(t) = y₀ + v₀y · t - 1/2 · g · t²</div>
+      <div class="formula">vᵧ(t) = v₀y - g · t</div>
+      <p>Para resolver problemas no basta con escribir una fórmula: debes reconocer la condición física adecuada.</p>
+      <ul>
+        <li>Altura máxima: vᵧ = 0.</li>
+        <li>Llegada al suelo: y = 0.</li>
+        <li>Movimiento horizontal: la velocidad vₓ permanece constante.</li>
+      </ul>
+    </section>
+
+    <section id="situaciones">
+      <h2>5. Situaciones de aprendizaje</h2>
+      <p>Cada situación de aprendizaje funciona como una pequeña investigación dentro del laboratorio. El simulador proporciona el entorno, pero el aprendizaje aparece cuando observas, comparas, calculas y justificas tus conclusiones.</p>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 1: ¿Qué ocurre en la altura máxima?</h3>
+        <p><span class="tag orange">Tiro vertical</span> <span class="tag">MRUA</span> <span class="tag red">vᵧ = 0</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿por qué la pelota se detiene un instante en el punto más alto si la gravedad sigue actuando?</p>
+        <p>Antes de comenzar, escribe una hipótesis sobre lo que crees que ocurrirá con la velocidad y la aceleración.</p>
+        <ol>
+          <li>Selecciona el escenario de tiro vertical.</li>
+          <li>Configura una velocidad inicial de 25 m/s.</li>
+          <li>Activa las pausas automáticas.</li>
+          <li>Ejecuta la simulación hasta la altura máxima.</li>
+          <li>Anota los valores de tiempo, altura y velocidad vertical.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿Cuánto vale vᵧ en la altura máxima?</li>
+            <li>¿La aceleración vale cero en ese punto?</li>
+            <li>¿Qué ecuación permite calcular el tiempo de subida?</li>
+            <li>¿Qué ocurre con el signo de vᵧ después del punto más alto?</li>
+            <li>¿Cómo se calcula la altura máxima una vez conocido el tiempo?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 2: Caída horizontal desde una altura</h3>
+        <p><span class="tag blue">Lanzamiento horizontal</span> <span class="tag">Independencia X/Y</span></p>
+        <p><strong>Pregunta inicial:</strong> si una pelota sale horizontalmente, ¿por qué acaba cayendo?</p>
+        <p>Intenta anticipar si el tiempo de caída depende de la velocidad horizontal.</p>
+        <ol>
+          <li>Selecciona lanzamiento horizontal desde altura.</li>
+          <li>Fija una altura inicial de 40 m.</li>
+          <li>Realiza una prueba con v₀ = 10 m/s y otra con v₀ = 40 m/s.</li>
+          <li>Compara el tiempo de caída y el alcance horizontal.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿El tiempo de caída cambia al modificar la velocidad horizontal?</li>
+            <li>¿Qué magnitud sí cambia claramente?</li>
+            <li>¿Qué ecuación determina el tiempo de caída?</li>
+            <li>¿Qué ecuación determina el alcance?</li>
+            <li>¿Qué significa que los movimientos X e Y sean independientes?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 3: Descomposición de la velocidad inicial</h3>
+        <p><span class="tag purple">Tiro parabólico</span> <span class="tag blue">v₀x</span> <span class="tag red">v₀y</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿cómo cambia la trayectoria cuando se modifica el ángulo de lanzamiento?</p>
+        <p>Observa si aumentar el ángulo siempre aumenta el alcance.</p>
+        <ol>
+          <li>Selecciona tiro parabólico completo.</li>
+          <li>Fija v₀ = 30 m/s y y₀ = 0 m.</li>
+          <li>Prueba con ángulos de 15°, 30°, 45°, 60° y 75°.</li>
+          <li>Registra el alcance y la altura máxima en cada caso.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿Qué ocurre con v₀x al aumentar el ángulo?</li>
+            <li>¿Qué ocurre con v₀y?</li>
+            <li>¿Qué ángulo produce mayor alcance en tus pruebas?</li>
+            <li>¿El ángulo de mayor altura coincide con el de mayor alcance?</li>
+            <li>¿Por qué la trayectoria tiene forma parabólica?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 4: Cambiar la gravedad</h3>
+        <p><span class="tag green">Investigación</span> <span class="tag">Comparación</span> <span class="tag red">aᵧ negativa</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿cómo cambiaría el lanzamiento si la gravedad fuese menor o mayor?</p>
+        <p>Usa el laboratorio como entorno de investigación y compara trayectorias manteniendo los mismos datos iniciales.</p>
+        <ol>
+          <li>Selecciona tiro parabólico.</li>
+          <li>Fija v₀ = 25 m/s y θ = 45°.</li>
+          <li>Prueba con diferentes valores de gravedad.</li>
+          <li>Observa tiempo de vuelo, altura máxima y alcance.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿Qué ocurre si la gravedad disminuye?</li>
+            <li>¿Qué ocurre si la gravedad aumenta?</li>
+            <li>¿Cambia la velocidad horizontal?</li>
+            <li>¿Qué magnitudes se ven más afectadas?</li>
+            <li>¿Por qué la aceleración vertical tiene signo negativo?</li>
+          </ol>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <h2>6. Recogida de datos</h2>
+      <p>Utiliza la información de la simulación para completar una tabla como esta. No hace falta registrar todos los valores: selecciona los que sean relevantes para comparar tus experimentos.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Experimento</th><th>v₀</th><th>θ</th><th>y₀</th><th>g</th><th>Tiempo de vuelo</th><th>Altura máxima</th><th>Alcance</th><th>Observaciones</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="producto-final">
+      <h2>7. Producto final</h2>
+      <p>Al finalizar, prepara un breve informe de investigación con:</p>
+      <ul>
+        <li>hipótesis inicial,</li>
+        <li>configuración utilizada,</li>
+        <li>datos observados,</li>
+        <li>descripción de la trayectoria,</li>
+        <li>ecuaciones utilizadas,</li>
+        <li>condiciones físicas aplicadas,</li>
+        <li>conclusión final.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>8. Criterios de valoración</h2>
+      <ul>
+        <li>Formula hipótesis antes de ejecutar la simulación.</li>
+        <li>Utiliza correctamente los controles del laboratorio.</li>
+        <li>Interpreta la trayectoria, los vectores y los valores numéricos.</li>
+        <li>Relaciona las condiciones físicas con las ecuaciones adecuadas.</li>
+        <li>Aplica correctamente el convenio de signos.</li>
+        <li>Extrae conclusiones apoyadas en datos.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>9. Reflexión final</h2>
+      <ol>
+        <li>¿Qué significa que el movimiento horizontal y vertical sean independientes?</li>
+        <li>¿Por qué en la altura máxima la velocidad vertical vale cero pero la aceleración no?</li>
+        <li>¿Qué papel tienen las condiciones físicas como y = 0 o vᵧ = 0?</li>
+        <li>¿Qué ventajas tiene usar una simulación para estudiar cinemática?</li>
+        <li>¿Qué limitaciones tiene este modelo respecto a un lanzamiento real?</li>
+      </ol>
+    </section>
+
+    <footer>
+      Laboratorio Virtual de Cinemática 2D · Verne Labs
+    </footer>
+  </main>
+</body>
+</html>

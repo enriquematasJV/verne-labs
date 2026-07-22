@@ -1,0 +1,56 @@
+# Laboratorios en desarrollo (solo local)
+BETA/
+BETA/*
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Sistema operativo
+.DS_Store
+.AppleDouble
+.LSOverride
+desktop.ini
+
+# Documentación interna (NO publicar en GitHub Pages)
+# Mantener en rama local o rama separada
+# documentacion/
+
+# Archivos temporales
+*.tmp
+*.temp
+*.log
+*.bak
+
+# Dependencias (si se usa en futuro)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Entorno local
+.env
+.env.local
+.env.*.local
+
+# Build outputs (si se usan en futuro)
+dist/
+build/
+*.min.js
+*.min.css
+
+# Archivos de test
+*.test.js
+*.spec.js
+coverage/
+
+# Historial de Git
+.git/
+
+# Caché local
+.cache/
+.parcel-cache/

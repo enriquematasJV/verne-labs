@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test SimulationLifecycle</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #f5f5f5;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 10px;
+        }
+
+        .test-section {
+            background: white;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .test-pass {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .test-fail {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .test-info {
+            color: #666;
+            margin: 5px 0;
+            padding: 5px 0;
+        }
+
+        .console-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .buttons {
+            margin: 20px 0;
+        }
+
+        .demo-state {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+
+        .demo-state div {
+            margin: 3px 0;
+        }
+
+        .state-running {
+            color: #16a34a;
+        }
+
+        .state-paused {
+            color: #ea580c;
+        }
+
+        .state-finished {
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test SimulationLifecycle.js</h1>
+
+    <div class="test-section">
+        <h2>Información del Test</h2>
+        <p class="test-info">Este archivo carga SimulationLifecycle.js y ejecuta tests automatizados usando console.assert</p>
+        <p class="test-info">Abre la consola del navegador (F12) para ver los resultados detallados</p>
+    </div>
+
+    <div class="buttons">
+        <button onclick="runAllTests()">▶ Ejecutar Todos los Tests</button>
+        <button onclick="runDemoInteractivo()">🎮 Demo Interactivo</button>
+        <button onclick="clearConsole()">🗑️ Limpiar Consola</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Consola de Output</h2>
+        <div class="console-output" id="consoleOutput"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Demo Interactivo</h2>
+        <p>Controla una instancia de SimulationLifecycle en vivo:</p>
+        <div id="demoControls" style="display:none; margin-top: 15px;">
+            <button onclick="demoStart()">Iniciar</button>
+            <button onclick="demoPause()">Pausar</button>
+            <button onclick="demoResume()">Reanudar</button>
+            <button onclick="demoReset()">Reiniciar</button>
+            <button onclick="demoStep()">Un paso</button>
+            <button onclick="demoFinish()">Terminar</button>
+
+            <div class="demo-state" id="demoState">
+                <div>Estado: <span class="state-paused">Parado</span></div>
+                <div>Tiempo: 0 ms</div>
+                <div>Pasos: 0</div>
+                <div>Terminado: No</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/simulations/SimulationLifecycle.js"></script>
+
+    <script>
+        // Sistema de logging customizado
+        const consoleLog = {
+            logs: [],
+            maxLogs: 100,
+
+            log(msg, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const prefix = {
+                    'info': 'ℹ️',
+                    'success': '✅',
+                    'error': '❌',
+                    'warn': '⚠️',
+                    'test': '🧪'
+                }[type] || '•';
+
+                const fullMsg = `[${timestamp}] ${prefix} ${msg}`;
+                this.logs.push(fullMsg);
+
+                if (this.logs.length > this.maxLogs) {
+                    this.logs.shift();
+                }
+
+                this.updateUI();
+            },
+
+            updateUI() {
+                const output = document.getElementById('consoleOutput');
+                output.innerHTML = this.logs.map(log =>
+                    `<div>${log}</div>`
+                ).join('');
+                output.scrollTop = output.scrollHeight;
+            },
+
+            clear() {
+                this.logs = [];
+                this.updateUI();
+            }
+        };
+
+        // Sobreescribir console.log para capturar output
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            consoleLog.log(args.join(' '), 'info');
+        };
+
+        function runAllTests() {
+            consoleLog.clear();
+            consoleLog.log('=== INICIANDO TESTS ===', 'test');
+            consoleLog.log('', 'info');
+
+            // Capturar console.assert
+            let assertsPassed = 0;
+            let assertsFailed = 0;
+
+            const originalAssert = console.assert;
+            console.assert = function(condition, message) {
+                if (condition) {
+                    assertsPassed++;
+                    consoleLog.log(`PASS: ${message}`, 'success');
+                } else {
+                    assertsFailed++;
+                    consoleLog.log(`FAIL: ${message}`, 'error');
+                }
+            };
+
+            // Ejecutar tests
+            testSimulationLifecycle();
+
+            // Restaurar console.assert
+            console.assert = originalAssert;
+
+            consoleLog.log('', 'info');
+            consoleLog.log(`=== RESULTADOS ===`, 'test');
+            consoleLog.log(`Assertions pasadas: ${assertsPassed}`, 'success');
+            if (assertsFailed > 0) {
+                consoleLog.log(`Assertions fallidas: ${assertsFailed}`, 'error');
+            }
+            consoleLog.log(`Total: ${assertsPassed + assertsFailed}`, 'info');
+        }
+
+        function runDemoInteractivo() {
+            consoleLog.clear();
+            consoleLog.log('=== DEMO INTERACTIVO ===', 'test');
+
+            window.demoLifecycle = new SimulationLifecycle(
+                () => {
+                    window.demoSteps = (window.demoSteps || 0) + 1;
+                    updateDemoState();
+                },
+                () => {
+                    window.demoSteps = 0;
+                    updateDemoState();
+                }
+            );
+
+            window.demoSteps = 0;
+
+            consoleLog.log('Demo listo. Usa los botones para interactuar.', 'success');
+            consoleLog.log('Abre la consola (F12) para ver los logs detallados.', 'info');
+
+            document.getElementById('demoControls').style.display = 'block';
+            updateDemoState();
+        }
+
+        // Funciones de demo
+        window.demoStart = function() {
+            const result = window.demoLifecycle.start();
+            consoleLog.log(`start() → ${result}`, result ? 'success' : 'warn');
+            updateDemoState();
+        };
+
+        window.demoPause = function() {
+            const result = window.demoLifecycle.pause();
+            consoleLog.log(`pause() → ${result}`, result ? 'success' : 'warn');
+            updateDemoState();
+        };
+
+        window.demoResume = function() {
+            const result = window.demoLifecycle.resume();
+            consoleLog.log(`resume() → ${result}`, result ? 'success' : 'warn');
+            updateDemoState();
+        };
+
+        window.demoReset = function() {
+            window.demoLifecycle.reset();
+            consoleLog.log(`reset() ejecutado`, 'success');
+            updateDemoState();
+        };
+
+        window.demoStep = function() {
+            if (window.demoLifecycle.isRunning()) {
+                window.demoLifecycle.step(16.67);
+                consoleLog.log(`step() → pasos: ${window.demoSteps}, tiempo: ${window.demoLifecycle.getElapsedTime().toFixed(0)}ms`, 'info');
+            } else {
+                consoleLog.log(`No se puede avanzar: simulación no está corriendo`, 'warn');
+            }
+            updateDemoState();
+        };
+
+        window.demoFinish = function() {
+            window.demoLifecycle.markFinished();
+            consoleLog.log(`markFinished() ejecutado`, 'success');
+            updateDemoState();
+        };
+
+        function updateDemoState() {
+            if (!window.demoLifecycle) return;
+
+            const state = window.demoLifecycle;
+            const stateDiv = document.getElementById('demoState');
+
+            let statusText = 'Parado';
+            let statusClass = 'state-paused';
+
+            if (state.isFinished()) {
+                statusText = 'Terminado';
+                statusClass = 'state-finished';
+            } else if (state.isRunning()) {
+                statusText = 'Corriendo';
+                statusClass = 'state-running';
+            } else if (state.isPaused()) {
+                statusText = 'Pausado';
+                statusClass = 'state-paused';
+            }
+
+            stateDiv.innerHTML = `
+                <div>Estado: <span class="${statusClass}">${statusText}</span></div>
+                <div>Tiempo: ${state.getElapsedTime().toFixed(0)} ms</div>
+                <div>Pasos: ${window.demoSteps}</div>
+                <div>Terminado: ${state.isFinished() ? 'Sí' : 'No'}</div>
+            `;
+        }
+
+        function clearConsole() {
+            consoleLog.clear();
+            consoleLog.log('Consola limpiada', 'info');
+        }
+
+        // Inicialización
+        window.addEventListener('load', function() {
+            consoleLog.log('Test page cargada', 'success');
+            consoleLog.log('SimulationLifecycle disponible:', typeof SimulationLifecycle !== 'undefined', 'info');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unidad didáctica - Derivada en un punto</title>
+  <style>
+    :root {
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #d4d4d8;
+      --soft: #f8fafc;
+      --accent: #0f172a;
+      --blue: #2563eb;
+      --red: #dc2626;
+      --green: #059669;
+      --orange: #ea580c;
+      --purple: #7c3aed;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: #ffffff;
+      line-height: 1.6;
+    }
+
+    .page {
+      width: min(100%, 1080px);
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    header {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      margin-bottom: 24px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 44px);
+      line-height: 1.1;
+    }
+
+    h2 {
+      margin-top: 34px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: 25px;
+    }
+
+    h3 {
+      margin-top: 22px;
+      font-size: 19px;
+    }
+
+    p { margin: 10px 0; }
+
+    .subtitle {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 780px;
+    }
+
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 13px;
+      color: var(--text);
+      background: white;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    a.button.primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    a.button:hover { background: #f1f5f9; }
+    a.button.primary:hover { background: #1e293b; }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 18px 0;
+    }
+
+    .card, .situation, .note {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      background: white;
+    }
+
+    .soft { background: var(--soft); }
+
+    .situation { margin: 22px 0; }
+    .situation h3 { margin-top: 0; }
+
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 9px;
+      margin: 2px 4px 2px 0;
+      font-size: 12px;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .tag.blue { background: #dbeafe; color: #1e40af; }
+    .tag.red { background: #fee2e2; color: #991b1b; }
+    .tag.green { background: #dcfce7; color: #166534; }
+    .tag.orange { background: #ffedd5; color: #9a3412; }
+    .tag.purple { background: #ede9fe; color: #5b21b6; }
+
+    .question-box {
+      border-left: 4px solid var(--accent);
+      background: var(--soft);
+      padding: 12px 14px;
+      border-radius: 0 12px 12px 0;
+      margin: 14px 0;
+    }
+
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: var(--soft); }
+
+    code {
+      background: #eef2ff;
+      color: #1e3a8a;
+      padding: 2px 5px;
+      border-radius: 6px;
+    }
+
+    .note {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #78350f;
+    }
+
+    footer {
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 840px) {
+      .grid { grid-template-columns: 1fr; }
+      .header-top { flex-direction: column; }
+    }
+
+    @media print {
+      .button-row, .header-top > a.button { display: none; }
+      .page { width: 100%; padding: 0; }
+      .card, .situation, header { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1>Unidad didáctica: Derivada en un punto</h1>
+          <p class="subtitle">Laboratorio virtual con situaciones de aprendizaje para investigar la derivada como límite de la pendiente secante, conectando representación gráfica, cálculo numérico e interpretación geométrica.</p>
+        </div>
+        <a class="button" href="../../index.html#simulaciones">← Volver a simulaciones</a>
+      </div>
+      <div class="button-row">
+        <a class="button primary" href="./index.html">Abrir simulación</a>
+        <a class="button" href="#situaciones">Situaciones de aprendizaje</a>
+        <a class="button" href="#producto-final">Producto final</a>
+      </div>
+    </header>
+
+    <section>
+      <h2>1. Presentación</h2>
+      <p>En esta unidad vas a utilizar una simulación interactiva para comprender qué significa calcular la derivada de una función en un punto. El objetivo no es aplicar una regla de derivación de memoria, sino observar cómo una idea geométrica se convierte en un concepto matemático preciso.</p>
+      <p>Trabajarás con una función <code>y = f(x)</code>, elegirás un punto <code>x</code>, modificarás el incremento horizontal <code>h</code> y observarás cómo cambia la pendiente de la recta secante entre los puntos <code>(x, f(x))</code> y <code>(x+h, f(x+h))</code>.</p>
+
+      <div class="grid">
+        <div class="card soft">
+          <h3><span class="tag blue">Función</span> y = f(x)</h3>
+          <p>Representa la curva sobre la que se estudia el comportamiento local. Puede ser una parábola, una función trigonométrica, una cúbica o cualquier expresión admitida por la aplicación.</p>
+        </div>
+        <div class="card soft">
+          <h3><span class="tag orange">Incremento</span> h</h3>
+          <p>Es el desplazamiento horizontal desde <code>x</code> hasta <code>x+h</code>. Al reducirlo, los dos puntos se acercan y se estudia lo que ocurre en el límite.</p>
+        </div>
+        <div class="card soft">
+          <h3><span class="tag green">Derivada</span> f'(x)</h3>
+          <p>Es la pendiente límite de las rectas secantes cuando <code>h → 0</code>. Gráficamente se interpreta como la pendiente de la recta tangente en el punto.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Objetivos de aprendizaje</h2>
+      <ul>
+        <li>Comprender la derivada en un punto como límite de una razón de incrementos.</li>
+        <li>Relacionar la pendiente secante con la pendiente tangente.</li>
+        <li>Interpretar gráficamente los valores <code>Δx</code>, <code>Δy</code> y <code>Δy/Δx</code>.</li>
+        <li>Observar el efecto de reducir <code>h</code> progresivamente hacia cero.</li>
+        <li>Comparar el comportamiento de distintas funciones en diferentes puntos.</li>
+        <li>Formular hipótesis, contrastarlas con la simulación y explicar los resultados.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3. Manejo del laboratorio virtual</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Elemento</th><th>Función</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Función y = f(x)</td><td>Permite escribir la función que se va a representar y analizar.</td></tr>
+            <tr><td>Botones de función</td><td>Cargan funciones de ejemplo como <code>x^2</code>, <code>sin(x)</code>, <code>cos(x)</code> o una función cúbica.</td></tr>
+            <tr><td>Punto x</td><td>Fija el punto de la curva donde se quiere estudiar la derivada.</td></tr>
+            <tr><td>Incremento h</td><td>Controla la separación horizontal entre <code>x</code> y <code>x+h</code>.</td></tr>
+            <tr><td>Animar h → 0</td><td>Reduce automáticamente el valor de <code>h</code> para visualizar el proceso de límite.</td></tr>
+            <tr><td>Escala / zoom</td><td>Ajusta la ventana visible de la gráfica.</td></tr>
+            <tr><td>Trasladar origen horizontal</td><td>Desplaza la vista a izquierda o derecha sin modificar la función.</td></tr>
+            <tr><td>Panel de lectura matemática</td><td>Muestra los valores de <code>x</code>, <code>x+h</code>, <code>f(x)</code>, <code>f(x+h)</code>, <code>Δx</code>, <code>Δy</code> y la pendiente calculada.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note"><strong>Antes de mover h:</strong> intenta anticipar qué ocurrirá con la recta secante y con su pendiente. Después, comprueba si tu predicción coincide con la gráfica y con los valores numéricos.</div>
+    </section>
+
+    <section id="situaciones">
+      <h2>4. Situaciones de aprendizaje</h2>
+      <p>Cada situación funciona como una pequeña investigación. La simulación no sirve solo para ver una animación, sino para construir una interpretación: observar, cambiar parámetros, comparar, calcular y explicar.</p>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 1: De la secante a la tangente</h3>
+        <p><span class="tag blue">Parábola</span> <span class="tag orange">h → 0</span> <span class="tag green">Tangente</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿qué ocurre con la recta secante cuando los dos puntos de la curva se acercan cada vez más?</p>
+        <ol>
+          <li>Carga la función <code>f(x)=x^2</code>.</li>
+          <li>Fija el punto <code>x = 1</code>.</li>
+          <li>Empieza con un valor de <code>h</code> relativamente grande.</li>
+          <li>Reduce <code>h</code> poco a poco y observa la recta secante.</li>
+          <li>Usa la animación <code>h → 0</code> y compara la secante con la tangente.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿Qué representan los puntos P y Q?</li>
+            <li>¿Qué representa el triángulo formado por <code>Δx</code> y <code>Δy</code>?</li>
+            <li>¿La pendiente secante se mantiene constante al cambiar <code>h</code>?</li>
+            <li>¿A qué valor se aproxima la pendiente cuando <code>h</code> se acerca a cero?</li>
+            <li>¿Por qué podemos interpretar ese valor como la pendiente instantánea?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 2: Comparar puntos de una misma función</h3>
+        <p><span class="tag blue">f(x)=x²</span> <span class="tag purple">Pendiente variable</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿tiene la misma pendiente la parábola en todos sus puntos?</p>
+        <ol>
+          <li>Mantén la función <code>f(x)=x^2</code>.</li>
+          <li>Calcula visualmente la derivada aproximada en <code>x = -2</code>, <code>x = 0</code>, <code>x = 1</code> y <code>x = 2</code>.</li>
+          <li>Reduce <code>h</code> hasta valores pequeños en cada caso.</li>
+          <li>Anota la pendiente tangente aproximada que aparece en el panel.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿Dónde la pendiente es negativa?</li>
+            <li>¿Dónde la pendiente se aproxima a cero?</li>
+            <li>¿Dónde la pendiente es positiva?</li>
+            <li>¿Qué relación observas entre el valor de <code>x</code> y la pendiente?</li>
+            <li>¿Puedes intuir la regla de derivación de <code>x^2</code> a partir de los datos?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 3: Funciones con máximos y mínimos</h3>
+        <p><span class="tag green">Tangente horizontal</span> <span class="tag blue">sin(x)</span> <span class="tag blue">cos(x)</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿qué tiene de especial la derivada en un máximo o en un mínimo local?</p>
+        <ol>
+          <li>Carga <code>sin(x)</code> o <code>cos(x)</code>.</li>
+          <li>Busca visualmente una zona donde la función tenga un máximo o un mínimo.</li>
+          <li>Coloca el punto <code>x</code> cerca de esa zona.</li>
+          <li>Reduce <code>h</code> y observa la recta tangente aproximada.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿Cómo es la recta tangente en un máximo?</li>
+            <li>¿Cómo es la recta tangente en un mínimo?</li>
+            <li>¿Qué valor aproximado toma la pendiente?</li>
+            <li>¿Significa eso que la función vale cero?</li>
+            <li>¿Qué diferencia hay entre que la función sea cero y que su derivada sea cero?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 4: Investigación libre con funciones propias</h3>
+        <p><span class="tag">Investigación</span> <span class="tag orange">Hipótesis</span> <span class="tag purple">Comparación</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿cómo cambia la derivada cuando cambia la forma de la función?</p>
+        <ol>
+          <li>Escribe una función propia, por ejemplo <code>x^3 - 2*x</code>, <code>exp(0.4*x)</code> o <code>log(x)</code>.</li>
+          <li>Elige varios puntos de estudio.</li>
+          <li>Reduce <code>h</code> y registra la pendiente aproximada en cada punto.</li>
+          <li>Compara la forma de la curva con los valores de la pendiente.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿En qué zonas la función crece más rápido?</li>
+            <li>¿En qué zonas crece más lentamente?</li>
+            <li>¿Hay puntos donde la pendiente cambie de signo?</li>
+            <li>¿Qué ocurre si usas valores negativos de <code>h</code>?</li>
+            <li>¿La aproximación por la izquierda y por la derecha parece coincidir?</li>
+          </ol>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <h2>5. Recogida de datos</h2>
+      <p>Utiliza el panel de valores de la simulación para recoger datos. Puedes completar una tabla como esta:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Función</th><th>x</th><th>h</th><th>f(x)</th><th>f(x+h)</th><th>Δy/Δx</th><th>Observaciones</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>x²</td><td>1</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>x²</td><td>1</td><td>0.5</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>x²</td><td>1</td><td>0.1</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>x²</td><td>1</td><td>0.01</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>sin(x)</td><td></td><td>0.01</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>función propia</td><td></td><td>0.01</td><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="producto-final">
+      <h2>6. Producto final</h2>
+      <p>Al finalizar, prepara un breve informe de investigación con:</p>
+      <ul>
+        <li>función o funciones estudiadas,</li>
+        <li>puntos elegidos para analizar la derivada,</li>
+        <li>hipótesis inicial sobre la pendiente,</li>
+        <li>valores observados al reducir <code>h</code>,</li>
+        <li>captura o descripción de la gráfica,</li>
+        <li>explicación de la relación entre secante, tangente y derivada,</li>
+        <li>conclusión final.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>7. Criterios de valoración</h2>
+      <ul>
+        <li>Comprende el significado de <code>h</code> como incremento horizontal.</li>
+        <li>Interpreta correctamente <code>Δx</code>, <code>Δy</code> y la razón <code>Δy/Δx</code>.</li>
+        <li>Relaciona la recta secante con la recta tangente mediante el proceso de límite.</li>
+        <li>Utiliza la simulación para comprobar hipótesis, no solo para mover controles.</li>
+        <li>Extrae conclusiones apoyadas en datos y observaciones gráficas.</li>
+        <li>Distingue entre valor de la función, pendiente de la función y derivada en un punto.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>8. Reflexión final</h2>
+      <ol>
+        <li>¿Por qué la derivada no se define simplemente con dos puntos separados?</li>
+        <li>¿Qué aporta la idea de límite al concepto de pendiente?</li>
+        <li>¿Qué diferencia hay entre pendiente media y pendiente instantánea?</li>
+        <li>¿Por qué la recta tangente puede entenderse como el límite de las rectas secantes?</li>
+        <li>¿Qué limitaciones tiene una simulación numérica para representar exactamente un límite matemático?</li>
+      </ol>
+    </section>
+
+    <footer>
+      Laboratorio Virtual de Derivada en un Punto · Verne Labs
+    </footer>
+  </main>
+</body>
+</html>

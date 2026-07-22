@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio virtual de cinemática</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --panel: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --soft: #e2e8f0;
+      --accent: #0f172a;
+      --sky: #e0f2fe;
+      --ground: #cbd5e1;
+      --lane: #94a3b8;
+      --carA: #2563eb;
+      --carB: #dc2626;
+      --ok: #16a34a;
+      --warn: #d97706;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+
+    .page-header {
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      border: 1px solid #d4d4d8;
+      border-radius: 28px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .page-header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .back-link {
+      text-decoration: none;
+      border: 1px solid #d4d4d8;
+      border-radius: 14px;
+      padding: 10px 14px;
+      color: #0f172a;
+      background: white;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+
+    .back-link:hover {
+      background: #f1f5f9;
+    }
+
+    .subtitle {
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .control label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .control input[type="range"],
+    .control select {
+      width: 100%;
+    }
+
+    .control select {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      font-size: 0.95rem;
+    }
+
+    .group-box {
+      background: #f8fafc;
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .group-box .title {
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 11px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    button.secondary {
+      background: #334155;
+      color: white;
+    }
+
+    button.light {
+      background: var(--soft);
+      color: var(--text);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .info-box {
+      background: #f8fafc;
+      border-radius: var(--radius);
+      padding: 14px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .info-box .title {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 18px;
+      background: var(--sky);
+    }
+
+    .metrics {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .metric, .detail-box {
+      background: #f8fafc;
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .metric .label {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .metric .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .details {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 14px;
+    }
+
+    .detail-box .title {
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .detail-box div {
+      margin-bottom: 7px;
+      font-size: 0.96rem;
+      line-height: 1.45;
+    }
+
+    .formula {
+      font-family: "Courier New", monospace;
+      background: white;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      overflow-x: auto;
+      border: 1px solid #e2e8f0;
+    }
+
+    .legend-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+    }
+
+    .dot.a { background: var(--carA); }
+    .dot.b { background: var(--carB); }
+    .dot.m { background: var(--ok); }
+
+    @media (max-width: 1040px) {
+      .page-header-content {
+        flex-direction: column;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .details {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app {
+        padding: 14px;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="page-header">
+      <div class="page-header-content">
+        <div>
+          <div class="eyebrow">Verne Labs · Física</div>
+          <h1>Laboratorio virtual de cinemática: encuentros y alcances</h1>
+          <p class="subtitle">
+            Simula ejercicios típicos de 1º de Bachillerato con dos móviles en una recta. Puedes cambiar posiciones iniciales,
+            velocidades y aceleraciones, tanto para MRU como para MRUA. La animación se detiene en el punto de encuentro y muestra
+            visualmente las distancias recorridas y las ecuaciones que lo explican.
+          </p>
+        </div>
+
+        <a class="back-link" href="../../index.html#simulaciones">
+          ← Volver a simulaciones
+        </a>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="panel">
+        <div class="controls">
+          <div class="control">
+            <label for="preset">Escenario base</label>
+            <select id="preset">
+              <option value="opuestos">Dos móviles en sentidos contrarios</option>
+              <option value="alcance">Alcance en la misma dirección</option>
+              <option value="libre">Libre</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <label for="motionMode">Tipo de movimiento</label>
+            <select id="motionMode">
+              <option value="mru">MRU (velocidad constante)</option>
+              <option value="mrua">MRUA (con aceleración)</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <label for="directionMode">Sentido relativo</label>
+            <select id="directionMode">
+              <option value="opuestos">Direcciones contrarias</option>
+              <option value="mismo">Misma dirección</option>
+            </select>
+          </div>
+
+          <div class="group-box">
+            <div class="title">Móvil A (azul)</div>
+            <div class="control">
+              <label for="x1">Posición inicial x₁(0): <span id="x1Value">0.0</span> m</label>
+              <input id="x1" type="range" min="0" max="500" step="1" value="0" />
+            </div>
+            <div class="control">
+              <label for="v1">Velocidad inicial v₁: <span id="v1Value">20.0</span> m/s</label>
+              <input id="v1" type="range" min="0" max="60" step="0.5" value="20" />
+            </div>
+            <div class="control">
+              <label for="a1">Aceleración a₁: <span id="a1Value">0.0</span> m/s²</label>
+              <input id="a1" type="range" min="-10" max="10" step="0.1" value="0" />
+            </div>
+          </div>
+
+          <div class="group-box">
+            <div class="title">Móvil B (rojo)</div>
+            <div class="control">
+              <label for="x2">Posición inicial x₂(0): <span id="x2Value">140.0</span> m</label>
+              <input id="x2" type="range" min="0" max="500" step="1" value="140" />
+            </div>
+            <div class="control">
+              <label for="v2">Velocidad inicial v₂: <span id="v2Value">15.0</span> m/s</label>
+              <input id="v2" type="range" min="0" max="60" step="0.5" value="15" />
+            </div>
+            <div class="control">
+              <label for="a2">Aceleración a₂: <span id="a2Value">0.0</span> m/s²</label>
+              <input id="a2" type="range" min="-10" max="10" step="0.1" value="0" />
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button id="startBtn" class="primary">Iniciar</button>
+            <button id="pauseBtn" class="secondary" disabled>Pausar</button>
+            <button id="resetBtn" class="light">Reiniciar</button>
+          </div>
+
+          <div class="info-box">
+            <div class="title">Estado</div>
+            <div id="statusText">Configura los parámetros y observa si existe punto de encuentro.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <canvas id="scene" width="930" height="560"></canvas>
+
+        <div class="legend-row">
+          <div class="legend-item"><span class="dot a"></span> Móvil A</div>
+          <div class="legend-item"><span class="dot b"></span> Móvil B</div>
+          <div class="legend-item"><span class="dot m"></span> Punto de encuentro</div>
+        </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="label">Tiempo actual</div>
+            <div class="value" id="timeValue">0.00 s</div>
+          </div>
+          <div class="metric">
+            <div class="label">Posición A / B</div>
+            <div class="value" id="positionValue">0.0 / 140.0 m</div>
+          </div>
+          <div class="metric">
+            <div class="label">Velocidad A / B</div>
+            <div class="value" id="velocityValue">20.0 / 15.0 m/s</div>
+          </div>
+          <div class="metric">
+            <div class="label">Separación</div>
+            <div class="value" id="gapValue">140.0 m</div>
+          </div>
+        </div>
+
+        <div class="details">
+          <div class="detail-box">
+            <div class="title">Modelo matemático</div>
+            <div id="modelSummary">Se usarán ecuaciones de posición para cada móvil.</div>
+            <div class="formula" id="formula1">x₁(t) = x₁₀ + v₁·t</div>
+            <div class="formula" id="formula2">x₂(t) = x₂₀ + v₂·t</div>
+            <div class="formula" id="meetingFormula">Igualando: x₁(t) = x₂(t)</div>
+            <div id="equationResult" style="margin-top: 10px;"></div>
+          </div>
+
+          <div class="detail-box">
+            <div class="title">Resultado teórico</div>
+            <div>¿Se encuentran?: <strong id="meetYesNo">Sí</strong></div>
+            <div>Tiempo de encuentro: <strong id="meetTimeValue">4.00 s</strong></div>
+            <div>Posición de encuentro: <strong id="meetPosValue">80.00 m</strong></div>
+            <div>Distancia recorrida por A: <strong id="dist1Value">80.00 m</strong></div>
+            <div>Distancia recorrida por B: <strong id="dist2Value">60.00 m</strong></div>
+            <div id="pedagogicText" style="margin-top: 10px; color: #475569;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MÓDULOS: Inline para funcionar con file:// -->
+  <script>
+    // ===== KinematicsEngine (inline) =====
+    class KinematicsEngine {
+      constructor() {
+        this.G = 9.81;
+      }
+
+      position1D(x0, v, a, t) {
+        return x0 + v * t + 0.5 * a * t * t;
+      }
+
+      velocity1D(v0, a, t) {
+        return v0 + a * t;
+      }
+
+      meetingData1D(x10, v10, a10, x20, v20, a20) {
+        const A = 0.5 * (a10 - a20);
+        const B = v10 - v20;
+        const C = x10 - x20;
+
+        let roots = [];
+        const eps = 1e-9;
+
+        if (Math.abs(A) < eps) {
+          if (Math.abs(B) < eps) {
+            if (Math.abs(C) < eps) {
+              return {
+                meets: true,
+                infinite: true,
+                time: 0,
+                position: x10,
+                A, B, C,
+              };
+            }
+            return { meets: false, infinite: false, A, B, C };
+          }
+          const t = -C / B;
+          if (t >= 0) roots.push(t);
+        } else {
+          const disc = B * B - 4 * A * C;
+          if (disc >= -eps) {
+            const safeDisc = Math.max(0, disc);
+            const sqrtDisc = Math.sqrt(safeDisc);
+            const t1 = (-B - sqrtDisc) / (2 * A);
+            const t2 = (-B + sqrtDisc) / (2 * A);
+            if (t1 >= 0) roots.push(t1);
+            if (t2 >= 0) roots.push(t2);
+          }
+        }
+
+        roots = roots.filter(t => Number.isFinite(t)).sort((m, n) => m - n);
+        if (roots.length === 0) {
+          return { meets: false, infinite: false, A, B, C };
+        }
+
+        const tMeet = roots[0];
+        const xMeet = this.position1D(x10, v10, a10, tMeet);
+        return {
+          meets: true,
+          infinite: false,
+          time: tMeet,
+          position: xMeet,
+          A, B, C,
+          roots,
+        };
+      }
+
+      projectileMotion(v0, angleRad, t) {
+        const vx = v0 * Math.cos(angleRad);
+        const vy = v0 * Math.sin(angleRad);
+        const x = vx * t;
+        const y = vy * t - 0.5 * this.G * t * t;
+        return { x, y, vx, vy };
+      }
+
+      circularMotion(r, omega, t) {
+        const theta = omega * t;
+        const x = r * Math.cos(theta);
+        const y = r * Math.sin(theta);
+        const vt = r * omega;
+        const at = r * omega * omega;
+        return { x, y, theta, vt, at };
+      }
+
+      gravity(m1, m2, r) {
+        const G = 6.674e-11;
+        return (G * m1 * m2) / (r * r);
+      }
+
+      gravityAccel(M, r) {
+        const G = 6.674e-11;
+        return (G * M) / (r * r);
+      }
+    }
+
+    // ===== Canvas2DRenderer (inline) =====
+    class Canvas2DRenderer {
+      constructor(canvasElement) {
+        this.canvas = canvasElement;
+        this.ctx = canvasElement.getContext('2d');
+      }
+
+      clear(color = '#ffffff') {
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+
+      drawRect(x, y, width, height, fillColor, strokeColor = null, lineWidth = 1) {
+        if (fillColor) {
+          this.ctx.fillStyle = fillColor;
+          this.ctx.fillRect(x, y, width, height);
+        }
+        if (strokeColor) {
+          this.ctx.strokeStyle = strokeColor;
+          this.ctx.lineWidth = lineWidth;
+          this.ctx.strokeRect(x, y, width, height);
+        }
+      }
+
+      drawPolygon(points, fillColor, strokeColor = null, lineWidth = 1) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+          this.ctx.lineTo(points[i].x, points[i].y);
+        }
+        this.ctx.closePath();
+
+        if (fillColor) {
+          this.ctx.fillStyle = fillColor;
+          this.ctx.fill();
+        }
+        if (strokeColor) {
+          this.ctx.strokeStyle = strokeColor;
+          this.ctx.lineWidth = lineWidth;
+          this.ctx.stroke();
+        }
+      }
+
+      drawLine(x1, y1, x2, y2, color = '#000000', lineWidth = 1) {
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = lineWidth;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x1, y1);
+        this.ctx.lineTo(x2, y2);
+        this.ctx.stroke();
+      }
+
+      drawArrow(x1, y1, x2, y2, color, label = '', lineWidth = 3) {
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        const headLength = 10;
+
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = lineWidth;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x1, y1);
+        this.ctx.lineTo(x2, y2);
+        this.ctx.stroke();
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(x2, y2);
+        this.ctx.lineTo(x2 - headLength * Math.cos(angle - Math.PI / 6), y2 - headLength * Math.sin(angle - Math.PI / 6));
+        this.ctx.moveTo(x2, y2);
+        this.ctx.lineTo(x2 - headLength * Math.cos(angle + Math.PI / 6), y2 - headLength * Math.sin(angle + Math.PI / 6));
+        this.ctx.stroke();
+
+        if (label) {
+          this.ctx.fillStyle = color;
+          this.ctx.font = 'bold 14px Arial';
+          this.ctx.fillText(label, x2 + 8, y2 - 6);
+        }
+      }
+
+      drawCircle(x, y, radius, fillColor = null, strokeColor = null, lineWidth = 1) {
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+
+        if (fillColor) {
+          this.ctx.fillStyle = fillColor;
+          this.ctx.fill();
+        }
+        if (strokeColor) {
+          this.ctx.strokeStyle = strokeColor;
+          this.ctx.lineWidth = lineWidth;
+          this.ctx.stroke();
+        }
+      }
+
+      drawArc(x, y, radius, startAngle, endAngle, strokeColor = '#000000', lineWidth = 1) {
+        this.ctx.strokeStyle = strokeColor;
+        this.ctx.lineWidth = lineWidth;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, radius, startAngle, endAngle, false);
+        this.ctx.stroke();
+      }
+
+      drawText(text, x, y, fontSize = 14, fontWeight = 'normal', color = '#000000', textAlign = 'left') {
+        this.ctx.fillStyle = color;
+        this.ctx.font = `${fontWeight} ${fontSize}px Arial`;
+        this.ctx.textAlign = textAlign;
+        this.ctx.fillText(text, x, y);
+        this.ctx.textAlign = 'left';
+      }
+
+      drawPath(points, strokeColor = '#000000', lineWidth = 1, closed = false) {
+        if (points.length === 0) return;
+        this.ctx.strokeStyle = strokeColor;
+        this.ctx.lineWidth = lineWidth;
+        this.ctx.beginPath();
+        this.ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+          this.ctx.lineTo(points[i].x, points[i].y);
+        }
+        if (closed) this.ctx.closePath();
+        this.ctx.stroke();
+      }
+
+      getContext() {
+        return this.ctx;
+      }
+
+      getWidth() {
+        return this.canvas.width;
+      }
+
+      getHeight() {
+        return this.canvas.height;
+      }
+    }
+
+    // ===== SliderControl (inline) =====
+    class SliderControl {
+      constructor(inputElement, displayElement, onChange) {
+        this.input = inputElement;
+        this.display = displayElement;
+        this.onChange = onChange;
+
+        this.input.addEventListener('input', () => {
+          const value = this.getValue();
+          this.updateDisplay(value);
+          if (this.onChange) {
+            this.onChange(value);
+          }
+        });
+      }
+
+      getValue() {
+        return Number(this.input.value);
+      }
+
+      setValue(value) {
+        this.input.value = value;
+        this.updateDisplay(value);
+      }
+
+      updateDisplay(value) {
+        const decimals = this.getDecimals();
+        this.display.textContent = value.toFixed(decimals);
+      }
+
+      getDecimals() {
+        const step = this.input.step || '1';
+        return (step.split('.')[1] || []).length;
+      }
+
+      setMin(value) {
+        this.input.min = value;
+      }
+
+      setMax(value) {
+        this.input.max = value;
+      }
+
+      setStep(value) {
+        this.input.step = value;
+      }
+
+      disable() {
+        this.input.disabled = true;
+      }
+
+      enable() {
+        this.input.disabled = false;
+      }
+
+      isDisabled() {
+        return this.input.disabled;
+      }
+    }
+  </script>
+
+  <script>
+    const canvas = document.getElementById('scene');
+    const renderer = new Canvas2DRenderer(canvas);
+    const ctx = renderer.getContext();
+    const kinematics = new KinematicsEngine();
+
+    const presetSelect = document.getElementById('preset');
+    const motionModeSelect = document.getElementById('motionMode');
+    const directionModeSelect = document.getElementById('directionMode');
+
+    const x1Input = document.getElementById('x1');
+    const v1Input = document.getElementById('v1');
+    const a1Input = document.getElementById('a1');
+    const x2Input = document.getElementById('x2');
+    const v2Input = document.getElementById('v2');
+    const a2Input = document.getElementById('a2');
+
+    const x1Value = document.getElementById('x1Value');
+    const v1Value = document.getElementById('v1Value');
+    const a1Value = document.getElementById('a1Value');
+    const x2Value = document.getElementById('x2Value');
+    const v2Value = document.getElementById('v2Value');
+    const a2Value = document.getElementById('a2Value');
+
+    const statusText = document.getElementById('statusText');
+    const timeValue = document.getElementById('timeValue');
+    const positionValue = document.getElementById('positionValue');
+    const velocityValue = document.getElementById('velocityValue');
+    const gapValue = document.getElementById('gapValue');
+
+    const modelSummary = document.getElementById('modelSummary');
+    const formula1 = document.getElementById('formula1');
+    const formula2 = document.getElementById('formula2');
+    const meetingFormula = document.getElementById('meetingFormula');
+    const equationResult = document.getElementById('equationResult');
+
+    const meetYesNo = document.getElementById('meetYesNo');
+    const meetTimeValue = document.getElementById('meetTimeValue');
+    const meetPosValue = document.getElementById('meetPosValue');
+    const dist1Value = document.getElementById('dist1Value');
+    const dist2Value = document.getElementById('dist2Value');
+    const pedagogicText = document.getElementById('pedagogicText');
+
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const state = {
+      x10: 0,
+      v10: 20,
+      a10: 0,
+      x20: 140,
+      v20mag: 15,
+      a20mag: 0,
+      motionMode: 'mru',
+      directionMode: 'opuestos',
+      time: 0,
+      running: false,
+      finished: false,
+      lastTimestamp: null,
+      animationId: null,
+      simEndTime: 12,
+      trailA: [],
+      trailB: [],
+    };
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function format(value, digits = 2) {
+      return Number.isFinite(value) ? value.toFixed(digits) : '∞';
+    }
+
+    function signedV2() {
+      return state.directionMode === 'opuestos' ? -state.v20mag : state.v20mag;
+    }
+
+    function signedA2() {
+      return state.directionMode === 'opuestos' ? -state.a20mag : state.a20mag;
+    }
+
+    function motionLabel() {
+      return state.motionMode === 'mru' ? 'MRU' : 'MRUA';
+    }
+
+    function pos1(t) {
+      return state.x10 + state.v10 * t + 0.5 * state.a10 * t * t;
+    }
+
+    function pos2(t) {
+      const v2 = signedV2();
+      const a2 = signedA2();
+      return state.x20 + v2 * t + 0.5 * a2 * t * t;
+    }
+
+    function vel1(t) {
+      return state.v10 + state.a10 * t;
+    }
+
+    function vel2(t) {
+      return signedV2() + signedA2() * t;
+    }
+
+    function getMeetingData() {
+      const useAcc = state.motionMode === 'mrua';
+      const a1 = useAcc ? state.a10 : 0;
+      const a2 = useAcc ? signedA2() : 0;
+      const v1 = state.v10;
+      const v2 = signedV2();
+      const x1 = state.x10;
+      const x2 = state.x20;
+
+      const result = kinematics.meetingData1D(x1, v1, a1, x2, v2, a2);
+
+      if (result.meets && !result.infinite) {
+        const d1 = Math.abs(result.position - state.x10);
+        const d2 = Math.abs(result.position - state.x20);
+        return { ...result, distances: [d1, d2] };
+      }
+      return result;
+    }
+
+    function getViewport() {
+      const meet = getMeetingData();
+      const samples = [];
+      const horizon = meet.meets && !meet.infinite ? Math.max(6, meet.time * 1.18) : 12;
+      for (let i = 0; i <= 80; i++) {
+        const t = horizon * i / 80;
+        samples.push(pos1(t), pos2(t));
+      }
+      samples.push(state.x10, state.x20);
+      if (meet.meets && !meet.infinite) samples.push(meet.position);
+      const minX = Math.min(...samples);
+      const maxX = Math.max(...samples);
+      const padding = Math.max(20, (maxX - minX) * 0.12);
+      return {
+        minX: minX - padding,
+        maxX: maxX + padding,
+        horizon,
+      };
+    }
+
+    function resetSimulation() {
+      state.time = 0;
+      state.running = false;
+      state.finished = false;
+      state.lastTimestamp = null;
+      state.trailA = [];
+      state.trailB = [];
+      if (state.animationId !== null) {
+        cancelAnimationFrame(state.animationId);
+        state.animationId = null;
+      }
+      const meet = getMeetingData();
+      state.simEndTime = meet.meets && !meet.infinite ? Math.max(4, meet.time) : getViewport().horizon;
+      syncUI();
+      drawScene();
+    }
+
+    function updateDirectionScenario() {
+      if (presetSelect.value === 'opuestos') {
+        directionModeSelect.value = 'opuestos';
+        motionModeSelect.value = 'mru';
+        x1Input.value = 0;
+        v1Input.value = 20;
+        a1Input.value = 0;
+        x2Input.value = 140;
+        v2Input.value = 15;
+        a2Input.value = 0;
+      } else if (presetSelect.value === 'alcance') {
+        directionModeSelect.value = 'mismo';
+        motionModeSelect.value = 'mru';
+        x1Input.value = 0;
+        v1Input.value = 28;
+        a1Input.value = 0;
+        x2Input.value = 60;
+        v2Input.value = 12;
+        a2Input.value = 0;
+      }
+      readControls();
+      resetSimulation();
+    }
+
+    function readControls() {
+      state.x10 = Number(x1Input.value);
+      state.v10 = Number(v1Input.value);
+      state.a10 = Number(a1Input.value);
+      state.x20 = Number(x2Input.value);
+      state.v20mag = Number(v2Input.value);
+      state.a20mag = Number(a2Input.value);
+      state.motionMode = motionModeSelect.value;
+      state.directionMode = directionModeSelect.value;
+
+      if (state.motionMode === 'mru') {
+        state.a10 = 0;
+        state.a20mag = 0;
+      }
+
+      x1Value.textContent = state.x10.toFixed(1);
+      v1Value.textContent = state.v10.toFixed(1);
+      a1Value.textContent = (state.motionMode === 'mru' ? 0 : state.a10).toFixed(1);
+      x2Value.textContent = state.x20.toFixed(1);
+      v2Value.textContent = state.v20mag.toFixed(1);
+      a2Value.textContent = (state.motionMode === 'mru' ? 0 : state.a20mag).toFixed(1);
+      a1Input.disabled = state.motionMode === 'mru';
+      a2Input.disabled = state.motionMode === 'mru';
+    }
+
+    function buildEquationText() {
+      const useAcc = state.motionMode === 'mrua';
+      const v2 = signedV2();
+      const a2 = useAcc ? signedA2() : 0;
+      const a1 = useAcc ? state.a10 : 0;
+
+      formula1.textContent = useAcc
+        ? `x₁(t) = ${format(state.x10,1)} + ${format(state.v10,1)}·t ${a1 >= 0 ? '+' : '-'} ${format(Math.abs(0.5 * a1),2)}·t²`
+        : `x₁(t) = ${format(state.x10,1)} + ${format(state.v10,1)}·t`;
+
+      formula2.textContent = useAcc
+        ? `x₂(t) = ${format(state.x20,1)} ${v2 >= 0 ? '+' : '-'} ${format(Math.abs(v2),1)}·t ${a2 >= 0 ? '+' : '-'} ${format(Math.abs(0.5 * a2),2)}·t²`
+        : `x₂(t) = ${format(state.x20,1)} ${v2 >= 0 ? '+' : '-'} ${format(Math.abs(v2),1)}·t`;
+
+      const meet = getMeetingData();
+      const A = meet.A || 0;
+      const B = meet.B || 0;
+      const C = meet.C || 0;
+      const left = [];
+
+      if (Math.abs(A) > 1e-9) left.push(`${format(A,2)}·t²`);
+      if (Math.abs(B) > 1e-9) left.push(`${B >= 0 && left.length ? '+ ' : ''}${format(B,2)}·t`);
+      if (Math.abs(C) > 1e-9 || left.length === 0) left.push(`${C >= 0 && left.length ? '+ ' : ''}${format(C,2)}`);
+      meetingFormula.textContent = `Igualando: ${left.join(' ')} = 0`;
+
+      if (meet.infinite) {
+        equationResult.innerHTML = 'Las ecuaciones son idénticas: ambos móviles ocupan siempre la misma posición.';
+      } else if (!meet.meets) {
+        equationResult.innerHTML = 'Con estos datos no aparece ninguna solución real y positiva para t. Por tanto, no hay encuentro físico.';
+      } else if (Math.abs(A) < 1e-9) {
+        equationResult.innerHTML = `Resolviendo la ecuación lineal: t = ${format(meet.time, 2)} s.`;
+      } else {
+        const rootsText = meet.roots.map(r => format(r, 2)).join(' s y t = ') + ' s';
+        equationResult.innerHTML = `Resolviendo la ecuación de segundo grado se obtiene: t = ${rootsText}. Se toma la menor raíz positiva.`;
+      }
+    }
+
+    function syncUI() {
+      readControls();
+      const meet = getMeetingData();
+      const xA = pos1(state.time);
+      const xB = pos2(state.time);
+      const vA = vel1(state.time);
+      const vB = vel2(state.time);
+      const gap = Math.abs(xB - xA);
+
+      timeValue.textContent = format(state.time) + ' s';
+      positionValue.textContent = format(xA, 1) + ' / ' + format(xB, 1) + ' m';
+      velocityValue.textContent = format(vA, 1) + ' / ' + format(vB, 1) + ' m/s';
+      gapValue.textContent = format(gap, 1) + ' m';
+
+      modelSummary.textContent = state.motionMode === 'mru'
+        ? 'En MRU se usan ecuaciones lineales de posición. El encuentro suele resolverse con una ecuación de primer grado.'
+        : 'En MRUA se usan ecuaciones cuadráticas de posición. El encuentro puede requerir resolver una ecuación de segundo grado.';
+
+      buildEquationText();
+
+      if (meet.infinite) {
+        meetYesNo.textContent = 'Coinciden siempre';
+        meetTimeValue.textContent = '0.00 s';
+        meetPosValue.textContent = format(meet.position, 2) + ' m';
+        dist1Value.textContent = '0.00 m';
+        dist2Value.textContent = '0.00 m';
+        pedagogicText.textContent = 'Caso degenerado: ambos tienen exactamente la misma ecuación de movimiento.';
+        statusText.textContent = 'Los dos móviles comparten la misma trayectoria desde el inicio.';
+      } else if (!meet.meets) {
+        meetYesNo.textContent = 'No';
+        meetTimeValue.textContent = '—';
+        meetPosValue.textContent = '—';
+        dist1Value.textContent = '—';
+        dist2Value.textContent = '—';
+        pedagogicText.textContent = 'No basta con que uno vaya rápido: las ecuaciones deben producir una igualdad de posición para un tiempo t ≥ 0.';
+        statusText.textContent = 'Con esta configuración no existe punto de encuentro físico.';
+      } else {
+        meetYesNo.textContent = 'Sí';
+        meetTimeValue.textContent = format(meet.time, 2) + ' s';
+        meetPosValue.textContent = format(meet.position, 2) + ' m';
+        dist1Value.textContent = format(meet.distances[0], 2) + ' m';
+        dist2Value.textContent = format(meet.distances[1], 2) + ' m';
+        pedagogicText.textContent = `En el instante del encuentro ambos tienen la misma posición x(t), aunque no necesariamente la misma velocidad.`;
+        statusText.textContent = state.finished
+          ? 'La animación se ha detenido exactamente en el punto de encuentro.'
+          : 'Existe encuentro. Al iniciar, la animación se detendrá en ese instante.';
+      }
+
+      startBtn.disabled = state.running || meet.infinite;
+      pauseBtn.disabled = !state.running;
+    }
+
+
+    function drawBraceLine(x1, x2, y, color, text) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x1, y);
+      ctx.lineTo(x2, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x1, y - 8);
+      ctx.lineTo(x1, y + 8);
+      ctx.moveTo(x2, y - 8);
+      ctx.lineTo(x2, y + 8);
+      ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.font = 'bold 14px Arial';
+      ctx.fillText(text, (x1 + x2) / 2 - ctx.measureText(text).width / 2, y - 12);
+    }
+
+    function drawCar(x, y, color, facingRight) {
+      ctx.save();
+      ctx.translate(x, y);
+      if (!facingRight) ctx.scale(-1, 1);
+
+      ctx.fillStyle = color;
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(-28, -12, 56, 24, 7);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#bfdbfe';
+      ctx.beginPath();
+      ctx.roundRect(-10, -10, 20, 10, 4);
+      ctx.fill();
+
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(-16, 14, 6, 0, Math.PI * 2);
+      ctx.arc(16, 14, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawScene() {
+      const view = getViewport();
+      const meet = getMeetingData();
+      const w = canvas.width;
+      const h = canvas.height;
+      const roadY = 330;
+      const left = 60;
+      const right = w - 60;
+      const pxPerMeter = (right - left) / (view.maxX - view.minX);
+      const xToPx = x => left + (x - view.minX) * pxPerMeter;
+
+      const xA = pos1(state.time);
+      const xB = pos2(state.time);
+      const vA = vel1(state.time);
+      const vB = vel2(state.time);
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#e0f2fe';
+      ctx.fillRect(0, 0, w, h);
+
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#e0f2fe');
+      grad.addColorStop(1, '#f8fafc');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(0, roadY - 32, w, 110);
+
+      ctx.fillStyle = '#64748b';
+      ctx.fillRect(left - 10, roadY - 8, right - left + 20, 44);
+
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 4;
+      ctx.setLineDash([18, 14]);
+      ctx.beginPath();
+      ctx.moveTo(left, roadY + 14);
+      ctx.lineTo(right, roadY + 14);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      const axisY = 120;
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(left, axisY);
+      ctx.lineTo(right, axisY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(right, axisY);
+      ctx.lineTo(right - 12, axisY - 7);
+      ctx.moveTo(right, axisY);
+      ctx.lineTo(right - 12, axisY + 7);
+      ctx.stroke();
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 15px Arial';
+      ctx.fillText('eje x (m)', right - 70, axisY - 12);
+
+      const tickStep = niceTick((view.maxX - view.minX) / 8);
+      const firstTick = Math.ceil(view.minX / tickStep) * tickStep;
+      for (let x = firstTick; x <= view.maxX; x += tickStep) {
+        const px = xToPx(x);
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(px, axisY - 10);
+        ctx.lineTo(px, roadY + 62);
+        ctx.stroke();
+        ctx.fillStyle = '#475569';
+        ctx.font = '13px Arial';
+        ctx.fillText(String(Math.round(x)), px - 10, axisY - 16);
+      }
+
+      drawCar(xToPx(xA), roadY, '#2563eb', vA >= 0);
+      drawCar(xToPx(xB), roadY + 52, '#dc2626', vB >= 0);
+
+      renderer.drawArrow(xToPx(xA), roadY - 36, xToPx(xA) + clamp(vA * 2.2, -70, 70), roadY - 36, '#2563eb', 'v₁');
+      renderer.drawArrow(xToPx(xB), roadY + 88, xToPx(xB) + clamp(vB * 2.2, -70, 70), roadY + 88, '#dc2626', 'v₂');
+
+      if (state.motionMode === 'mrua') {
+        renderer.drawArrow(xToPx(xA), roadY - 74, xToPx(xA) + clamp(state.a10 * 9, -70, 70), roadY - 74, '#1d4ed8', 'a₁');
+        renderer.drawArrow(xToPx(xB), roadY + 126, xToPx(xB) + clamp(signedA2() * 9, -70, 70), roadY + 126, '#b91c1c', 'a₂');
+      }
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 15px Arial';
+      ctx.fillText('Móvil A', xToPx(xA) - 28, roadY - 54);
+      ctx.fillText('Móvil B', xToPx(xB) - 28, roadY + 112);
+
+      const startAPx = xToPx(state.x10);
+      const startBPx = xToPx(state.x20);
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath();
+      ctx.arc(startAPx, roadY - 100, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.arc(startBPx, roadY - 100, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#334155';
+      ctx.font = '14px Arial';
+      ctx.fillText('x₁₀', startAPx - 10, roadY - 112);
+      ctx.fillText('x₂₀', startBPx - 10, roadY - 112);
+
+      if (meet.meets && !meet.infinite) {
+        const meetPx = xToPx(meet.position);
+        ctx.strokeStyle = '#16a34a';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([8, 8]);
+        ctx.beginPath();
+        ctx.moveTo(meetPx, axisY - 10);
+        ctx.lineTo(meetPx, roadY + 150);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#16a34a';
+        ctx.beginPath();
+        ctx.arc(meetPx, roadY + 26, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.font = 'bold 15px Arial';
+        ctx.fillText('Encuentro', meetPx - 35, roadY + 52);
+
+        if (state.finished) {
+          drawBraceLine(startAPx, meetPx, roadY - 148, '#2563eb', `d₁ = ${format(meet.distances[0], 1)} m`);
+          drawBraceLine(meetPx, startBPx, roadY - 176, '#dc2626', `d₂ = ${format(meet.distances[1], 1)} m`);
+        }
+      }
+
+      const panelX = 640;
+      const panelY = 22;
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      ctx.beginPath();
+      ctx.roundRect(panelX, panelY, 250, 122, 18);
+      ctx.fill();
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 16px Arial';
+      ctx.fillText('Datos instantáneos', panelX + 16, panelY + 24);
+      ctx.font = '14px Arial';
+      ctx.fillText(`t = ${format(state.time, 2)} s`, panelX + 16, panelY + 50);
+      ctx.fillText(`x₁ = ${format(xA, 1)} m`, panelX + 16, panelY + 72);
+      ctx.fillText(`x₂ = ${format(xB, 1)} m`, panelX + 16, panelY + 94);
+      ctx.fillText(`|x₂ - x₁| = ${format(Math.abs(xB - xA), 1)} m`, panelX + 16, panelY + 116);
+
+      ctx.fillStyle = '#475569';
+      ctx.font = 'bold 14px Arial';
+      ctx.fillText(`${motionLabel()} · ${state.directionMode === 'opuestos' ? 'sentidos contrarios' : 'misma dirección'}`, 62, 36);
+    }
+
+    function niceTick(rawStep) {
+      const power = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
+      const norm = rawStep / power;
+      if (norm < 1.5) return 1 * power;
+      if (norm < 3) return 2 * power;
+      if (norm < 7) return 5 * power;
+      return 10 * power;
+    }
+
+    function animate(timestamp) {
+      if (!state.running) return;
+      if (state.lastTimestamp === null) state.lastTimestamp = timestamp;
+      let delta = (timestamp - state.lastTimestamp) / 1000;
+      state.lastTimestamp = timestamp;
+      delta = Math.min(delta, 0.035);
+
+      state.time += delta;
+      const meet = getMeetingData();
+      if (meet.meets && !meet.infinite && state.time >= meet.time) {
+        state.time = meet.time;
+        state.running = false;
+        state.finished = true;
+      } else if (!meet.meets && state.time >= state.simEndTime) {
+        state.time = state.simEndTime;
+        state.running = false;
+        state.finished = true;
+      }
+
+      syncUI();
+      drawScene();
+
+      if (state.running) state.animationId = requestAnimationFrame(animate);
+    }
+
+    [x1Input, v1Input, a1Input, x2Input, v2Input, a2Input, motionModeSelect, directionModeSelect].forEach(el => {
+      el.addEventListener('input', () => {
+        readControls();
+        resetSimulation();
+      });
+      el.addEventListener('change', () => {
+        readControls();
+        resetSimulation();
+      });
+    });
+
+    presetSelect.addEventListener('change', updateDirectionScenario);
+
+    startBtn.addEventListener('click', () => {
+      const meet = getMeetingData();
+      if (meet.infinite) return;
+      state.running = true;
+      state.finished = false;
+      state.lastTimestamp = null;
+      syncUI();
+      state.animationId = requestAnimationFrame(animate);
+    });
+
+    pauseBtn.addEventListener('click', () => {
+      state.running = false;
+      if (state.animationId !== null) {
+        cancelAnimationFrame(state.animationId);
+        state.animationId = null;
+      }
+      syncUI();
+    });
+
+    resetBtn.addEventListener('click', resetSimulation);
+
+    CanvasRenderingContext2D.prototype.roundRect = CanvasRenderingContext2D.prototype.roundRect || function (x, y, w, h, r) {
+      this.beginPath();
+      this.moveTo(x + r, y);
+      this.arcTo(x + w, y, x + w, y + h, r);
+      this.arcTo(x + w, y + h, x, y + h, r);
+      this.arcTo(x, y + h, x, y, r);
+      this.arcTo(x, y, x + w, y, r);
+      this.closePath();
+      return this;
+    };
+
+    updateDirectionScenario();
+    syncUI();
+    drawScene();
+  </script>
+</body>
+</html>

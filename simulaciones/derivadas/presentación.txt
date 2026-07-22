@@ -1,0 +1,35 @@
+<article class="simulation-card">
+  <div class="card-header">
+    <div class="tag-row">
+      <span class="tag bio">Matemáticas</span>
+      <span class="tag js">JavaScript</span>
+    </div>
+
+    <h3>Derivada en un punto: límite de la secante</h3>
+  </div>
+
+  <div class="card-body">
+    <p>
+      Laboratorio virtual para visualizar la derivada en un punto a partir de la definición de límite.
+      Permite representar una función, elegir un punto x, modificar el incremento h y observar cómo
+      la recta secante se aproxima a la recta tangente.
+    </p>
+
+    <ul class="features">
+      <li>Representación de funciones y = f(x).</li>
+      <li>Visualización de Δx, Δy y pendiente secante.</li>
+      <li>Animación del proceso h → 0.</li>
+      <li>Comparación entre secante y tangente.</li>
+    </ul>
+  </div>
+
+  <div class="card-actions">
+    <a class="button primary" href="simulaciones/derivada-limite/">
+      Abrir simulación
+    </a>
+
+    <a class="button secondary" href="simulaciones/derivada-limite/unidad-didactica.html">
+      Ver unidad didáctica
+    </a>
+  </div>
+</article>

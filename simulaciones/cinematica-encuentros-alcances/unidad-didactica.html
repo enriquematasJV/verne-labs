@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unidad didáctica - Encuentros y Alcances</title>
+  <style>
+    :root {
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #d4d4d8;
+      --soft: #f8fafc;
+      --accent: #0f172a;
+      --blue: #2563eb;
+      --red: #dc2626;
+      --green: #16a34a;
+      --orange: #f59e0b;
+      --purple: #7c3aed;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: #ffffff;
+      line-height: 1.6;
+    }
+
+    .page {
+      width: min(100%, 1080px);
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    header {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      margin-bottom: 24px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 44px);
+      line-height: 1.1;
+    }
+
+    h2 {
+      margin-top: 34px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: 25px;
+    }
+
+    h3 {
+      margin-top: 22px;
+      font-size: 19px;
+    }
+
+    p { margin: 10px 0; }
+
+    .subtitle {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 780px;
+    }
+
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 13px;
+      color: var(--text);
+      background: white;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    a.button.primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    a.button:hover { background: #f1f5f9; }
+    a.button.primary:hover { background: #1e293b; }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 18px 0;
+    }
+
+    .card, .situation, .note {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      background: white;
+    }
+
+    .soft { background: var(--soft); }
+
+    .situation { margin: 22px 0; }
+    .situation h3 { margin-top: 0; }
+
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 9px;
+      margin: 2px 4px 2px 0;
+      font-size: 12px;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .tag.blue { background: #dbeafe; color: #1e40af; }
+    .tag.red { background: #fee2e2; color: #991b1b; }
+    .tag.green { background: #dcfce7; color: #166534; }
+    .tag.orange { background: #fef3c7; color: #92400e; }
+    .tag.purple { background: #ede9fe; color: #5b21b6; }
+
+    .question-box {
+      border-left: 4px solid var(--accent);
+      background: var(--soft);
+      padding: 12px 14px;
+      border-radius: 0 12px 12px 0;
+      margin: 14px 0;
+    }
+
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: var(--soft); }
+
+    .note {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #78350f;
+    }
+
+    .formula {
+      font-family: "Courier New", monospace;
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    footer {
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 840px) {
+      .grid { grid-template-columns: 1fr; }
+      .header-top { flex-direction: column; }
+    }
+
+    @media print {
+      .button-row, .header-top > a.button { display: none; }
+      .page { width: 100%; padding: 0; }
+      .card, .situation, header { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1>Unidad didáctica: Encuentros y Alcances</h1>
+          <p class="subtitle">Laboratorio virtual para investigar problemas de cinemática rectilínea con dos móviles: encuentros en sentidos contrarios, alcances en la misma dirección y movimientos con aceleración.</p>
+        </div>
+        <a class="button" href="../../index.html#simulaciones">← Volver a simulaciones</a>
+      </div>
+      <div class="button-row">
+        <a class="button primary" href="./index.html">Abrir simulación</a>
+        <a class="button" href="#situaciones">Situaciones de aprendizaje</a>
+        <a class="button" href="#producto-final">Producto final</a>
+      </div>
+    </header>
+
+    <section>
+      <h2>1. Presentación</h2>
+      <p>En esta unidad vas a utilizar un laboratorio virtual de cinemática para estudiar el movimiento de dos móviles sobre una misma recta. Podrás modificar sus posiciones iniciales, velocidades, aceleraciones y sentidos de movimiento.</p>
+      <p>El objetivo no es simplemente observar una animación, sino investigar: plantear hipótesis, interpretar la escena, escribir las ecuaciones de posición de cada móvil, igualarlas y comprobar visualmente el punto y el instante de encuentro.</p>
+
+      <div class="grid">
+        <div class="card soft">
+          <h3><span class="tag blue">Encuentro</span> Sentidos contrarios</h3>
+          <p>Dos móviles parten de posiciones distintas y avanzan uno hacia el otro hasta coincidir en una misma posición.</p>
+        </div>
+        <div class="card soft">
+          <h3><span class="tag red">Alcance</span> Misma dirección</h3>
+          <p>Un móvil parte por detrás de otro. Si va más rápido, puede alcanzarlo después de cierto tiempo.</p>
+        </div>
+        <div class="card soft">
+          <h3><span class="tag green">MRUA</span> Con aceleración</h3>
+          <p>Cuando hay aceleración, las ecuaciones de posición incluyen el término cuadrático 1/2 · a · t².</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Objetivos de aprendizaje</h2>
+      <ul>
+        <li>Comprender cómo se representa el movimiento rectilíneo de dos móviles.</li>
+        <li>Diferenciar un problema de encuentro de un problema de alcance.</li>
+        <li>Utilizar correctamente el convenio de signos en una recta.</li>
+        <li>Plantear las ecuaciones de posición de ambos móviles.</li>
+        <li>Resolver el instante de encuentro mediante la condición x₁(t) = x₂(t).</li>
+        <li>Interpretar el resultado físico: tiempo, posición y distancia recorrida por cada móvil.</li>
+        <li>Comparar casos de MRU y MRUA.</li>
+        <li>Utilizar la simulación como herramienta de investigación y comprobación.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3. Manejo del laboratorio virtual</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Elemento</th><th>Función</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Escenario base</td><td>Carga situaciones iniciales de encuentro en sentidos contrarios o alcance en la misma dirección.</td></tr>
+            <tr><td>Tipo de movimiento</td><td>Permite elegir entre MRU, con velocidad constante, y MRUA, con aceleración.</td></tr>
+            <tr><td>Sentido relativo</td><td>Indica si los móviles se desplazan en direcciones contrarias o en la misma dirección.</td></tr>
+            <tr><td>Posición inicial x₁(0), x₂(0)</td><td>Define desde qué punto de la recta parte cada móvil.</td></tr>
+            <tr><td>Velocidad inicial v₁, v₂</td><td>Controla la velocidad inicial de cada móvil.</td></tr>
+            <tr><td>Aceleración a₁, a₂</td><td>Solo interviene en MRUA. Permite estudiar movimientos no uniformes.</td></tr>
+            <tr><td>Iniciar / Pausar</td><td>Ejecuta o detiene la simulación para observar el estado del sistema.</td></tr>
+            <tr><td>Panel de ecuaciones</td><td>Muestra las ecuaciones de posición y la igualdad necesaria para resolver el problema.</td></tr>
+            <tr><td>Resultado teórico</td><td>Indica si existe encuentro, el tiempo, la posición y las distancias recorridas.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note"><strong>Antes de ejecutar:</strong> escribe una hipótesis. Indica si crees que los móviles se encontrarán, dónde aproximadamente y cuál recorrerá más distancia.</div>
+    </section>
+
+    <section>
+      <h2>4. Ecuaciones que vas a utilizar</h2>
+      <p>En este laboratorio todo ocurre sobre una recta. Se toma un origen de referencia y, normalmente, el sentido hacia la derecha se considera positivo.</p>
+      <p>En MRU, cada móvil se describe con una ecuación lineal:</p>
+      <div class="formula">x₁(t) = x₁₀ + v₁ · t</div>
+      <div class="formula">x₂(t) = x₂₀ + v₂ · t</div>
+      <p>En MRUA, si hay aceleración, se usa:</p>
+      <div class="formula">x₁(t) = x₁₀ + v₁ · t + 1/2 · a₁ · t²</div>
+      <div class="formula">x₂(t) = x₂₀ + v₂ · t + 1/2 · a₂ · t²</div>
+      <p>La condición fundamental de encuentro o alcance es:</p>
+      <div class="formula">x₁(t) = x₂(t)</div>
+      <p>Al igualar ambas posiciones se obtiene una ecuación en t. Si el tiempo obtenido es positivo, el encuentro tiene sentido físico.</p>
+    </section>
+
+    <section id="situaciones">
+      <h2>5. Situaciones de aprendizaje</h2>
+      <p>Cada situación de aprendizaje funciona como una pequeña investigación dentro del laboratorio. El experimento proporciona el punto de partida, pero el aprendizaje aparece cuando observas, comparas resultados, interpretas los datos y explicas lo que ocurre.</p>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 1: Dos móviles que se encuentran</h3>
+        <p><span class="tag blue">Encuentro</span> <span class="tag">MRU</span> <span class="tag green">x₁ = x₂</span></p>
+        <p><strong>Pregunta inicial:</strong> si dos vehículos salen desde puntos distintos y se mueven uno hacia el otro, ¿en qué punto se cruzarán?</p>
+        <p>Antes de comenzar, estima si el encuentro se producirá cerca del centro o más cerca de uno de los extremos.</p>
+        <ol>
+          <li>Selecciona el escenario de dos móviles en sentidos contrarios.</li>
+          <li>Utiliza movimiento MRU.</li>
+          <li>Configura x₁(0) = 0 m y x₂(0) = 140 m.</li>
+          <li>Prueba con velocidades diferentes para cada móvil.</li>
+          <li>Ejecuta la simulación y observa dónde se detiene.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿En qué posición se encuentran?</li>
+            <li>¿Qué móvil recorre más distancia?</li>
+            <li>¿El encuentro ocurre en el punto medio?</li>
+            <li>¿Qué ecuaciones de posición aparecen en el panel?</li>
+            <li>¿Por qué se igualan las posiciones para resolver el problema?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 2: Alcance en la misma dirección</h3>
+        <p><span class="tag red">Alcance</span> <span class="tag">MRU</span> <span class="tag blue">Velocidad relativa</span></p>
+        <p><strong>Pregunta inicial:</strong> si un vehículo sale detrás de otro pero va más rápido, ¿cuándo lo alcanza?</p>
+        <p>Antes de ejecutar, piensa qué ocurrirá si la diferencia de velocidades es muy pequeña.</p>
+        <ol>
+          <li>Selecciona el escenario de alcance en la misma dirección.</li>
+          <li>Coloca el móvil A detrás del móvil B.</li>
+          <li>Haz que el móvil A tenga mayor velocidad.</li>
+          <li>Ejecuta la simulación.</li>
+          <li>Repite reduciendo la diferencia entre las velocidades.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿Qué ocurre si el móvil de atrás no es más rápido?</li>
+            <li>¿Qué pasa con el tiempo de alcance cuando las velocidades son muy parecidas?</li>
+            <li>¿Qué distancia inicial separa a los móviles?</li>
+            <li>¿Cómo aparece esa distancia en las ecuaciones?</li>
+            <li>¿Por qué el concepto de velocidad relativa ayuda a entender el problema?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 3: Encuentros con aceleración</h3>
+        <p><span class="tag green">MRUA</span> <span class="tag purple">Ecuación cuadrática</span> <span class="tag">Aceleración</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿qué cambia cuando uno o los dos móviles aceleran?</p>
+        <p>Observa cómo la posición ya no cambia de forma lineal con el tiempo.</p>
+        <ol>
+          <li>Selecciona movimiento MRUA.</li>
+          <li>Configura dos móviles con posiciones iniciales distintas.</li>
+          <li>Introduce una aceleración en uno de ellos.</li>
+          <li>Observa la ecuación que aparece al igualar posiciones.</li>
+          <li>Compara el resultado con el caso sin aceleración.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿La ecuación resultante es lineal o cuadrática?</li>
+            <li>¿Puede haber más de una solución matemática?</li>
+            <li>¿Por qué solo tienen sentido físico los tiempos positivos?</li>
+            <li>¿Cómo cambia la posición de encuentro al modificar la aceleración?</li>
+            <li>¿Qué representa físicamente el término 1/2 · a · t²?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 4: ¿Cuándo no hay encuentro?</h3>
+        <p><span class="tag orange">Investigación</span> <span class="tag red">Sin solución física</span> <span class="tag">Hipótesis</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿puede ocurrir que dos móviles nunca lleguen a coincidir?</p>
+        <p>Utiliza el laboratorio para crear configuraciones donde los móviles no se encuentren.</p>
+        <ol>
+          <li>Configura dos móviles en la misma dirección.</li>
+          <li>Haz que el móvil de delante sea igual o más rápido que el de detrás.</li>
+          <li>Observa el resultado teórico.</li>
+          <li>Prueba ahora con aceleraciones que cambien la situación.</li>
+          <li>Compara cuándo aparece o desaparece el encuentro.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿Qué significa que no haya solución positiva para t?</li>
+            <li>¿Puede haber una solución matemática que no tenga sentido físico?</li>
+            <li>¿Cómo se interpreta un tiempo negativo?</li>
+            <li>¿Qué condiciones permiten que vuelva a aparecer un encuentro?</li>
+            <li>¿Por qué la simulación ayuda a entender mejor este caso?</li>
+          </ol>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <h2>6. Recogida de datos</h2>
+      <p>Utiliza la información de la simulación para completar una tabla como esta. Selecciona datos que te ayuden a comparar situaciones distintas.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Prueba</th><th>Tipo</th><th>x₁(0)</th><th>x₂(0)</th><th>v₁</th><th>v₂</th><th>a₁</th><th>a₂</th><th>t encuentro</th><th>x encuentro</th><th>Observaciones</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="producto-final">
+      <h2>7. Producto final</h2>
+      <p>Al finalizar, prepara un breve informe titulado <strong>Cómo resolver problemas de encuentros y alcances</strong>. Debe incluir:</p>
+      <ul>
+        <li>hipótesis inicial,</li>
+        <li>configuración utilizada,</li>
+        <li>datos iniciales de ambos móviles,</li>
+        <li>ecuaciones de posición,</li>
+        <li>igualación x₁(t) = x₂(t),</li>
+        <li>resultado obtenido,</li>
+        <li>interpretación física del tiempo y de la posición de encuentro,</li>
+        <li>conclusión final apoyada en la simulación.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>8. Criterios de valoración</h2>
+      <ul>
+        <li>Formula hipótesis claras antes de experimentar.</li>
+        <li>Utiliza correctamente los controles del laboratorio.</li>
+        <li>Distingue problemas de encuentro y problemas de alcance.</li>
+        <li>Plantea correctamente las ecuaciones de posición de ambos móviles.</li>
+        <li>Interpreta el significado físico de igualar posiciones.</li>
+        <li>Aplica correctamente el convenio de signos.</li>
+        <li>Extrae conclusiones apoyadas en datos y ecuaciones.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>9. Reflexión final</h2>
+      <ol>
+        <li>¿Por qué el encuentro se resuelve igualando posiciones?</li>
+        <li>¿Qué diferencia hay entre cruzarse y alcanzar?</li>
+        <li>¿Qué papel tiene la velocidad relativa en los problemas de alcance?</li>
+        <li>¿Qué cambia al pasar de MRU a MRUA?</li>
+        <li>¿Qué limitaciones tiene este modelo respecto al movimiento real de vehículos?</li>
+      </ol>
+    </section>
+
+    <footer>
+      Laboratorio Virtual de Encuentros y Alcances · Verne Labs
+    </footer>
+  </main>
+</body>
+</html>

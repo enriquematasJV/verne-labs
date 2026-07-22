@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unidad didáctica - Ecología de Poblaciones</title>
+  <style>
+    :root {
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #d4d4d8;
+      --soft: #f8fafc;
+      --accent: #0f172a;
+      --green: #22c55e;
+      --red: #ef4444;
+      --blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: #ffffff;
+      line-height: 1.6;
+    }
+
+    .page {
+      width: min(100%, 1080px);
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    header {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      margin-bottom: 24px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 44px);
+      line-height: 1.1;
+    }
+
+    h2 {
+      margin-top: 34px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: 25px;
+    }
+
+    h3 {
+      margin-top: 22px;
+      font-size: 19px;
+    }
+
+    p { margin: 10px 0; }
+
+    .subtitle {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 780px;
+    }
+
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 13px;
+      color: var(--text);
+      background: white;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    a.button.primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    a.button:hover { background: #f1f5f9; }
+    a.button.primary:hover { background: #1e293b; }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 18px 0;
+    }
+
+    .card, .situation, .note {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      background: white;
+    }
+
+    .soft { background: var(--soft); }
+
+    .situation { margin: 22px 0; }
+    .situation h3 { margin-top: 0; }
+
+    .tag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 9px;
+      margin: 2px 4px 2px 0;
+      font-size: 12px;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .tag.green { background: #dcfce7; color: #166534; }
+    .tag.red { background: #fee2e2; color: #991b1b; }
+    .tag.blue { background: #dbeafe; color: #1e40af; }
+
+    .question-box {
+      border-left: 4px solid var(--accent);
+      background: var(--soft);
+      padding: 12px 14px;
+      border-radius: 0 12px 12px 0;
+      margin: 14px 0;
+    }
+
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: var(--soft); }
+
+    .note {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #78350f;
+    }
+
+    footer {
+      margin-top: 36px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 840px) {
+      .grid { grid-template-columns: 1fr; }
+      .header-top { flex-direction: column; }
+    }
+
+    @media print {
+      .button-row, .header-top > a.button { display: none; }
+      .page { width: 100%; padding: 0; }
+      .card, .situation, header { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="header-top">
+        <div>
+          <h1>Unidad didáctica: Ecología de Poblaciones</h1>
+          <p class="subtitle">Laboratorio virtual con situaciones de aprendizaje para investigar crecimiento, depredación, competencia, estabilidad y comportamiento emergente.</p>
+        </div>
+        <a class="button" href="../../index.html#simulaciones">← Volver a simulaciones</a>
+      </div>
+      <div class="button-row">
+        <a class="button primary" href="./index.html">Abrir simulación</a>
+        <a class="button" href="#situaciones">Situaciones de aprendizaje</a>
+        <a class="button" href="#producto-final">Producto final</a>
+      </div>
+    </header>
+
+    <section>
+      <h2>1. Presentación</h2>
+      <p>En esta unidad vas a utilizar una simulación interactiva para estudiar la dinámica de poblaciones en un ecosistema artificial. Trabajarás con un laboratorio virtual donde tres tipos de organismos interactúan siguiendo reglas simples de movimiento, energía, reproducción y muerte.</p>
+      <p>El objetivo no es simplemente ejecutar una animación, sino investigar: observar, formular hipótesis, cambiar parámetros, analizar gráficas, recoger datos y explicar lo que ocurre.</p>
+
+      <div class="grid">
+        <div class="card soft">
+          <h3><span class="tag green">Verdes</span> Presas</h3>
+          <p>Ganan energía, se reproducen y pierden energía al chocar entre sí. Representan recursos vivos o poblaciones presa.</p>
+        </div>
+        <div class="card soft">
+          <h3><span class="tag red">Rojos</span> Depredadores</h3>
+          <p>Consumen verdes, pierden energía con el tiempo y pueden reproducirse si acumulan suficiente energía.</p>
+        </div>
+        <div class="card soft">
+          <h3><span class="tag blue">Azules</span> Competidores</h3>
+          <p>Actúan como segundo depredador y permiten estudiar la competencia por un mismo recurso.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Objetivos de aprendizaje</h2>
+      <ul>
+        <li>Comprender cómo reglas simples pueden generar comportamientos complejos.</li>
+        <li>Interpretar gráficas temporales de evolución de poblaciones.</li>
+        <li>Relacionar cambios en parámetros locales con cambios globales del sistema.</li>
+        <li>Analizar crecimiento, autorregulación, depredación, competencia y extinción.</li>
+        <li>Formular hipótesis, contrastarlas con datos y elaborar conclusiones.</li>
+        <li>Utilizar una simulación computacional como herramienta de investigación.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3. Manejo del laboratorio virtual</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Elemento</th><th>Función</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Exp. 1, Exp. 2, Exp. 3</td><td>Cargan configuraciones iniciales para investigar fenómenos concretos.</td></tr>
+            <tr><td>Ejecutar / Pausar</td><td>Inicia o detiene la simulación.</td></tr>
+            <tr><td>Reiniciar</td><td>Vuelve a la configuración inicial del experimento seleccionado.</td></tr>
+            <tr><td>Avanzar X ciclos</td><td>Avanza por bloques según el intervalo de toma de datos.</td></tr>
+            <tr><td>+5 verdes, +1 rojo, +1 azul</td><td>Añaden organismos al sistema sin reiniciar la simulación.</td></tr>
+            <tr><td>Coste choque verde-verde</td><td>Modifica la pérdida de energía de los verdes al chocar.</td></tr>
+            <tr><td>Velocidad roja / azul</td><td>Permite comparar el efecto de la movilidad de cada depredador.</td></tr>
+            <tr><td>Zoom gráfico</td><td>Ajusta la escala vertical para observar mejor poblaciones pequeñas.</td></tr>
+            <tr><td>Tabla de datos</td><td>Registra los valores de población cada cierto número de ciclos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note"><strong>Antes de ejecutar:</strong> escribe una hipótesis. Después, compara lo que esperabas con lo que realmente ocurre en la gráfica y en la tabla.</div>
+    </section>
+
+    <section id="situaciones">
+      <h2>4. Situaciones de aprendizaje</h2>
+      <p>Cada situación de aprendizaje funciona como una pequeña investigación dentro del laboratorio virtual. El experimento proporciona el punto de partida, pero el aprendizaje aparece cuando observas, comparas resultados, interpretas datos y explicas lo que ocurre en el sistema.</p>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 1: Crecimiento y autorregulación</h3>
+        <p><span class="tag green">Experimento 1</span> <span class="tag">Crecimiento</span> <span class="tag">Autorregulación</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿puede crecer indefinidamente una población?</p>
+        <p>Antes de comenzar, escribe una hipótesis sobre lo que crees que ocurrirá.</p>
+        <ol>
+          <li>Carga el Experimento 1.</li>
+          <li>Ejecuta la simulación durante varios cientos de ciclos.</li>
+          <li>Observa la gráfica y consulta la tabla de datos.</li>
+          <li>Repite la prueba modificando el coste de choque verde-verde.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿La población verde crece indefinidamente?</li>
+            <li>¿Qué ocurre cuando aumenta la densidad de verdes?</li>
+            <li>¿Cómo cambia el resultado con coste -0.5, -1 o -2?</li>
+            <li>¿Aparece algún equilibrio o saturación?</li>
+            <li>¿Qué significa que una población se autorregule?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 2: Relación depredador-presa</h3>
+        <p><span class="tag red">Experimento 2</span> <span class="tag">Depredación</span> <span class="tag">Oscilaciones</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿cómo afecta un depredador a una población de presas?</p>
+        <p>Intenta anticipar qué ocurrirá antes de ejecutar la simulación.</p>
+        <ol>
+          <li>Carga el Experimento 2.</li>
+          <li>Observa la evolución de verdes y rojos.</li>
+          <li>Modifica la velocidad roja.</li>
+          <li>Compara los resultados obtenidos.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿Qué población aumenta primero?</li>
+            <li>¿Los máximos de rojos coinciden con los máximos de verdes?</li>
+            <li>¿Qué ocurre cuando quedan pocos verdes?</li>
+            <li>¿Una mayor velocidad del depredador siempre es ventajosa?</li>
+            <li>¿Qué configuración parece más estable?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 3: Competencia entre depredadores</h3>
+        <p><span class="tag blue">Experimento 3</span> <span class="tag">Competencia</span> <span class="tag">Dominancia</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿qué ocurre cuando dos depredadores compiten por el mismo recurso?</p>
+        <p>Observa si uno de los depredadores termina dominando el sistema o si ambos pueden coexistir.</p>
+        <ol>
+          <li>Carga el Experimento 3.</li>
+          <li>Observa la evolución de rojos y azules.</li>
+          <li>Prueba distintas velocidades para cada depredador.</li>
+          <li>Registra qué especie domina en cada caso.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿Pueden coexistir rojos y azules?</li>
+            <li>¿Qué especie domina con la configuración inicial?</li>
+            <li>¿Qué ocurre si los azules son más rápidos?</li>
+            <li>¿Qué ocurre si los rojos son más rápidos?</li>
+            <li>¿Influye más la velocidad o la energía inicial?</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="situation">
+        <h3>Situación de aprendizaje 4: Perturbaciones e investigación libre</h3>
+        <p><span class="tag">Investigación</span> <span class="tag">Resiliencia</span> <span class="tag">Hipótesis</span></p>
+        <p><strong>Pregunta inicial:</strong> ¿cómo responde un ecosistema ante una perturbación?</p>
+        <p>Utiliza el laboratorio como un entorno de investigación y prueba diferentes intervenciones.</p>
+        <ol>
+          <li>Ejecuta cualquiera de los experimentos anteriores.</li>
+          <li>Espera hasta observar una tendencia clara.</li>
+          <li>Añade organismos con los botones: +5 verdes, +1 rojo o +1 azul.</li>
+          <li>Observa si el sistema se recupera, oscila o colapsa.</li>
+        </ol>
+        <div class="question-box">
+          <strong>Preguntas guía:</strong>
+          <ol>
+            <li>¿El sistema vuelve a una situación parecida a la anterior?</li>
+            <li>¿Una pequeña perturbación puede alterar todo el sistema?</li>
+            <li>¿Qué ocurre al añadir depredadores cuando hay pocas presas?</li>
+            <li>¿Qué ocurre al añadir verdes cuando casi no quedan presas?</li>
+            <li>¿Qué significa resiliencia ecológica?</li>
+          </ol>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <h2>5. Recogida de datos</h2>
+      <p>Utiliza la tabla de la aplicación para seleccionar datos relevantes. También puedes copiar algunos valores en una tabla de trabajo como esta:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Ciclo</th><th>Verdes</th><th>Rojos</th><th>Azules</th><th>Observaciones</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>50</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>100</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>200</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>300</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>500</td><td></td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="producto-final">
+      <h2>6. Producto final</h2>
+      <p>Al finalizar, prepara un breve informe de investigación con:</p>
+      <ul>
+        <li>hipótesis inicial,</li>
+        <li>experimento o configuración utilizada,</li>
+        <li>datos observados,</li>
+        <li>descripción de la gráfica,</li>
+        <li>explicación de los resultados,</li>
+        <li>conclusión final.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>7. Criterios de valoración</h2>
+      <ul>
+        <li>Formula hipótesis claras antes de experimentar.</li>
+        <li>Utiliza correctamente la simulación y sus controles.</li>
+        <li>Interpreta gráficas y datos de forma razonada.</li>
+        <li>Relaciona cambios de parámetros con cambios en el sistema.</li>
+        <li>Explica fenómenos como crecimiento, competencia, depredación o extinción.</li>
+        <li>Extrae conclusiones apoyadas en evidencias.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>8. Reflexión final</h2>
+      <ol>
+        <li>¿El comportamiento global del sistema estaba programado directamente?</li>
+        <li>¿Qué significa comportamiento emergente?</li>
+        <li>¿Qué parecidos tiene esta simulación con un ecosistema real?</li>
+        <li>¿Qué limitaciones tiene el modelo?</li>
+        <li>¿Podrían aplicarse ideas similares a epidemias, economía, tráfico o redes sociales?</li>
+      </ol>
+    </section>
+
+    <footer>
+      Laboratorio Virtual de Ecología de Poblaciones · Verne Labs
+    </footer>
+  </main>
+</body>
+</html>

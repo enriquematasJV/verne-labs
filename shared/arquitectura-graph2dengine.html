@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arquitectura: Fragmentada → Unificada (Graph2DEngine)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      padding: 20px;
+      overflow: hidden;
+    }
+    .container {
+      max-width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .header {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px #0001;
+    }
+    h1 {
+      color: #172554;
+      margin-bottom: 8px;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+      color: #64748b;
+    }
+    .controls button {
+      padding: 6px 12px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .controls button:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+    .canvas-container {
+      flex: 1;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px #0001;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    svg {
+      max-width: none;
+    }
+    .zoom-info {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      background: #172554;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📊 Arquitectura: Fragmentada → Unificada</h1>
+      <div class="controls">
+        <span>🖱️ Rueda del ratón para zoom | Arrastra para panear</span>
+        <button onclick="resetZoom()">↺ Reset</button>
+        <button onclick="zoomTo(1)">100%</button>
+        <button onclick="zoomTo(1.5)">150%</button>
+        <button onclick="zoomTo(2)">200%</button>
+      </div>
+    </div>
+    <div class="canvas-container" id="canvas">
+      <svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg" id="diagram">
+        <defs>
+          <style>
+            .title { font-size: 18px; font-weight: 700; fill: #172554; }
+            .subtitle { font-size: 14px; font-weight: 600; fill: #475569; }
+            .label { font-size: 11px; font-weight: 600; fill: #334155; }
+            .box { stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+            .old-box { stroke: #fca5a5; fill: #fef2f2; }
+            .new-box { stroke: #86efac; fill: #f0fdf4; }
+            .generic-box { stroke: #93c5fd; fill: #eff6ff; }
+            .arrow { stroke: #cbd5e1; stroke-width: 2; marker-end: url(#arrow); fill: none; }
+            .arrow-replace { stroke: #f97316; stroke-width: 2.5; marker-end: url(#arrow-replace); fill: none; }
+            .comment { font-size: 10px; fill: #64748b; font-style: italic; }
+          </style>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+            <polygon points="0 0, 10 3, 0 6" fill="#cbd5e1"/>
+          </marker>
+          <marker id="arrow-replace" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+            <polygon points="0 0, 10 3, 0 6" fill="#f97316"/>
+          </marker>
+        </defs>
+
+        <!-- ANTES -->
+        <text x="50" y="30" class="title">ANTES (Fragmentado)</text>
+
+        <!-- Nivel bajo -->
+        <rect x="20" y="60" width="120" height="60" class="box generic-box" rx="6"/>
+        <text x="80" y="85" class="label" text-anchor="middle">Canvas2D</text>
+        <text x="80" y="100" class="comment" text-anchor="middle">Primitivas</text>
+
+        <!-- Nivel intermedio -->
+        <rect x="170" y="60" width="120" height="60" class="box old-box" rx="6"/>
+        <text x="230" y="85" class="label" text-anchor="middle">ChartRenderer</text>
+        <text x="230" y="100" class="comment" text-anchor="middle">Series temp</text>
+
+        <rect x="320" y="60" width="120" height="60" class="box old-box" rx="6"/>
+        <text x="380" y="85" class="label" text-anchor="middle">GraphNavigator</text>
+        <text x="380" y="100" class="comment" text-anchor="middle">Pan/zoom</text>
+
+        <!-- Nivel labs -->
+        <text x="50" y="180" class="subtitle">Labs (cada uno su forma):</text>
+
+        <rect x="20" y="200" width="110" height="70" class="box old-box" rx="6"/>
+        <text x="75" y="220" class="label" text-anchor="middle">Derivadas</text>
+        <text x="75" y="235" class="comment" text-anchor="middle">Canvas +</text>
+        <text x="75" y="248" class="comment" text-anchor="middle">Navigator</text>
+
+        <rect x="160" y="200" width="110" height="70" class="box old-box" rx="6"/>
+        <text x="215" y="220" class="label" text-anchor="middle">Ecología</text>
+        <text x="215" y="235" class="comment" text-anchor="middle">ChartRenderer</text>
+        <text x="215" y="248" class="comment" text-anchor="middle">+ canvas</text>
+
+        <rect x="300" y="200" width="110" height="70" class="box old-box" rx="6"/>
+        <text x="355" y="220" class="label" text-anchor="middle">Cinemática</text>
+        <text x="355" y="235" class="comment" text-anchor="middle">Canvas 2D</text>
+        <text x="355" y="248" class="comment" text-anchor="middle">inline</text>
+
+        <rect x="440" y="200" width="110" height="70" class="box old-box" rx="6"/>
+        <text x="495" y="220" class="label" text-anchor="middle">Resonancia</text>
+        <text x="495" y="235" class="comment" text-anchor="middle">Funciones</text>
+        <text x="495" y="248" class="comment" text-anchor="middle">custom</text>
+
+        <!-- Problemas -->
+        <text x="50" y="330" class="subtitle">❌ Problemas:</text>
+        <text x="50" y="350" class="comment">• Cada lab reimplementa gráficas</text>
+        <text x="50" y="368" class="comment">• ChartRenderer solo para series temporales</text>
+        <text x="50" y="386" class="comment">• GraphNavigator no en todos lados</text>
+        <text x="50" y="404" class="comment">• Código duplicado de pan/zoom</text>
+        <text x="50" y="422" class="comment">• Imposible mezclar tipos de gráficas</text>
+
+        <!-- DESPUÉS -->
+        <text x="600" y="30" class="title">DESPUÉS (Unificado)</text>
+
+        <!-- Nivel bajo -->
+        <rect x="570" y="60" width="120" height="60" class="box generic-box" rx="6"/>
+        <text x="630" y="85" class="label" text-anchor="middle">Canvas2D</text>
+        <text x="630" y="100" class="comment" text-anchor="middle">Primitivas</text>
+
+        <!-- NUEVO: Nivel intermedio unificado -->
+        <rect x="530" y="160" width="280" height="80" class="box new-box" rx="8" stroke-width="3"/>
+        <text x="670" y="185" class="label" text-anchor="middle" font-size="13" font-weight="700">Graph2DEngine (NUEVO)</text>
+        <text x="670" y="205" class="comment" text-anchor="middle">funciones + series + parametrizada + scatter + trayectorias</text>
+        <text x="670" y="220" class="comment" text-anchor="middle">pan/zoom/autoScale integrados</text>
+
+        <!-- GraphNavigator se engancha -->
+        <rect x="570" y="280" width="120" height="60" class="box generic-box" rx="6"/>
+        <text x="630" y="305" class="label" text-anchor="middle">GraphNavigator</text>
+        <text x="630" y="320" class="comment" text-anchor="middle">Pan/zoom UI</text>
+
+        <path d="M 630 280 L 630 240" class="arrow"/>
+        <text x="640" y="265" class="comment">se engancha</text>
+
+        <!-- Labs: todos usan lo mismo -->
+        <text x="600" y="400" class="subtitle">Labs (todos reutilizan):</text>
+
+        <rect x="570" y="420" width="110" height="70" class="box new-box" rx="6"/>
+        <text x="625" y="440" class="label" text-anchor="middle">Derivadas</text>
+        <text x="625" y="455" class="comment" text-anchor="middle">addFunction</text>
+        <text x="625" y="468" class="comment" text-anchor="middle">Plot</text>
+
+        <rect x="710" y="420" width="110" height="70" class="box new-box" rx="6"/>
+        <text x="765" y="440" class="label" text-anchor="middle">Ecología</text>
+        <text x="765" y="455" class="comment" text-anchor="middle">addMultiTime</text>
+        <text x="765" y="468" class="comment" text-anchor="middle">SeriesPlot</text>
+
+        <rect x="850" y="420" width="110" height="70" class="box new-box" rx="6"/>
+        <text x="905" y="440" class="label" text-anchor="middle">Cinemática</text>
+        <text x="905" y="455" class="comment" text-anchor="middle">addDynamic</text>
+        <text x="905" y="468" class="comment" text-anchor="middle">Trajectory</text>
+
+        <!-- Flechas de labs a Graph2DEngine -->
+        <path d="M 625 420 L 625 240" class="arrow"/>
+        <path d="M 765 420 L 670 240" class="arrow"/>
+        <path d="M 905 420 L 680 240" class="arrow"/>
+
+        <!-- Beneficios -->
+        <text x="600" y="550" class="subtitle">✓ Beneficios:</text>
+        <text x="600" y="570" class="comment">• Un solo módulo para todas las gráficas</text>
+        <text x="600" y="588" class="comment">• Mismo API: addFunctionPlot(), addScatterPlot(), etc.</text>
+        <text x="600" y="606" class="comment">• Pan/zoom automático en todos lados</text>
+        <text x="600" y="624" class="comment">• Combina múltiples tipos en una pantalla</text>
+        <text x="600" y="642" class="comment">• Auto-escala según datos</text>
+        <text x="600" y="660" class="comment">• Reutilización máxima</text>
+
+        <!-- Comparación lado a lado -->
+        <text x="50" y="550" class="subtitle">Antes vs Después:</text>
+
+        <rect x="20" y="570" width="240" height="200" class="box old-box" rx="6"/>
+        <text x="140" y="595" class="label" text-anchor="middle" font-weight="700">ANTES</text>
+        <text x="30" y="620" class="comment">// Ecología</text>
+        <text x="30" y="635" class="comment">const renderer = new</text>
+        <text x="30" y="650" class="comment">  Canvas2DRenderer(c)</text>
+        <text x="30" y="665" class="comment">// + código custom de</text>
+        <text x="30" y="680" class="comment">gráficas</text>
+        <text x="30" y="700" class="comment">// Derivadas</text>
+        <text x="30" y="715" class="comment">// Diferente código</text>
+        <text x="30" y="730" class="comment">// + GraphNavigator</text>
+        <text x="30" y="745" class="comment">// + Canvas2D</text>
+
+        <rect x="300" y="570" width="240" height="200" class="box new-box" rx="6"/>
+        <text x="420" y="595" class="label" text-anchor="middle" font-weight="700">DESPUÉS</text>
+        <text x="310" y="620" class="comment">// Ecología</text>
+        <text x="310" y="635" class="comment">const graph = new</text>
+        <text x="310" y="650" class="comment">  Graph2DEngine(c)</text>
+        <text x="310" y="665" class="comment">graph.add</text>
+        <text x="310" y="680" class="comment">  MultiTimeSeriesPlot</text>
+        <text x="310" y="700" class="comment">// Derivadas</text>
+        <text x="310" y="715" class="comment">const graph = new</text>
+        <text x="310" y="730" class="comment">  Graph2DEngine(c)</text>
+        <text x="310" y="745" class="comment">graph.addFunctionPlot</text>
+
+        <!-- Flecha de reemplazo -->
+        <path d="M 270 670 L 300 670" class="arrow-replace" stroke-dasharray="5,5"/>
+      </svg>
+      <div class="zoom-info">
+        Zoom: <span id="zoomLevel">100%</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentZoom = 1;
+    const svg = document.getElementById('diagram');
+    const canvas = document.getElementById('canvas');
+    let isPanning = false;
+    let panX = 0;
+    let panY = 0;
+
+    // Zoom con rueda del ratón
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const factor = e.deltaY > 0 ? 0.9 : 1.1;
+      zoomTo(currentZoom * factor);
+    });
+
+    // Pan con arrastre
+    canvas.addEventListener('mousedown', (e) => {
+      isPanning = true;
+      panX = e.clientX;
+      panY = e.clientY;
+      canvas.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isPanning) return;
+      const deltaX = (e.clientX - panX) * 2;
+      const deltaY = (e.clientY - panY) * 2;
+      canvas.scrollLeft -= deltaX;
+      canvas.scrollTop -= deltaY;
+      panX = e.clientX;
+      panY = e.clientY;
+    });
+
+    document.addEventListener('mouseup', () => {
+      isPanning = false;
+      canvas.style.cursor = 'grab';
+    });
+
+    function zoomTo(zoom) {
+      currentZoom = Math.max(0.5, Math.min(3, zoom));
+      svg.style.transform = `scale(${currentZoom})`;
+      svg.style.transformOrigin = 'top left';
+      document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
+    }
+
+    function resetZoom() {
+      currentZoom = 1;
+      svg.style.transform = 'scale(1)';
+      canvas.scrollLeft = 0;
+      canvas.scrollTop = 0;
+      document.getElementById('zoomLevel').textContent = '100%';
+    }
+
+    canvas.style.cursor = 'grab';
+  </script>
+</body>
+</html>

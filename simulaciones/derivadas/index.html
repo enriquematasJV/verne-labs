@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulación: derivada como límite</title>
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d9dee8;
+      --accent: #2563eb;
+      --accent2: #dc2626;
+      --green: #059669;
+      --orange: #ea580c;
+      --purple: #7c3aed;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+      color: #0f172a;
+    }
+
+    .page-header {
+      width: min(calc(100% - 36px), 1364px);
+      margin: 24px auto 0;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 20px;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    .page-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 850px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: #0f172a;
+      background: white;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .back-link:hover {
+      background: #f1f5f9;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(620px, 1fr) 360px;
+      gap: 18px;
+      padding: 18px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .canvas-card,
+    .controls-card,
+    .info-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+    }
+
+    .canvas-card {
+      padding: 14px;
+      min-height: 620px;
+    }
+
+    .explanation-box {
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border: 1px solid #dbeafe;
+      background: #eff6ff;
+      color: #1e3a8a;
+      border-radius: 14px;
+      line-height: 1.45;
+      font-size: 0.95rem;
+    }
+
+    .explanation-box strong {
+      color: #1d4ed8;
+    }
+
+    canvas {
+      width: 100%;
+      height: 620px;
+      display: block;
+      border-radius: 14px;
+      background: #ffffff;
+      border: 1px solid #eef1f6;
+    }
+
+    aside {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .controls-card,
+    .info-card {
+      padding: 16px;
+    }
+
+    .section-title {
+      font-weight: 750;
+      margin: 0 0 12px;
+      font-size: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 650;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .control {
+      margin-bottom: 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .value-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin-top: 4px;
+    }
+
+    .value-line strong {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 11px;
+      padding: 9px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+    }
+
+    button.secondary {
+      background: #eef2ff;
+      color: #3730a3;
+    }
+
+    button.ghost {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .formula-box {
+      background: #f9fafb;
+      border: 1px solid #edf0f5;
+      border-radius: 14px;
+      padding: 12px;
+      line-height: 1.55;
+      font-size: 0.95rem;
+    }
+
+    .formula-box code {
+      background: #eef2ff;
+      color: #1e3a8a;
+      padding: 2px 5px;
+      border-radius: 6px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .metric {
+      border: 1px solid #edf0f5;
+      background: #fbfcfe;
+      border-radius: 14px;
+      padding: 10px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-bottom: 4px;
+    }
+
+    .metric strong {
+      font-size: 1rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .legend {
+      display: grid;
+      gap: 7px;
+      margin-top: 10px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .swatch {
+      width: 18px;
+      height: 4px;
+      border-radius: 99px;
+      display: inline-block;
+      background: #111;
+    }
+
+    .error {
+      display: none;
+      color: #991b1b;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 9px 10px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      line-height: 1.4;
+      margin-top: 8px;
+    }
+
+    details {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    details summary {
+      cursor: pointer;
+      color: var(--text);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 1050px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .canvas-card {
+        min-height: 520px;
+      }
+
+      canvas {
+        height: 520px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <div>
+      <h1>Simulación de Derivada en un Punto</h1>
+      <p>
+        Laboratorio virtual para visualizar la derivada como límite de la pendiente secante cuando el incremento <strong>h</strong> tiende a cero.
+      </p>
+    </div>
+    <a class="back-link" href="../../index.html#simulaciones">← Volver a simulaciones</a>
+  </header>
+
+  <main>
+    <section class="canvas-card">
+      <div class="explanation-box">
+        <strong>¿Qué es h?</strong> En esta simulación, <strong>h</strong> es un pequeño desplazamiento horizontal desde el punto <strong>x</strong> hasta el punto <strong>x + h</strong>. Al principio compara dos puntos separados de la curva; cuando <strong>h</strong> se hace cada vez más pequeño, esos dos puntos se acercan y la recta secante se aproxima a la recta tangente.
+        <br /><br />
+        <strong>Navegación:</strong> arrastra el gráfico para desplazarte y usa la rueda del ratón (o el pellizco en pantalla táctil) para hacer zoom.
+      </div>
+      <canvas id="graph" width="1100" height="720" aria-label="Gráfica de la derivada como límite"></canvas>
+    </section>
+
+    <aside>
+      <section class="controls-card">
+        <h2 class="section-title">Controles</h2>
+
+        <div class="control">
+          <label for="functionInput">Función y = f(x)</label>
+          <input id="functionInput" type="text" value="x^2" spellcheck="false" />
+          <div class="button-row">
+            <button class="secondary" data-fn="x^2">x²</button>
+            <button class="secondary" data-fn="sin(x)">sin(x)</button>
+            <button class="secondary" data-fn="cos(x)">cos(x)</button>
+            <button class="secondary" data-fn="x^3 - 2*x">x³ - 2x</button>
+            <button class="secondary" data-fn="exp(0.4*x)">exp(0.4x)</button>
+          </div>
+          <div id="errorBox" class="error"></div>
+        </div>
+
+        <div class="row">
+          <div class="control">
+            <label for="xPoint">Punto x</label>
+            <input id="xPoint" type="number" value="1" step="0.1" />
+          </div>
+          <div class="control">
+            <label for="viewScale">Escala inicial</label>
+            <select id="viewScale">
+              <option value="4">±4</option>
+              <option value="6" selected>±6</option>
+              <option value="10">±10</option>
+              <option value="15">±15</option>
+              <option value="25">±25</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control">
+          <label for="zoomSlider">Escala / zoom de la vista</label>
+          <input id="zoomSlider" type="range" min="2" max="30" step="0.1" value="6" />
+          <div class="value-line"><span>Ventana visible</span><strong id="zoomValue">±6.0000</strong></div>
+        </div>
+
+        <div class="control">
+          <label for="originSlider">Trasladar origen horizontal</label>
+          <input id="originSlider" type="range" min="-20" max="20" step="0.1" value="0" />
+          <div class="value-line"><span>Centro de la vista</span><strong id="originValue">0.0000</strong></div>
+        </div>
+
+        <div class="control">
+          <label for="hSlider">Incremento h</label>
+          <input id="hSlider" type="range" min="-3" max="3" step="0.001" value="1.5" />
+          <div class="value-line"><span>h actual</span><strong id="hValue">1.5000</strong></div>
+        </div>
+
+        <div class="button-row">
+          <button id="towardsZeroBtn">Animar h → 0</button>
+          <button id="pauseBtn" class="ghost">Pausar</button>
+          <button id="resetBtn" class="ghost">Reiniciar</button>
+        </div>
+
+        <details>
+          <summary>Sintaxis admitida</summary>
+          Puedes escribir expresiones como <code>x^2</code>, <code>sin(x)</code>, <code>cos(x)</code>, <code>tan(x)</code>, <code>sqrt(x)</code>, <code>abs(x)</code>, <code>log(x)</code> (base 10), <code>ln(x)</code> (natural), <code>exp(x)</code>, <code>pi</code> y <code>e</code>. La multiplicación puede escribirse de forma explícita (<code>2*x</code>) o implícita (<code>2x</code>, <code>3(x+1)</code>).
+        </details>
+      </section>
+
+      <section class="info-card">
+        <h2 class="section-title">Lectura matemática</h2>
+        <div class="formula-box">
+          Pendiente secante:<br />
+          <code>m(h) = [f(x+h) - f(x)] / h</code><br /><br />
+          Derivada en el punto:<br />
+          <code>f'(x) = lim h→0 [f(x+h) - f(x)] / h</code>
+        </div>
+
+        <div class="metrics">
+          <div class="metric"><span>x</span><strong id="metricX">1.0000</strong></div>
+          <div class="metric"><span>x + h</span><strong id="metricXH">2.5000</strong></div>
+          <div class="metric"><span>f(x)</span><strong id="metricFX">1.0000</strong></div>
+          <div class="metric"><span>f(x+h)</span><strong id="metricFXH">6.2500</strong></div>
+          <div class="metric"><span>Δx = h</span><strong id="metricDX">1.5000</strong></div>
+          <div class="metric"><span>Δy</span><strong id="metricDY">5.2500</strong></div>
+          <div class="metric"><span>m secante</span><strong id="metricM">3.5000</strong></div>
+          <div class="metric"><span>m tangente aprox.</span><strong id="metricTangent">2.0000</strong></div>
+        </div>
+
+        <div class="legend">
+          <div class="legend-item"><span class="swatch" style="background: var(--accent);"></span> Función f(x)</div>
+          <div class="legend-item"><span class="swatch" style="background: var(--accent2);"></span> Recta secante entre x y x+h</div>
+          <div class="legend-item"><span class="swatch" style="background: var(--green);"></span> Recta tangente aproximada en x</div>
+          <div class="legend-item"><span class="swatch" style="background: var(--orange);"></span> Triángulo de incrementos Δx y Δy</div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <script src="../../shared/js/math/math-parser.js"></script>
+  <script src="../../shared/js/ui/graph-navigator.js"></script>
+  <script>
+    const canvas = document.getElementById('graph');
+    const ctx = canvas.getContext('2d');
+
+    const functionInput = document.getElementById('functionInput');
+    const xPointInput = document.getElementById('xPoint');
+    const hSlider = document.getElementById('hSlider');
+    const hValue = document.getElementById('hValue');
+    const viewScale = document.getElementById('viewScale');
+    const zoomSlider = document.getElementById('zoomSlider');
+    const zoomValue = document.getElementById('zoomValue');
+    const originSlider = document.getElementById('originSlider');
+    const originValue = document.getElementById('originValue');
+    const errorBox = document.getElementById('errorBox');
+
+    const metricX = document.getElementById('metricX');
+    const metricXH = document.getElementById('metricXH');
+    const metricFX = document.getElementById('metricFX');
+    const metricFXH = document.getElementById('metricFXH');
+    const metricDX = document.getElementById('metricDX');
+    const metricDY = document.getElementById('metricDY');
+    const metricM = document.getElementById('metricM');
+    const metricTangent = document.getElementById('metricTangent');
+
+    const towardsZeroBtn = document.getElementById('towardsZeroBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let animationId = null;
+    let animating = false;
+
+    const state = {
+      margin: 52,
+      xMin: -6,
+      xMax: 6,
+      yMin: -6,
+      yMax: 6,
+      compiled: null,
+      lastValidExpression: 'x^2',
+      manualView: false
+    };
+
+    function compileFunction() {
+      const raw = functionInput.value.trim() || 'x^2';
+      return VerneMath.compile(raw);
+    }
+
+    function safeEval(x) {
+      return VerneMath.safeEvaluate(state.compiled, x);
+    }
+
+    function resizeBackingCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function W() { return canvas.getBoundingClientRect().width; }
+    function H() { return canvas.getBoundingClientRect().height; }
+
+    function toScreenX(x) {
+      return state.margin + (x - state.xMin) / (state.xMax - state.xMin) * (W() - 2 * state.margin);
+    }
+
+    function toScreenY(y) {
+      return H() - state.margin - (y - state.yMin) / (state.yMax - state.yMin) * (H() - 2 * state.margin);
+    }
+
+    function toWorldX(px) {
+      return state.xMin + (px - state.margin) / (W() - 2 * state.margin) * (state.xMax - state.xMin);
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, W(), H());
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W(), H());
+
+      const xStep = niceStep((state.xMax - state.xMin) / 12);
+      const yStep = niceStep((state.yMax - state.yMin) / 10);
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#eef1f6';
+      ctx.fillStyle = '#8b95a7';
+      ctx.font = '12px system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+
+      for (let x = Math.ceil(state.xMin / xStep) * xStep; x <= state.xMax; x += xStep) {
+        const px = toScreenX(x);
+        ctx.beginPath();
+        ctx.moveTo(px, state.margin);
+        ctx.lineTo(px, H() - state.margin);
+        ctx.stroke();
+        if (Math.abs(x) > 1e-9) ctx.fillText(formatShort(x), px, H() - state.margin + 8);
+      }
+
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for (let y = Math.ceil(state.yMin / yStep) * yStep; y <= state.yMax; y += yStep) {
+        const py = toScreenY(y);
+        ctx.beginPath();
+        ctx.moveTo(state.margin, py);
+        ctx.lineTo(W() - state.margin, py);
+        ctx.stroke();
+        if (Math.abs(y) > 1e-9) ctx.fillText(formatShort(y), state.margin - 8, py);
+      }
+
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.4;
+      if (state.yMin <= 0 && state.yMax >= 0) {
+        const y0 = toScreenY(0);
+        ctx.beginPath();
+        ctx.moveTo(state.margin, y0);
+        ctx.lineTo(W() - state.margin, y0);
+        ctx.stroke();
+      }
+
+      if (state.xMin <= 0 && state.xMax >= 0) {
+        const x0 = toScreenX(0);
+        ctx.beginPath();
+        ctx.moveTo(x0, state.margin);
+        ctx.lineTo(x0, H() - state.margin);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#64748b';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText('x', W() - state.margin + 12, toScreenY(0) - 8);
+      ctx.fillText('y', toScreenX(0) + 8, state.margin - 26);
+    }
+
+    function niceStep(raw) {
+      const power = Math.pow(10, Math.floor(Math.log10(raw)));
+      const normalized = raw / power;
+      if (normalized < 1.5) return power;
+      if (normalized < 3.5) return 2 * power;
+      if (normalized < 7.5) return 5 * power;
+      return 10 * power;
+    }
+
+    function drawFunction() {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(state.margin, state.margin, W() - 2 * state.margin, H() - 2 * state.margin);
+      ctx.clip();
+
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+
+      let drawing = false;
+      const samples = 900;
+      for (let i = 0; i <= samples; i++) {
+        const px = state.margin + i / samples * (W() - 2 * state.margin);
+        const x = toWorldX(px);
+        const y = safeEval(x);
+        const py = toScreenY(y);
+
+        const visible = Number.isFinite(y) && py > -10000 && py < 10000;
+        if (!visible) {
+          drawing = false;
+          continue;
+        }
+
+        if (!drawing) {
+          ctx.moveTo(px, py);
+          drawing = true;
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function derivativeApprox(x) {
+      const eps = Math.max(1e-5, (state.xMax - state.xMin) / 100000);
+      const y1 = safeEval(x + eps);
+      const y0 = safeEval(x - eps);
+      if (!Number.isFinite(y1) || !Number.isFinite(y0)) return NaN;
+      return (y1 - y0) / (2 * eps);
+    }
+
+    function drawLineThroughPoint(x, y, slope, color, dashed = false) {
+      if (!Number.isFinite(slope)) return;
+      const xA = state.xMin;
+      const xB = state.xMax;
+      const yA = y + slope * (xA - x);
+      const yB = y + slope * (xB - x);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(state.margin, state.margin, W() - 2 * state.margin, H() - 2 * state.margin);
+      ctx.clip();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.2;
+      if (dashed) ctx.setLineDash([8, 7]);
+      ctx.beginPath();
+      ctx.moveTo(toScreenX(xA), toScreenY(yA));
+      ctx.lineTo(toScreenX(xB), toScreenY(yB));
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawPoint(x, y, color, label, dx = 8, dy = -12) {
+      const px = toScreenX(x);
+      const py = toScreenY(y);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(px, py, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.font = '13px system-ui';
+      ctx.fillStyle = color;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, px + dx, py + dy);
+    }
+
+    function drawTriangle(x, fx, xh, fxh) {
+      const px1 = toScreenX(x);
+      const py1 = toScreenY(fx);
+      const px2 = toScreenX(xh);
+      const py2 = toScreenY(fxh);
+      const pyHorizontal = py1;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(state.margin, state.margin, W() - 2 * state.margin, H() - 2 * state.margin);
+      ctx.clip();
+
+      ctx.fillStyle = 'rgba(234, 88, 12, 0.12)';
+      ctx.strokeStyle = '#ea580c';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([]);
+
+      ctx.beginPath();
+      ctx.moveTo(px1, py1);
+      ctx.lineTo(px2, pyHorizontal);
+      ctx.lineTo(px2, py2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = '#ea580c';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(px1, py1);
+      ctx.lineTo(px2, pyHorizontal);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#7c3aed';
+      ctx.beginPath();
+      ctx.moveTo(px2, pyHorizontal);
+      ctx.lineTo(px2, py2);
+      ctx.stroke();
+
+      ctx.font = '13px system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillStyle = '#ea580c';
+      ctx.fillText('Δx = h', (px1 + px2) / 2, pyHorizontal - 7);
+
+      ctx.save();
+      ctx.translate(px2 + 13, (pyHorizontal + py2) / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillStyle = '#7c3aed';
+      ctx.fillText('Δy = f(x+h) - f(x)', 0, 0);
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    function drawAnnotations(x, fx, h, fxh, secantSlope, tangentSlope) {
+      const xh = x + h;
+
+      drawLineThroughPoint(x, fx, tangentSlope, '#059669', true);
+      drawLineThroughPoint(x, fx, secantSlope, '#dc2626', false);
+      drawTriangle(x, fx, xh, fxh);
+
+      drawPoint(x, fx, '#111827', 'P = (x, f(x))');
+      drawPoint(xh, fxh, '#dc2626', 'Q = (x+h, f(x+h))', 8, 14);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.strokeStyle = '#e5e7eb';
+      ctx.lineWidth = 1;
+      roundRect(ctx, 18, 18, 355, 108, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#1f2937';
+      ctx.font = '14px system-ui';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText(`m secante = Δy / Δx = ${formatNumber(secantSlope)}`, 36, 36);
+      ctx.fillStyle = '#059669';
+      ctx.fillText(`m tangente aprox. = ${formatNumber(tangentSlope)}`, 36, 62);
+      ctx.fillStyle = '#6b7280';
+      ctx.fillText(`Cuando h se acerca a 0, Q se acerca a P`, 36, 88);
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function syncSlidersFromView() {
+      const scale = (state.xMax - state.xMin) / 2;
+      const origin = (state.xMax + state.xMin) / 2;
+      zoomSlider.value = String(clampRange(scale, 2, 30));
+      originSlider.value = String(clampRange(origin, -20, 20));
+      zoomValue.textContent = `±${formatNumber(scale)}`;
+      originValue.textContent = formatNumber(origin);
+    }
+
+    function clampRange(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function autoFitY() {
+      if (state.manualView) return;
+
+      const scale = Number(zoomSlider.value);
+      const origin = Number(originSlider.value);
+      state.xMin = origin - scale;
+      state.xMax = origin + scale;
+      zoomValue.textContent = `±${formatNumber(scale)}`;
+      originValue.textContent = formatNumber(origin);
+
+      const values = [];
+      const samples = 420;
+      for (let i = 0; i <= samples; i++) {
+        const x = state.xMin + i / samples * (state.xMax - state.xMin);
+        const y = safeEval(x);
+        if (Number.isFinite(y) && Math.abs(y) < 1e6) values.push(y);
+      }
+
+      const x = Number(xPointInput.value);
+      const h = Number(hSlider.value);
+      [x, x + h].forEach(v => {
+        const y = safeEval(v);
+        if (Number.isFinite(y) && Math.abs(y) < 1e6) values.push(y);
+      });
+
+      if (!values.length) {
+        state.yMin = -scale;
+        state.yMax = scale;
+        return;
+      }
+
+      let min = Math.min(...values);
+      let max = Math.max(...values);
+      if (Math.abs(max - min) < 1e-6) {
+        min -= 1;
+        max += 1;
+      }
+      const pad = Math.max(1, (max - min) * 0.18);
+      state.yMin = min - pad;
+      state.yMax = max + pad;
+
+      const maxAbs = Math.max(Math.abs(state.yMin), Math.abs(state.yMax));
+      if (maxAbs < scale * 0.4) {
+        state.yMin = -scale * 0.4;
+        state.yMax = scale * 0.4;
+      }
+    }
+
+    function render() {
+      try {
+        state.compiled = compileFunction();
+        state.lastValidExpression = functionInput.value.trim();
+        errorBox.style.display = 'none';
+      } catch (error) {
+        errorBox.textContent = error.message || 'No se ha podido interpretar la función.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      autoFitY();
+      drawGrid();
+      drawFunction();
+
+      const x = Number(xPointInput.value);
+      let h = Number(hSlider.value);
+
+      if (Math.abs(h) < 0.001) h = h >= 0 ? 0.001 : -0.001;
+      hSlider.value = String(h);
+      hValue.textContent = formatNumber(h);
+
+      const fx = safeEval(x);
+      const fxh = safeEval(x + h);
+      const dy = fxh - fx;
+      const secantSlope = dy / h;
+      const tangentSlope = derivativeApprox(x);
+
+      if (Number.isFinite(fx) && Number.isFinite(fxh)) {
+        drawAnnotations(x, fx, h, fxh, secantSlope, tangentSlope);
+      }
+
+      metricX.textContent = formatNumber(x);
+      metricXH.textContent = formatNumber(x + h);
+      metricFX.textContent = formatNumber(fx);
+      metricFXH.textContent = formatNumber(fxh);
+      metricDX.textContent = formatNumber(h);
+      metricDY.textContent = formatNumber(dy);
+      metricM.textContent = formatNumber(secantSlope);
+      metricTangent.textContent = formatNumber(tangentSlope);
+    }
+
+    function formatNumber(value) {
+      if (!Number.isFinite(value)) return '—';
+      if (Math.abs(value) >= 10000 || Math.abs(value) < 0.0001 && value !== 0) return value.toExponential(3);
+      return value.toFixed(4);
+    }
+
+    function formatShort(value) {
+      if (Math.abs(value) < 1e-9) return '0';
+      if (Math.abs(value) >= 10) return value.toFixed(0);
+      if (Math.abs(value) >= 1) return value.toFixed(1).replace(/\.0$/, '');
+      return value.toFixed(2).replace(/0$/, '').replace(/\.$/, '');
+    }
+
+    function animateTowardsZero() {
+      animating = true;
+      cancelAnimationFrame(animationId);
+
+      function step() {
+        let h = Number(hSlider.value);
+        if (Math.abs(h) <= 0.01) {
+          hSlider.value = h > 0 ? '0.001' : '-0.001';
+          animating = false;
+          render();
+          return;
+        }
+        h *= 0.94;
+        hSlider.value = String(h);
+        render();
+        animationId = requestAnimationFrame(step);
+      }
+
+      step();
+    }
+
+    function pauseAnimation() {
+      animating = false;
+      cancelAnimationFrame(animationId);
+    }
+
+    function reset() {
+      pauseAnimation();
+      state.manualView = false;
+      functionInput.value = 'x^2';
+      xPointInput.value = '1';
+      hSlider.value = '1.5';
+      viewScale.value = '6';
+      zoomSlider.value = '6';
+      originSlider.value = '0';
+      render();
+    }
+
+    function init() {
+      resizeBackingCanvas();
+      render();
+
+      VerneGraphNavigator.attach(canvas, {
+        margin: state.margin,
+        getViewport: () => ({ xMin: state.xMin, xMax: state.xMax, yMin: state.yMin, yMax: state.yMax }),
+        setViewport: (next) => {
+          state.manualView = true;
+          state.xMin = next.xMin;
+          state.xMax = next.xMax;
+          state.yMin = next.yMin;
+          state.yMax = next.yMax;
+          syncSlidersFromView();
+          render();
+        },
+        minSpanX: 0.2,
+        maxSpanX: 400,
+        minSpanY: 0.2,
+        maxSpanY: 400
+      });
+    }
+
+    functionInput.addEventListener('input', render);
+    xPointInput.addEventListener('input', render);
+    hSlider.addEventListener('input', () => {
+      pauseAnimation();
+      render();
+    });
+    viewScale.addEventListener('change', () => {
+      state.manualView = false;
+      zoomSlider.value = viewScale.value;
+      render();
+    });
+    zoomSlider.addEventListener('input', () => {
+      state.manualView = false;
+      render();
+    });
+    originSlider.addEventListener('input', () => {
+      state.manualView = false;
+      render();
+    });
+
+    towardsZeroBtn.addEventListener('click', animateTowardsZero);
+    pauseBtn.addEventListener('click', pauseAnimation);
+    resetBtn.addEventListener('click', reset);
+
+    document.querySelectorAll('[data-fn]').forEach(button => {
+      button.addEventListener('click', () => {
+        pauseAnimation();
+        functionInput.value = button.dataset.fn;
+        render();
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      resizeBackingCanvas();
+      render();
+    });
+
+    init();
+  </script>
+</body>
+</html>

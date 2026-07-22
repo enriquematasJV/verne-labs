@@ -1,0 +1,91 @@
+<!--
+  PLANTILLA: Tarjeta de Simulación
+
+  Copia este bloque completo y rellena los campos.
+
+  IMPORTANTE:
+  1. data-subject debe ser: fisica, biologia, matematicas, informatica
+     (o varios separados por espacio si aplica a varias áreas)
+  2. El class="tag phys|bio|math|info" debe coincidir con data-subject
+  3. Los enlaces deben apuntar a simulaciones/nombre-carpeta/index.html
+  4. El botón secundario es opcional (elimina si no hay unidad didáctica)
+-->
+
+<article class="simulation-card" data-subject="CAMBIAR-ESTO">
+  <div class="card-header">
+    <div class="tag-row">
+      <!--
+        Cambiar tag según categoría:
+        - <span class="tag phys">Física</span>
+        - <span class="tag bio">Biología</span>
+        - <span class="tag math">Matemáticas</span>
+        - <span class="tag info">Informática / IA</span>
+      -->
+      <span class="tag phys">CATEGORÍA</span>
+      <span class="tag js">JavaScript</span>
+    </div>
+
+    <h3>NOMBRE DE LA SIMULACIÓN</h3>
+  </div>
+
+  <div class="card-body">
+    <p>
+      DESCRIPCIÓN BREVE: 2-3 líneas explicando qué se simula y qué puede hacer el usuario.
+    </p>
+
+    <ul class="features">
+      <li>CONCEPTO CLAVE 1</li>
+      <li>CONCEPTO CLAVE 2</li>
+      <li>CONCEPTO CLAVE 3</li>
+    </ul>
+  </div>
+
+  <div class="card-actions">
+    <a class="button primary" href="simulaciones/NOMBRE-CARPETA/index.html">
+      Abrir simulación
+    </a>
+
+    <a class="button secondary" href="simulaciones/NOMBRE-CARPETA/unidad-didactica.html">
+      Ver unidad didáctica
+    </a>
+  </div>
+</article>
+
+<!--
+  EJEMPLO RELLENO:
+
+  <article class="simulation-card" data-subject="biologia">
+    <div class="card-header">
+      <div class="tag-row">
+        <span class="tag bio">Biología</span>
+        <span class="tag js">JavaScript</span>
+      </div>
+
+      <h3>Laboratorio de Ecología de Poblaciones</h3>
+    </div>
+
+    <div class="card-body">
+      <p>
+        Simulación interactiva para estudiar cómo evolucionan distintas poblaciones
+        dentro de un ecosistema sencillo. Permite observar crecimiento, competencia,
+        equilibrio, extinción y cambios derivados de modificar las condiciones iniciales.
+      </p>
+
+      <ul class="features">
+        <li>Dinámica de poblaciones.</li>
+        <li>Interacciones entre organismos.</li>
+        <li>Experimentación con parámetros.</li>
+      </ul>
+    </div>
+
+    <div class="card-actions">
+      <a class="button primary" href="simulaciones/ecologia-poblaciones/index.html">
+        Abrir simulación
+      </a>
+
+      <a class="button secondary" href="simulaciones/ecologia-poblaciones/unidad-didactica.html">
+        Ver unidad didáctica
+      </a>
+    </div>
+  </article>
+-->
