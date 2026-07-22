@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio de mapas geológicos · Bloque, mapa y corte</title>
+  <style>
+    :root {
+      --bg: #f5f3ee;
+      --ink: #202124;
+      --muted: #687076;
+      --line: #d8d2c7;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #ffffff 0, var(--bg) 42%, #ece7dc 100%);
+      color: var(--ink);
+    }
+
+    header {
+      padding: 12px 24px 10px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,0.76);
+      backdrop-filter: blur(10px);
+    }
+
+    header a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 650;
+      font-size: 0.94rem;
+    }
+
+    h1 {
+      margin: 8px 0 4px;
+      font-size: clamp(1.35rem, 2.2vw, 2.05rem);
+      line-height: 1.08;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 6px;
+      padding: 6px;
+      max-width: 1680px;
+      margin: 0 auto;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.22fr) minmax(0, 0.78fr);
+      grid-template-rows: auto auto;
+      gap: 6px;
+      align-items: start;
+    }
+
+    .linkedViewsCard {
+      grid-row: span 1;
+    }
+
+    .blockCard {
+      min-height: 0;
+    }
+
+    .infoCard {
+      grid-column: 1 / -1;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.94);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+
+    .card h2 {
+      margin: 0;
+      padding: 5px 8px 3px;
+      font-size: 0.94rem;
+    }
+
+    .canvasWrap, .linkedCanvasWrap {
+      padding: 2px 4px 4px;
+    }
+
+    .blockRotationControls {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      padding: 0 6px 6px;
+    }
+
+    .blockRotationControls button {
+      width: 100%;
+      padding: 7px 8px;
+      border-radius: 10px;
+      border: 1px solid #bfdbfe;
+      background: var(--accent-soft);
+      color: #174ea6;
+      font-weight: 700;
+      font-size: 0.84rem;
+      cursor: pointer;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .blockRotationControls button:hover {
+      filter: brightness(0.98);
+    }
+
+    .linkedCanvasWrap + .linkedCanvasWrap {
+      padding-top: 0;
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      border-radius: 10px;
+      border: 1px solid #ded8ce;
+      background: #f9fafb;
+    }
+
+    aside {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .controls { padding: 10px; }
+    .control { margin: 7px 0; }
+
+    .control label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.84rem;
+      color: #32363a;
+      font-weight: 650;
+      margin-bottom: 3px;
+    }
+
+    .control span {
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    select {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: white;
+      font-size: 0.93rem;
+    }
+
+    .infoGrid {
+      display: grid;
+      grid-template-columns: 0.72fr 1.28fr;
+      gap: 12px;
+      padding: 0 10px 10px;
+      align-items: start;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      padding: 0;
+    }
+
+    .legendItem {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: #3f4448;
+    }
+
+    .swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      border: 1px solid rgba(0,0,0,0.18);
+      flex: 0 0 auto;
+    }
+
+    .note {
+      padding: 0;
+      font-size: 0.82rem;
+      line-height: 1.32;
+      color: #394046;
+    }
+
+    .note strong { color: var(--ink); }
+
+    @media (max-width: 1180px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 920px) {
+      .workspace { grid-template-columns: 1fr; }
+      .infoGrid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="https://enriquematasjv.github.io/verne-labs/#simulaciones">← Volver a Verne Labs</a>
+    <h1>Laboratorio de mapas geológicos</h1>
+    <div class="subtitle">Bloque, mapa de afloramientos y corte geológico por plano móvil.</div>
+  </header>
+
+  <main>
+    <section class="workspace">
+      <article class="card linkedViewsCard">
+        <h2>Vista cenital · mapa de afloramientos / corte geológico</h2>
+        <div class="linkedCanvasWrap"><canvas id="mapCanvas" width="1380" height="650"></canvas></div>
+        <div class="linkedCanvasWrap"><canvas id="sectionCanvas" width="1380" height="500"></canvas></div>
+      </article>
+
+      <article class="card blockCard">
+        <h2>Bloque geológico 3D</h2>
+        <div class="canvasWrap"><canvas id="blockCanvas" width="1040" height="1080"></canvas></div>
+        <div class="blockRotationControls" aria-label="Rotación visual del bloque geológico">
+          <button type="button" class="blockRotBtn" data-dir="-1">⟲ Girar</button>
+          <button type="button" id="resetBlockView">Vista inicial</button>
+          <button type="button" class="blockRotBtn" data-dir="1">Girar ⟳</button>
+        </div>
+      </article>
+
+      <article class="card infoCard">
+        <h2>Leyenda y lectura geológica</h2>
+        <div class="infoGrid">
+          <div class="legend" id="legend"></div>
+          <div class="note" id="interpretation"></div>
+        </div>
+      </article>
+    </section>
+
+    <aside>
+      <article class="card controls">
+        <h2 style="padding:0 0 6px">Controles</h2>
+
+        <div class="control"><label>Barrido del plano <span id="sliceVal">0.00</span></label><input id="slice" type="range" min="-100" max="100" value="0" /></div>
+        <div class="control"><label>Rotación plano de corte <span id="planeRotVal">0°</span></label><input id="planeRot" type="range" min="-180" max="180" value="0" /></div>
+        <div class="control"><label>Escala mapa <span id="mapZoomVal">0.94</span></label><input id="mapZoom" type="range" min="55" max="110" value="94" /></div>
+
+        <div class="control">
+          <label for="structure">Estructura</label>
+          <select id="structure">
+            <option value="horizontal">Estratos horizontales</option>
+            <option value="dipping" selected>Estratos inclinados</option>
+            <option value="fold">Pliegue sencillo</option>
+          </select>
+        </div>
+
+        <div class="control"><label>Número total de estratos <span id="layerCountVal">3</span></label><input id="layerCount" type="range" min="1" max="6" value="3" /></div>
+        <div class="control"><label>Grosor uniforme estratos <span id="spacingVal">0.32</span></label><input id="spacing" type="range" min="6" max="90" value="32" /></div>
+        <div class="control"><label>Buzamiento <span id="dipVal">28°</span></label><input id="dip" type="range" min="0" max="90" value="28" /></div>
+        <div class="control"><label>Dirección buzamiento <span id="azimuthVal">45°</span></label><input id="azimuth" type="range" min="0" max="180" value="45" /></div>
+        <div class="control" id="foldControl"><label>Pliegue anticlinal/sinclinal <span id="foldVal">0.00</span></label><input id="fold" type="range" min="-90" max="90" value="0" /></div>
+
+        <hr />
+
+        <div class="control"><label>Relieve / crestas <span id="reliefVal">0.80</span></label><input id="relief" type="range" min="0" max="130" value="80" /></div>
+        <div class="control"><label>Valle central <span id="valleyVal">1.05</span></label><input id="valley" type="range" min="0" max="140" value="105" /></div>
+      </article>
+    </aside>
+  </main>
+
+  <script>
+    'use strict';
+
+    var blockCanvas = document.getElementById('blockCanvas');
+    var mapCanvas = document.getElementById('mapCanvas');
+    var sectionCanvas = document.getElementById('sectionCanvas');
+    var bctx = blockCanvas.getContext('2d');
+    var mctx = mapCanvas.getContext('2d');
+    var sctx = sectionCanvas.getContext('2d');
+
+    var controls = {
+      structure: document.getElementById('structure'),
+      layerCount: document.getElementById('layerCount'),
+      spacing: document.getElementById('spacing'),
+      dip: document.getElementById('dip'),
+      azimuth: document.getElementById('azimuth'),
+      fold: document.getElementById('fold'),
+      relief: document.getElementById('relief'),
+      valley: document.getElementById('valley'),
+      slice: document.getElementById('slice'),
+      planeRot: document.getElementById('planeRot'),
+      mapZoom: document.getElementById('mapZoom'),
+      resetBlockView: document.getElementById('resetBlockView')
+    };
+
+    var labels = {
+      layerCount: document.getElementById('layerCountVal'),
+      spacing: document.getElementById('spacingVal'),
+      dip: document.getElementById('dipVal'),
+      azimuth: document.getElementById('azimuthVal'),
+      fold: document.getElementById('foldVal'),
+      relief: document.getElementById('reliefVal'),
+      valley: document.getElementById('valleyVal'),
+      slice: document.getElementById('sliceVal'),
+      planeRot: document.getElementById('planeRotVal'),
+      mapZoom: document.getElementById('mapZoomVal')
+    };
+
+    var legend = document.getElementById('legend');
+    var interpretation = document.getElementById('interpretation');
+
+    var rocks = [
+      { name: 'Caliza', color: '#e8d9a8' },
+      { name: 'Arcilla', color: '#b86b5f' },
+      { name: 'Arenisca', color: '#d99b45' },
+      { name: 'Marga', color: '#9ab17d' },
+      { name: 'Pizarra', color: '#5c6f82' },
+      { name: 'Conglomerado', color: '#8172b2' }
+    ];
+
+    var camera = {
+      rotX: 58 * Math.PI / 180,
+      rotZ: -38 * Math.PI / 180
+    };
+
+    var blockRotationTimer = null;
+    var blockRotationStep = 2 * Math.PI / 180;
+
+    var renderState = {
+      pending: false,
+      draft: false,
+      settleTimer: null
+    };
+
+    var mapBufferCanvas = document.createElement('canvas');
+    var mapBufferCtx = mapBufferCanvas.getContext('2d');
+
+    initialise();
+
+    function initialise() {
+      validateDomReferences();
+      bindEvents();
+      runSelfTests();
+      draw();
+    }
+
+    function validateDomReferences() {
+      var missing = [];
+      var base = [blockCanvas, mapCanvas, sectionCanvas, bctx, mctx, sctx, legend, interpretation];
+      for (var i = 0; i < base.length; i++) {
+        if (!base[i]) missing.push('base:' + i);
+      }
+      Object.keys(controls).forEach(function (name) {
+        if (!controls[name]) missing.push('control:' + name);
+      });
+      Object.keys(labels).forEach(function (name) {
+        if (!labels[name]) missing.push('label:' + name);
+      });
+      if (missing.length > 0) throw new Error('Faltan elementos DOM: ' + missing.join(', '));
+    }
+
+    function bindEvents() {
+      Object.keys(controls).forEach(function (key) {
+        if (!controls[key] || controls[key].tagName === 'BUTTON') return;
+        controls[key].addEventListener('input', function () { requestRender(true); });
+        controls[key].addEventListener('change', function () { requestRender(false); });
+      });
+
+      document.querySelectorAll('.blockRotBtn').forEach(function (button) {
+        button.addEventListener('pointerdown', function (event) {
+          event.preventDefault();
+          button.setPointerCapture(event.pointerId);
+          startBlockRotation(Number(button.dataset.dir));
+        });
+        button.addEventListener('pointerup', function (event) {
+          stopBlockRotation();
+          if (button.hasPointerCapture(event.pointerId)) button.releasePointerCapture(event.pointerId);
+        });
+        button.addEventListener('pointercancel', stopBlockRotation);
+        button.addEventListener('pointerleave', stopBlockRotation);
+      });
+
+      controls.resetBlockView.addEventListener('click', function () {
+        camera.rotX = 58 * Math.PI / 180;
+        camera.rotZ = -38 * Math.PI / 180;
+        requestRender(false);
+      });
+    }
+
+    function startBlockRotation(direction) {
+      stopBlockRotation();
+      rotateBlockView(direction);
+      blockRotationTimer = setInterval(function () {
+        rotateBlockView(direction);
+      }, 18);
+    }
+
+    function stopBlockRotation() {
+      if (blockRotationTimer !== null) {
+        clearInterval(blockRotationTimer);
+        blockRotationTimer = null;
+      }
+    }
+
+    function rotateBlockView(direction) {
+      camera.rotZ = normalizeAngle(camera.rotZ + direction * blockRotationStep);
+      requestRender(true);
+    }
+
+    function state() {
+      return {
+        structure: controls.structure.value,
+        layerCount: Number(controls.layerCount.value),
+        spacing: Number(controls.spacing.value) / 100,
+        dip: Number(controls.dip.value),
+        azimuth: Number(controls.azimuth.value),
+        fold: Number(controls.fold.value) / 100,
+        relief: Number(controls.relief.value) / 100,
+        valley: Number(controls.valley.value) / 100,
+        slice: Number(controls.slice.value) / 100,
+        planeRot: Number(controls.planeRot.value) * Math.PI / 180,
+        mapZoom: Number(controls.mapZoom.value) / 100,
+        rotX: camera.rotX,
+        rotZ: camera.rotZ
+      };
+    }
+
+    function requestRender(draft) {
+      renderState.draft = !!draft;
+      if (renderState.settleTimer !== null) {
+        clearTimeout(renderState.settleTimer);
+        renderState.settleTimer = null;
+      }
+      if (draft) {
+        renderState.settleTimer = setTimeout(function () {
+          requestRender(false);
+        }, 180);
+      }
+      if (renderState.pending) return;
+      renderState.pending = true;
+      window.requestAnimationFrame(function () {
+        renderState.pending = false;
+        draw();
+      });
+    }
+
+    function qualityValue(finalValue, draftValue) {
+      return renderState.draft ? draftValue : finalValue;
+    }
+
+    function draw() {
+      bctx.imageSmoothingEnabled = true;
+      mctx.imageSmoothingEnabled = true;
+      sctx.imageSmoothingEnabled = true;
+      var s = state();
+      updateControlState(s);
+      updateLabels(s);
+      updateLegend(s.layerCount);
+      drawBlock(s);
+      drawMap(s);
+      drawSection(s);
+      updateInterpretation(s);
+    }
+
+    function updateControlState(s) {
+      var foldControl = document.getElementById('foldControl');
+      if (!foldControl) return;
+      if (s.structure === 'fold') {
+        controls.fold.disabled = false;
+        foldControl.style.opacity = '1';
+      } else {
+        controls.fold.disabled = true;
+        foldControl.style.opacity = '0.45';
+      }
+    }
+
+    function updateLabels(s) {
+      labels.layerCount.textContent = String(s.layerCount);
+      labels.spacing.textContent = s.spacing.toFixed(2);
+      labels.dip.textContent = Math.round(s.dip) + '°';
+      labels.azimuth.textContent = Math.round(s.azimuth) + '°';
+      labels.fold.textContent = s.fold.toFixed(2);
+      labels.relief.textContent = s.relief.toFixed(2);
+      labels.valley.textContent = s.valley.toFixed(2);
+      labels.slice.textContent = s.slice.toFixed(2);
+      labels.planeRot.textContent = Math.round(Number(controls.planeRot.value)) + '°';
+      labels.mapZoom.textContent = s.mapZoom.toFixed(2);
+    }
+
+    function updateLegend(layerCount) {
+      var html = '';
+      for (var i = 0; i < layerCount; i++) {
+        html += '<div class="legendItem"><span class="swatch" style="background:' + rocks[i].color + '"></span>' + rocks[i].name + '</div>';
+      }
+      legend.innerHTML = html;
+    }
+
+    function terrain(x, y, s) {
+      var hillHeight = 0.38 * s.relief;
+      var valleyDepth = 0.52 * s.valley;
+      var leftCrest = hillHeight * Math.exp(-6.5 * Math.pow(x + 0.55, 2)) * (0.84 + 0.16 * Math.cos(Math.PI * y));
+      var rightCrest = hillHeight * Math.exp(-6.5 * Math.pow(x - 0.55, 2)) * (0.84 + 0.16 * Math.cos(Math.PI * y));
+      var centralValley = valleyDepth * Math.exp(-18 * Math.pow(x, 2)) * (0.9 + 0.1 * Math.cos(Math.PI * y));
+      return clamp(leftCrest + rightCrest - centralValley, -0.72, 0.62);
+    }
+
+    function stratigraphicLevel(x, y, z, s) {
+      var dipRad = s.dip * Math.PI / 180;
+      var azRad = s.azimuth * Math.PI / 180;
+      var alongDip = Math.sin(azRad) * x + Math.cos(azRad) * y;
+      var level = z * Math.cos(dipRad) - alongDip * Math.sin(dipRad);
+      if (s.structure === 'horizontal') level = z;
+      if (s.structure === 'fold') level += s.fold * 0.55 * Math.sin(Math.PI * 1.35 * x);
+      return level;
+    }
+
+    function layerIndexAt(x, y, z, s) {
+      if (s.layerCount <= 1) return 0;
+      var totalThickness = s.spacing * s.layerCount;
+      var datum = -totalThickness / 2;
+      var idx = Math.floor((stratigraphicLevel(x, y, z, s) - datum) / s.spacing);
+      return clampInt(idx, 0, s.layerCount - 1);
+    }
+
+    function project(point, s, canvas) {
+      var cosX = Math.cos(s.rotX);
+      var sinX = Math.sin(s.rotX);
+      var cosZ = Math.cos(s.rotZ);
+      var sinZ = Math.sin(s.rotZ);
+      var x = point.x * cosZ - point.y * sinZ;
+      var y = point.x * sinZ + point.y * cosZ;
+      var z = point.z;
+      var y2 = y * cosX - z * sinX;
+      var z2 = y * sinX + z * cosX;
+      var scale;
+      if (canvas === blockCanvas) {
+        // La ventana del bloque puede crecer hacia abajo sin agrandar el bloque.
+        // Se fija una escala base para mantener el tamaño actual y ganar aire vertical.
+        scale = 820 * 0.54;
+      } else {
+        scale = Math.min(canvas.width, canvas.height) * 0.54;
+      }
+      return { x: canvas.width / 2 + x * scale, y: canvas.height / 2 + y2 * scale + 6, depth: z2 };
+    }
+
+    function drawBlock(s) {
+      bctx.clearRect(0, 0, blockCanvas.width, blockCanvas.height);
+      bctx.fillStyle = '#f9fafb';
+      bctx.fillRect(0, 0, blockCanvas.width, blockCanvas.height);
+      var bottomZ = -0.82;
+      var cells = [];
+      buildSurfaceCells(s, cells);
+      buildSideCells(s, bottomZ, cells);
+      buildSlicePlaneCells(s, bottomZ, cells);
+      buildSlicePlaneOutline(s, bottomZ, cells);
+      buildSurfaceContourSegments(s, cells, blockCanvas);
+      cells.sort(function (a, b) { return a.depth - b.depth; }).forEach(function (item) {
+        if (item.kind === 'poly') drawPoly(bctx, item.points, item.color, item.stroke);
+        if (item.kind === 'line') drawLine(bctx, item.a, item.b, item.color, item.width);
+      });
+      drawFrameEdges(s, bottomZ);
+      drawAxisLegendXZ();
+    }
+
+    function buildSurfaceCells(s, cells) {
+      var n = qualityValue(76, 34);
+      for (var i = 0; i < n; i++) {
+        for (var j = 0; j < n; j++) {
+          var x1 = -1 + 2 * i / n;
+          var x2 = -1 + 2 * (i + 1) / n;
+          var y1 = -1 + 2 * j / n;
+          var y2 = -1 + 2 * (j + 1) / n;
+          var xm = (x1 + x2) / 2;
+          var ym = (y1 + y2) / 2;
+          var pts = [
+            { x: x1, y: y1, z: terrain(x1, y1, s) },
+            { x: x2, y: y1, z: terrain(x2, y1, s) },
+            { x: x2, y: y2, z: terrain(x2, y2, s) },
+            { x: x1, y: y2, z: terrain(x1, y2, s) }
+          ];
+          var idx = layerIndexAt(xm, ym, terrain(xm, ym, s), s);
+          addPolyCell(cells, pts, s, rocks[idx].color, 'rgba(0,0,0,0)');
+        }
+      }
+    }
+
+    function buildSideCells(s, bottomZ, cells) {
+      buildSide('x', -1, 0.68, s, bottomZ, cells);
+      buildSide('x', 1, 0.64, s, bottomZ, cells);
+      buildSide('y', -1, 0.76, s, bottomZ, cells);
+      buildSide('y', 1, 0.72, s, bottomZ, cells);
+    }
+
+    function buildSide(axis, fixed, shadeFactor, s, bottomZ, cells) {
+      var n = qualityValue(72, 30);
+      var vSteps = qualityValue(30, 14);
+      for (var i = 0; i < n; i++) {
+        var a1 = -1 + 2 * i / n;
+        var a2 = -1 + 2 * (i + 1) / n;
+        var p1 = axis === 'x' ? { x: fixed, y: a1 } : { x: a1, y: fixed };
+        var p2 = axis === 'x' ? { x: fixed, y: a2 } : { x: a2, y: fixed };
+        var top1 = terrain(p1.x, p1.y, s);
+        var top2 = terrain(p2.x, p2.y, s);
+        for (var v = 0; v < vSteps; v++) {
+          var t1 = v / vSteps;
+          var t2 = (v + 1) / vSteps;
+          var z11 = top1 + (bottomZ - top1) * t1;
+          var z21 = top2 + (bottomZ - top2) * t1;
+          var z22 = top2 + (bottomZ - top2) * t2;
+          var z12 = top1 + (bottomZ - top1) * t2;
+          var xm = (p1.x + p2.x) / 2;
+          var ym = (p1.y + p2.y) / 2;
+          var zm = (z11 + z21 + z22 + z12) / 4;
+          var idx = layerIndexAt(xm, ym, zm, s);
+          addPolyCell(cells, [
+            { x: p1.x, y: p1.y, z: z11 },
+            { x: p2.x, y: p2.y, z: z21 },
+            { x: p2.x, y: p2.y, z: z22 },
+            { x: p1.x, y: p1.y, z: z12 }
+          ], s, shade(rocks[idx].color, shadeFactor), 'rgba(0,0,0,0)');
+        }
+      }
+    }
+
+    function buildSlicePlaneCells(s, bottomZ, cells) {
+      var trace = clippedPlaneTrace(planeDefinition(s));
+      if (!trace) return;
+      var strip = buildSectionSamplesFromTrace(trace, s, 42);
+      if (strip.length < 2) return;
+      var topZ = 0.76;
+      for (var i = 0; i < strip.length - 1; i++) {
+        var a = strip[i];
+        var b = strip[i + 1];
+        addPolyCell(cells, [
+          { x: a.x, y: a.y, z: topZ },
+          { x: b.x, y: b.y, z: topZ },
+          { x: b.x, y: b.y, z: bottomZ },
+          { x: a.x, y: a.y, z: bottomZ }
+        ], s, 'rgba(37,99,235,0.20)', 'rgba(0,0,0,0)');
+      }
+    }
+
+    function buildSlicePlaneOutline(s, bottomZ, cells) {
+      var trace = clippedPlaneTrace(planeDefinition(s));
+      if (!trace) return;
+      var strip = buildSectionSamplesFromTrace(trace, s, 80);
+      if (strip.length < 2) return;
+      var topZ = 0.76;
+      var top = [];
+      var bottom = [];
+      for (var i = 0; i < strip.length; i++) {
+        top.push({ x: strip[i].x, y: strip[i].y, z: topZ });
+        bottom.push({ x: strip[i].x, y: strip[i].y, z: bottomZ });
+      }
+      addProjectedLineStrip(cells, top, s, 'rgba(0,0,0,0.92)', 1.6);
+      addProjectedLineStrip(cells, bottom, s, 'rgba(0,0,0,0.82)', 1.35);
+      addProjectedLineSegment(cells, top[0], bottom[0], s, 'rgba(0,0,0,0.9)', 1.5);
+      addProjectedLineSegment(cells, top[top.length - 1], bottom[bottom.length - 1], s, 'rgba(0,0,0,0.9)', 1.5);
+    }
+
+    function addProjectedLineStrip(cells, pts, s, color, width) {
+      for (var i = 0; i < pts.length - 1; i++) addProjectedLineSegment(cells, pts[i], pts[i + 1], s, color, width);
+    }
+
+    function addProjectedLineSegment(cells, a3, b3, s, color, width) {
+      var a = project(a3, s, blockCanvas);
+      var b = project(b3, s, blockCanvas);
+      cells.push({ kind: 'line', a: a, b: b, depth: (a.depth + b.depth) / 2 + 0.002, color: color, width: width });
+    }
+
+    function buildSurfaceContourSegments(s, cells, canvas) {
+      var levels = [-0.65, -0.5, -0.35, -0.2, -0.05, 0.1, 0.25, 0.4, 0.55];
+      var n = qualityValue(76, 34);
+      for (var li = 0; li < levels.length; li++) {
+        var level = levels[li];
+        for (var i = 0; i < n; i++) {
+          for (var j = 0; j < n; j++) {
+            var x1 = -1 + 2 * i / n;
+            var x2 = -1 + 2 * (i + 1) / n;
+            var y1 = -1 + 2 * j / n;
+            var y2 = -1 + 2 * (j + 1) / n;
+            var z1 = terrain(x1, y1, s);
+            var z2 = terrain(x2, y1, s);
+            var z3 = terrain(x2, y2, s);
+            var z4 = terrain(x1, y2, s);
+            var inter = [];
+            addIso(inter, x1, y1, z1, x2, y1, z2, level);
+            addIso(inter, x2, y1, z2, x2, y2, z3, level);
+            addIso(inter, x2, y2, z3, x1, y2, z4, level);
+            addIso(inter, x1, y2, z4, x1, y1, z1, level);
+            if (inter.length === 2) {
+              var pa = project(inter[0], s, canvas);
+              var pb = project(inter[1], s, canvas);
+              cells.push({ kind: 'line', a: pa, b: pb, depth: (pa.depth + pb.depth) / 2, color: 'rgba(0,0,0,0.72)', width: 1.15 });
+            }
+          }
+        }
+      }
+    }
+
+    function addIso(list, x1, y1, z1, x2, y2, z2, level) {
+      if ((z1 < level && z2 >= level) || (z2 < level && z1 >= level)) {
+        var t = (level - z1) / (z2 - z1);
+        list.push({ x: x1 + t * (x2 - x1), y: y1 + t * (y2 - y1), z: level });
+      }
+    }
+
+    function addPolyCell(cells, pts3, s, color, stroke) {
+      var points = pts3.map(function (p) { return project(p, s, blockCanvas); });
+      cells.push({ kind: 'poly', points: points, depth: averageDepth(points), color: color, stroke: stroke });
+    }
+
+    function drawFrameEdges(s, bottomZ) {
+      var edges = [edgePoints('x', -1, s, bottomZ), edgePoints('x', 1, s, bottomZ), edgePoints('y', -1, s, bottomZ), edgePoints('y', 1, s, bottomZ)];
+      edges.sort(function (a, b) { return b.depth - a.depth; }).slice(0, 2).forEach(function (edge) {
+        drawProjectedPolyline(bctx, edge.top, s, 'rgba(0,0,0,1)', 2.8);
+        drawProjectedPolyline(bctx, edge.bottom, s, 'rgba(0,0,0,1)', 2.2);
+      });
+    }
+
+    function edgePoints(axis, fixed, s, bottomZ) {
+      var top = [];
+      var bottom = [];
+      var depth = 0;
+      var steps = qualityValue(72, 32);
+      for (var i = 0; i <= steps; i++) {
+        var a = -1 + 2 * i / steps;
+        var p = axis === 'x' ? { x: fixed, y: a } : { x: a, y: fixed };
+        var topPoint = { x: p.x, y: p.y, z: terrain(p.x, p.y, s) };
+        var bottomPoint = { x: p.x, y: p.y, z: bottomZ };
+        top.push(topPoint);
+        bottom.push(bottomPoint);
+        depth += project(topPoint, s, blockCanvas).depth;
+      }
+      return { top: top, bottom: bottom, depth: depth / (steps + 1) };
+    }
+
+    function drawAxisLegendXZ() {
+      var x0 = blockCanvas.width - 82;
+      var y0 = 18;
+      bctx.save();
+      bctx.fillStyle = 'rgba(255,255,255,0.78)';
+      roundRect(bctx, x0 - 8, y0 - 8, 62, 44, 9);
+      bctx.fill();
+      bctx.strokeStyle = 'rgba(0,0,0,0.20)';
+      bctx.stroke();
+      bctx.strokeStyle = 'rgba(0,0,0,0.86)';
+      bctx.lineWidth = 1.5;
+      bctx.beginPath();
+      bctx.moveTo(x0 + 10, y0 + 25);
+      bctx.lineTo(x0 + 39, y0 + 25);
+      bctx.stroke();
+      bctx.beginPath();
+      bctx.moveTo(x0 + 10, y0 + 25);
+      bctx.lineTo(x0 + 10, y0 + 6);
+      bctx.stroke();
+      bctx.fillStyle = 'rgba(0,0,0,0.9)';
+      bctx.font = 'bold 11px system-ui';
+      bctx.fillText('X', x0 + 43, y0 + 29);
+      bctx.fillText('Z', x0 + 6, y0 + 4);
+      bctx.restore();
+    }
+
+    function drawMap(s) {
+      var rasterScale = qualityValue(0.72, 0.32);
+      var w = Math.max(160, Math.floor(mapCanvas.width * rasterScale));
+      var h = Math.max(100, Math.floor(mapCanvas.height * rasterScale));
+      mapBufferCanvas.width = w;
+      mapBufferCanvas.height = h;
+      var img = mapBufferCtx.createImageData(w, h);
+
+      for (var py = 0; py < h; py++) {
+        for (var px = 0; px < w; px++) {
+          var display = pixelToDisplayScaled(px, py, w, h);
+          var k = (py * w + px) * 4;
+          if (!insideWorld(display.x, display.y)) {
+            img.data[k] = 246; img.data[k + 1] = 247; img.data[k + 2] = 249; img.data[k + 3] = 255;
+          } else {
+            var z = terrain(display.x, display.y, s);
+            var idx = layerIndexAt(display.x, display.y, z, s);
+            var rgb = hexToRgb(rocks[idx].color);
+            img.data[k] = rgb.r; img.data[k + 1] = rgb.g; img.data[k + 2] = rgb.b; img.data[k + 3] = 255;
+          }
+        }
+      }
+
+      mapBufferCtx.putImageData(img, 0, 0);
+      mctx.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+      mctx.imageSmoothingEnabled = true;
+      mctx.drawImage(mapBufferCanvas, 0, 0, mapCanvas.width, mapCanvas.height);
+      drawMapContours(s);
+      drawMapSliceLine(s);
+    }
+
+    function drawMapContours(s) {
+      var levels = [-0.65, -0.5, -0.35, -0.2, -0.05, 0.1, 0.25, 0.4, 0.55];
+      var n = qualityValue(76, 32);
+      mctx.save();
+      mctx.strokeStyle = 'rgba(0,0,0,0.70)';
+      mctx.lineWidth = 1.05;
+      for (var li = 0; li < levels.length; li++) {
+        var level = levels[li];
+        mctx.beginPath();
+        for (var i = 0; i < n; i++) {
+          for (var j = 0; j < n; j++) {
+            var x1 = -1 + 2 * i / n;
+            var x2 = -1 + 2 * (i + 1) / n;
+            var y1 = -1 + 2 * j / n;
+            var y2 = -1 + 2 * (j + 1) / n;
+            var z1 = terrain(x1, y1, s);
+            var z2 = terrain(x2, y1, s);
+            var z3 = terrain(x2, y2, s);
+            var z4 = terrain(x1, y2, s);
+            var inter = [];
+            addDisplayIso(inter, x1, y1, z1, x2, y1, z2, level);
+            addDisplayIso(inter, x2, y1, z2, x2, y2, z3, level);
+            addDisplayIso(inter, x2, y2, z3, x1, y2, z4, level);
+            addDisplayIso(inter, x1, y2, z4, x1, y1, z1, level);
+            if (inter.length === 2) {
+              mctx.moveTo(displayX(inter[0].x), displayY(inter[0].y));
+              mctx.lineTo(displayX(inter[1].x), displayY(inter[1].y));
+            }
+          }
+        }
+        mctx.stroke();
+      }
+      mctx.restore();
+    }
+
+    function addDisplayIso(list, x1, y1, z1, x2, y2, z2, level) {
+      if ((z1 < level && z2 >= level) || (z2 < level && z1 >= level)) {
+        var t = (level - z1) / (z2 - z1);
+        list.push({ x: x1 + t * (x2 - x1), y: y1 + t * (y2 - y1) });
+      }
+    }
+
+    function drawMapSliceLine(s) {
+      var trace = clippedPlaneTrace(planeDefinition(s));
+      if (!trace) return;
+      mctx.save();
+      mctx.strokeStyle = 'rgba(0,0,0,0.96)';
+      mctx.lineWidth = 2.05;
+      mctx.lineCap = 'round';
+      mctx.beginPath();
+      mctx.moveTo(displayX(trace.a.x), displayY(trace.a.y));
+      mctx.lineTo(displayX(trace.b.x), displayY(trace.b.y));
+      mctx.stroke();
+      mctx.restore();
+    }
+
+    function drawSection(s) {
+      sctx.clearRect(0, 0, sectionCanvas.width, sectionCanvas.height);
+      sctx.fillStyle = '#f9fafb';
+      sctx.fillRect(0, 0, sectionCanvas.width, sectionCanvas.height);
+      var bottomZ = -0.82;
+      var trace = clippedPlaneTrace(planeDefinition(s));
+      if (!trace) return;
+      var samples = buildSectionSamplesFromTrace(trace, s, qualityValue(Math.floor(sectionCanvas.width * 0.72), 180));
+      drawSectionRaster(s, samples, bottomZ);
+      drawSectionContacts(s, samples, bottomZ);
+      drawSectionTopLine(samples);
+      drawSectionFrame();
+    }
+
+    function buildSectionSamplesFromTrace(trace, s, count) {
+      var result = [];
+      var n = Math.max(2, Math.floor(count));
+      for (var i = 0; i < n; i++) {
+        var u = i / (n - 1);
+        var x = lerp(trace.a.x, trace.b.x, u);
+        var y = lerp(trace.a.y, trace.b.y, u);
+        result.push({
+          x: x,
+          y: y,
+          top: terrain(x, y, s),
+          bottom: -0.82,
+          u: u,
+          valid: true
+        });
+      }
+      return result;
+    }
+
+    function buildHorizontalCutSamples(s, count) {
+      var result = [];
+      var n = Math.max(2, Math.floor(count));
+      for (var i = 0; i < n; i++) {
+        var u = i / (n - 1);
+        var displayXCoord = -1 + 2 * u;
+        var displayYCoord = clamp(s.slice, -1, 1);
+        var world = displayToWorld(displayXCoord, displayYCoord, s);
+        var valid = insideWorld(world.x, world.y);
+        result.push({
+          x: world.x,
+          y: world.y,
+          top: valid ? terrain(world.x, world.y, s) : -999,
+          bottom: -0.82,
+          u: u,
+          displayX: displayXCoord,
+          valid: valid
+        });
+      }
+      return result;
+    }
+
+    function drawSectionRaster(s, samples, bottomZ) {
+      var w = sectionCanvas.width;
+      var h = sectionCanvas.height;
+      var left = 18;
+      var right = w - 18;
+      var img = sctx.createImageData(w, h);
+      for (var py = 0; py < h; py++) {
+        for (var px = 0; px < w; px++) {
+          var k = (py * w + px) * 4;
+          img.data[k] = 249; img.data[k + 1] = 250; img.data[k + 2] = 251; img.data[k + 3] = 255;
+        }
+      }
+      for (var xPix = left; xPix <= right; xPix++) {
+        var u = (xPix - left) / Math.max(1, right - left);
+        var point = sectionPointAt(samples, u);
+        if (!point.valid) continue;
+        var yStart = Math.max(18, Math.floor(sectionY(point.top)));
+        var yEnd = Math.min(h - 18, Math.ceil(sectionY(bottomZ)));
+        for (var yPix = yStart; yPix <= yEnd; yPix++) {
+          var z = sectionZ(yPix);
+          if (z > point.top || z < bottomZ) continue;
+          var idx = layerIndexAt(point.x, point.y, z, s);
+          var rgb = hexToRgb(rocks[idx].color);
+          var kk = (yPix * w + xPix) * 4;
+          img.data[kk] = rgb.r; img.data[kk + 1] = rgb.g; img.data[kk + 2] = rgb.b; img.data[kk + 3] = 255;
+        }
+      }
+      sctx.putImageData(img, 0, 0);
+    }
+
+    function drawSectionContacts(s, samples, bottomZ) {
+      if (s.layerCount <= 1) return;
+      var totalThickness = s.spacing * s.layerCount;
+      var datum = -totalThickness / 2;
+      var uSteps = qualityValue(210, 72);
+      var zSteps = qualityValue(86, 34);
+      sctx.save();
+      sctx.strokeStyle = 'rgba(0,0,0,0.50)';
+      sctx.lineWidth = 1.15;
+      sctx.lineJoin = 'round';
+      sctx.lineCap = 'round';
+      for (var b = 1; b <= s.layerCount - 1; b++) {
+        var boundary = datum + b * s.spacing;
+        for (var i = 0; i < uSteps; i++) {
+          for (var j = 0; j < zSteps; j++) {
+            var u1 = i / uSteps;
+            var u2 = (i + 1) / uSteps;
+            var z1 = sectionZFromFraction(j / zSteps, bottomZ);
+            var z2 = sectionZFromFraction((j + 1) / zSteps, bottomZ);
+            var p11 = sectionPointAt(samples, u1);
+            var p21 = sectionPointAt(samples, u2);
+            var p22 = sectionPointAt(samples, u2);
+            var p12 = sectionPointAt(samples, u1);
+            if (!p11.valid || !p21.valid || !p22.valid || !p12.valid) continue;
+            if (z1 > p11.top && z1 > p21.top && z2 > p12.top && z2 > p22.top) continue;
+            var v11 = stratigraphicLevel(p11.x, p11.y, z1, s) - boundary;
+            var v21 = stratigraphicLevel(p21.x, p21.y, z1, s) - boundary;
+            var v22 = stratigraphicLevel(p22.x, p22.y, z2, s) - boundary;
+            var v12 = stratigraphicLevel(p12.x, p12.y, z2, s) - boundary;
+            var pts = [];
+            addSectionIso(pts, u1, z1, v11, u2, z1, v21);
+            addSectionIso(pts, u2, z1, v21, u2, z2, v22);
+            addSectionIso(pts, u2, z2, v22, u1, z2, v12);
+            addSectionIso(pts, u1, z2, v12, u1, z1, v11);
+            if (pts.length === 2) {
+              sctx.beginPath();
+              sctx.moveTo(sectionXFromFraction(pts[0].u), sectionY(pts[0].z));
+              sctx.lineTo(sectionXFromFraction(pts[1].u), sectionY(pts[1].z));
+              sctx.stroke();
+            }
+          }
+        }
+      }
+      sctx.restore();
+    }
+
+    function addSectionIso(list, u1, z1, v1, u2, z2, v2) {
+      if ((v1 < 0 && v2 >= 0) || (v2 < 0 && v1 >= 0)) {
+        var t = v1 === v2 ? 0 : (0 - v1) / (v2 - v1);
+        list.push({ u: lerp(u1, u2, t), z: lerp(z1, z2, t) });
+      }
+    }
+
+    function sectionZFromFraction(f, bottomZ) {
+      return 0.68 + (bottomZ - 0.68) * f;
+    }
+
+    function sectionPointAt(samples, fraction) {
+      var pos = clamp(fraction, 0, 1) * (samples.length - 1);
+      var i = Math.floor(pos);
+      var j = Math.min(samples.length - 1, i + 1);
+      var t = pos - i;
+      return {
+        x: lerp(samples[i].x, samples[j].x, t),
+        y: lerp(samples[i].y, samples[j].y, t),
+        top: lerp(samples[i].top, samples[j].top, t),
+        bottom: lerp(samples[i].bottom, samples[j].bottom, t),
+        u: fraction,
+        displayX: lerp(samples[i].displayX, samples[j].displayX, t),
+        valid: samples[i].valid !== false && samples[j].valid !== false
+      };
+    }
+
+    function drawSectionTopLine(samples) {
+      sctx.save();
+      sctx.strokeStyle = 'rgba(0,0,0,0.95)';
+      sctx.lineWidth = 2.4;
+      sctx.beginPath();
+      var started = false;
+      for (var i = 0; i < samples.length; i++) {
+        if (!samples[i].valid) { started = false; continue; }
+        var x = sectionXFromFraction(samples[i].u);
+        var y = sectionY(samples[i].top);
+        if (!started) { sctx.moveTo(x, y); started = true; }
+        else sctx.lineTo(x, y);
+      }
+      sctx.stroke();
+      sctx.restore();
+    }
+
+    function drawSectionFrame() {
+      sctx.imageSmoothingEnabled = true;
+      sctx.strokeStyle = 'rgba(0,0,0,0.55)';
+      sctx.lineWidth = 1.6;
+      sctx.strokeRect(1, 1, sectionCanvas.width - 2, sectionCanvas.height - 2);
+    }
+
+    function mapScale() {
+      var currentState = state();
+      return (mapCanvas.width / 2) * currentState.mapZoom;
+    }
+
+    function mapCenterX() {
+      return mapCanvas.width / 2;
+    }
+
+    function mapCenterY() {
+      return mapCanvas.height / 2;
+    }
+
+    function mapX(x) {
+      return mapCenterX() + x * mapScale();
+    }
+
+    function mapY(y) {
+      return mapCenterY() + y * mapScale();
+    }
+
+    function displayX(x) {
+      return mapX(x);
+    }
+
+    function displayY(y) {
+      return mapY(y);
+    }
+
+    function pixelToDisplay(px, py) {
+      var scale = mapScale();
+      return {
+        x: (px - mapCenterX()) / scale,
+        y: (py - mapCenterY()) / scale
+      };
+    }
+
+    function pixelToDisplayScaled(px, py, width, height) {
+      var canvasX = px * mapCanvas.width / Math.max(1, width - 1);
+      var canvasY = py * mapCanvas.height / Math.max(1, height - 1);
+      return pixelToDisplay(canvasX, canvasY);
+    }
+
+    function displayToWorld(x, y, s) {
+      return { x: x, y: y };
+    }
+
+    function worldToDisplay(x, y, s) {
+      return { x: x, y: y };
+    }
+
+    function planeDefinition(s) {
+      var direction = rotate2D({ x: 1, y: 0 }, s.planeRot);
+      var normal = { x: -direction.y, y: direction.x };
+      var center = {
+        x: normal.x * s.slice,
+        y: normal.y * s.slice
+      };
+      return {
+        center: center,
+        direction: direction,
+        normal: normal
+      };
+    }
+
+    function clippedPlaneTrace(plane) {
+      var candidates = [];
+      var c = plane.center;
+      var d = plane.direction;
+
+      if (Math.abs(d.x) > 0.000001) {
+        addTraceCandidate(candidates, c, d, (-1 - c.x) / d.x);
+        addTraceCandidate(candidates, c, d, (1 - c.x) / d.x);
+      }
+
+      if (Math.abs(d.y) > 0.000001) {
+        addTraceCandidate(candidates, c, d, (-1 - c.y) / d.y);
+        addTraceCandidate(candidates, c, d, (1 - c.y) / d.y);
+      }
+
+      var unique = [];
+      for (var i = 0; i < candidates.length; i++) {
+        var p = candidates[i];
+        var repeated = false;
+        for (var j = 0; j < unique.length; j++) {
+          if (Math.hypot(p.x - unique[j].x, p.y - unique[j].y) < 0.0001) {
+            repeated = true;
+          }
+        }
+        if (!repeated) unique.push(p);
+      }
+
+      if (unique.length < 2) return null;
+      return orderTraceForDisplay(farthestPair(unique));
+    }
+
+    function addTraceCandidate(list, center, direction, t) {
+      var x = center.x + direction.x * t;
+      var y = center.y + direction.y * t;
+      if (x >= -1.0001 && x <= 1.0001 && y >= -1.0001 && y <= 1.0001) {
+        list.push({
+          x: clamp(x, -1, 1),
+          y: clamp(y, -1, 1)
+        });
+      }
+    }
+
+    function farthestPair(points) {
+      var a = points[0];
+      var b = points[1];
+      var best = -1;
+      for (var i = 0; i < points.length; i++) {
+        for (var j = i + 1; j < points.length; j++) {
+          var distance = Math.pow(points[i].x - points[j].x, 2) + Math.pow(points[i].y - points[j].y, 2);
+          if (distance > best) {
+            best = distance;
+            a = points[i];
+            b = points[j];
+          }
+        }
+      }
+      return { a: a, b: b };
+    }
+
+    function orderTraceForDisplay(trace) {
+      var ax = displayX(trace.a.x);
+      var bx = displayX(trace.b.x);
+      var ay = displayY(trace.a.y);
+      var by = displayY(trace.b.y);
+
+      if (ax > bx || (Math.abs(ax - bx) < 0.0001 && ay > by)) {
+        return { a: trace.b, b: trace.a };
+      }
+      return trace;
+    }
+
+    function insideWorld(x, y) {
+      return x >= -1 && x <= 1 && y >= -1 && y <= 1;
+    }
+
+    function sectionXFromFraction(f) {
+      return 18 + clamp(f, 0, 1) * (sectionCanvas.width - 36);
+    }
+
+    function sectionY(z) {
+      return 18 + (0.68 - z) * (sectionCanvas.height - 36) / 1.55;
+    }
+
+    function sectionZ(y) {
+      return 0.68 - ((y - 18) * 1.55 / (sectionCanvas.height - 36));
+    }
+
+    function drawPoly(ctx, points, color, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (var i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+      if (stroke && stroke !== 'rgba(0,0,0,0)') {
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+    }
+
+    function drawLine(ctx, a, b, color, width) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawProjectedPolyline(ctx, pts3, s, color, width) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      for (var i = 0; i < pts3.length; i++) {
+        var pp = project(pts3[i], s, blockCanvas);
+        if (i === 0) ctx.moveTo(pp.x, pp.y);
+        else ctx.lineTo(pp.x, pp.y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function updateInterpretation(s) {
+      var text = '';
+      if (s.structure === 'horizontal') text = 'Estratos horizontales fijos. La topografía corta esos niveles y hace aflorar distintas rocas.';
+      else if (s.structure === 'fold') text = 'Pliegue sencillo idealizado. Valores positivos y negativos invierten el sentido del pliegue: anticlinal/sinclinal.';
+      else text = 'Estratos inclinados. El buzamiento y su dirección controlan contactos, mapa y corte.';
+      interpretation.innerHTML = '<strong>' + labelStructure(s.structure) + '.</strong> ' + text + ' El número de estratos es total, no patrón repetido. El grosor controla la separación uniforme entre contactos.';
+    }
+
+    function labelStructure(value) {
+      if (value === 'horizontal') return 'Estratos horizontales';
+      if (value === 'fold') return 'Pliegue sencillo';
+      return 'Estratos inclinados';
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function hexToRgb(hex) {
+      var c = hex.replace('#', '');
+      return { r: parseInt(c.substring(0, 2), 16), g: parseInt(c.substring(2, 4), 16), b: parseInt(c.substring(4, 6), 16) };
+    }
+
+    function shade(hex, factor) {
+      var rgb = hexToRgb(hex);
+      return 'rgb(' + clamp(Math.round(rgb.r * factor), 0, 255) + ',' + clamp(Math.round(rgb.g * factor), 0, 255) + ',' + clamp(Math.round(rgb.b * factor), 0, 255) + ')';
+    }
+
+    function averageDepth(points) {
+      var sum = 0;
+      for (var i = 0; i < points.length; i++) sum += points[i].depth;
+      return sum / points.length;
+    }
+
+    function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+    function clampInt(value, min, max) { return Math.max(min, Math.min(max, Math.floor(value))); }
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function rotate2D(v, angle) {
+      var c = Math.cos(angle);
+      var s = Math.sin(angle);
+      return { x: v.x * c - v.y * s, y: v.x * s + v.y * c };
+    }
+
+    function normalizeAngle(angle) {
+      var result = angle;
+      while (result > Math.PI) result -= 2 * Math.PI;
+      while (result < -Math.PI) result += 2 * Math.PI;
+      return result;
+    }
+
+    function runSelfTests() {
+      var s = state();
+      console.assert(Number.isFinite(terrain(0, 0, s)), 'terrain devuelve número finito');
+      console.assert([0, 1, 2, 3, 4, 5].indexOf(layerIndexAt(0.2, -0.1, 0.05, s)) >= 0, 'layerIndexAt devuelve capa válida');
+      var noRepeatState = Object.assign({}, s, { layerCount: 3, spacing: 0.15 });
+      console.assert(layerIndexAt(0, 0, 10, noRepeatState) === 2, 'no se repiten colores por encima');
+      console.assert(layerIndexAt(0, 0, -10, noRepeatState) === 0, 'no se repiten colores por debajo');
+      var verticalState = Object.assign({}, s, { dip: 90, layerCount: 3, spacing: 0.3, structure: 'dipping' });
+      console.assert(Number.isFinite(stratigraphicLevel(0.2, 0.1, 0, verticalState)), 'buzamiento 90 sin infinitos');
+      var foldPositive = Object.assign({}, s, { structure: 'fold', fold: 0.6 });
+      var foldNegative = Object.assign({}, s, { structure: 'fold', fold: -0.6 });
+      console.assert(stratigraphicLevel(0.4, 0, 0, foldPositive) !== stratigraphicLevel(0.4, 0, 0, foldNegative), 'el pliegue permite invertir anticlinal/sinclinal');
+      console.assert(Number(controls.fold.min) < 0 && Number(controls.fold.max) > 0, 'el control de pliegue admite valores negativos y positivos');
+      console.assert(Math.abs(sectionZ(sectionY(0.15)) - 0.15) < 0.0001, 'sectionY y sectionZ son inversas');
+      console.assert(Number(controls.dip.max) === 90, 'el buzamiento permite llegar a 90 grados');
+      console.assert(buildSectionSamplesFromTrace(clippedPlaneTrace(planeDefinition(s)), s, 20).length === 20, 'el corte oblicuo genera muestras');
+      console.assert(qualityValue(210, 72) >= 72 && qualityValue(86, 34) >= 34, 'el corte ajusta densidad entre borrador y render fino');
+      console.assert(typeof window.requestAnimationFrame === 'function', 'el renderizado usa requestAnimationFrame');
+      console.assert(typeof drawMapSectionProjection === 'undefined', 'las líneas discontinuas de proyección están eliminadas');
+      var rotState = Object.assign({}, s, { planeRot: 90 * Math.PI / 180 });
+      var trace90 = clippedPlaneTrace(planeDefinition(rotState));
+      console.assert(trace90 !== null, 'el plano girado genera una traza visible en la vista cenital');
+      var dx = mapX(1) - mapX(0);
+      var dy = mapY(1) - mapY(0);
+      console.assert(Math.abs(dx - dy) < 0.0001, 'el mapa cenital usa la misma escala en X e Y');
+      console.assert(mapScale() > mapCanvas.width * 0.4, 'el mapa cenital ocupa gran parte del ancho del marco');
+      var zoomState = Object.assign({}, s, { mapZoom: 0.60 });
+      console.assert(zoomState.mapZoom < 0.94, 'se puede reducir la escala del mapa');
+      console.assert(sectionCanvas.width === mapCanvas.width, 'mapa y corte tienen el mismo ancho de canvas');
+      console.assert(blockCanvas.height >= 1000, 'la ventana del bloque geológico 3D se estira hacia abajo');
+      console.assert(820 * 0.54 > 300, 'el bloque 3D mantiene una escala interna suficiente sin crecer más');
+      var oldRotZ = camera.rotZ;
+      rotateBlockView(1);
+      console.assert(camera.rotZ !== oldRotZ, 'los controles bajo el bloque rotan la vista sobre el plano de base');
+      camera.rotZ = oldRotZ;
+    }
+  </script>
+</body>
+</html>
