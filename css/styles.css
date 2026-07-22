@@ -233,6 +233,11 @@ h2 {
   color: #92400e;
 }
 
+.tag.geo {
+  background: var(--soft-blue);
+  color: #1e40af;
+}
+
 .tag.js {
   background: var(--soft-blue);
   color: #1e40af;

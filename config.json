@@ -25,6 +25,12 @@
       "id": "informatica",
       "color": "#fef3c7",
       "tagClass": "info"
+    },
+    {
+      "nombre": "Geología",
+      "id": "geologia",
+      "color": "#dbeafe",
+      "tagClass": "geo"
     }
   ],
 
@@ -104,7 +110,7 @@
       "id": "representacion-mapas-geologicos",
       "nombre": "Representación de mapas geológicos",
       "carpeta": "representación-de-mapas-geológicos",
-      "categoria": "ciencias",
+      "categoria": "geologia",
       "modulosRequeridos": ["graphics"],
       "estado": "publicado"
     }
