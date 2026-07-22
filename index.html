@@ -6,373 +6,7 @@
 
   <title>Verne Labs | Simulaciones didácticas</title>
 
-  <style>
-    :root {
-      --bg: #f4f7fb;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #64748b;
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --secondary: #0f766e;
-      --secondary-dark: #115e59;
-      --border: #e2e8f0;
-      --soft-blue: #dbeafe;
-      --soft-green: #ccfbf1;
-      --soft-purple: #ede9fe;
-      --soft-amber: #fef3c7;
-      --soft-red: #fee2e2;
-      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-      --radius: 20px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    header {
-      background: linear-gradient(135deg, #0f172a, #1e3a8a);
-      color: white;
-      padding: 4rem 1.5rem 3.5rem;
-      text-align: center;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: clamp(2.4rem, 6vw, 4.5rem);
-      letter-spacing: -0.05em;
-    }
-
-    header .subtitle {
-      margin: 1rem auto 0;
-      max-width: 850px;
-      color: #dbeafe;
-      font-size: 1.15rem;
-    }
-
-    header .author {
-      margin-top: 1.5rem;
-      color: #bfdbfe;
-      font-size: 0.95rem;
-    }
-
-    nav {
-      background: white;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-
-    .nav-inner {
-      max-width: 1150px;
-      margin: 0 auto;
-      padding: 0.9rem 1.5rem;
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    nav a {
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 650;
-      font-size: 0.95rem;
-    }
-
-    nav a:hover {
-      color: var(--primary);
-    }
-
-    main {
-      max-width: 1150px;
-      margin: 0 auto;
-      padding: 2.8rem 1.5rem 4rem;
-    }
-
-    section {
-      margin-bottom: 3.5rem;
-    }
-
-    h2 {
-      font-size: 2rem;
-      margin: 0 0 0.75rem;
-      letter-spacing: -0.04em;
-    }
-
-    .intro {
-      max-width: 850px;
-      color: var(--muted);
-      font-size: 1.05rem;
-      margin-bottom: 2rem;
-    }
-
-    .filter-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.8rem;
-    }
-
-    .filter-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid var(--border);
-      background: white;
-      color: var(--muted);
-      font-size: 0.85rem;
-      font-weight: 700;
-      padding: 0.45rem 0.9rem;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-    }
-
-    .chip:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .chip.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: white;
-    }
-
-    .search-input {
-      flex: 0 1 260px;
-      padding: 0.55rem 0.9rem;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      font-size: 0.9rem;
-      background: white;
-      color: var(--text);
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-    }
-
-    .no-results {
-      display: none;
-      color: var(--muted);
-      background: white;
-      border: 1px dashed var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      text-align: center;
-    }
-
-    .no-results.visible {
-      display: block;
-    }
-
-    .simulations-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.2rem;
-    }
-
-    .simulation-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .card-header {
-      padding: 1rem 1rem 0.75rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .tag-row {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-
-    .tag {
-      display: inline-block;
-      font-size: 0.78rem;
-      font-weight: 750;
-      padding: 0.28rem 0.65rem;
-      border-radius: 999px;
-    }
-
-    .tag.bio {
-      background: var(--soft-green);
-      color: #115e59;
-    }
-
-    .tag.phys {
-      background: var(--soft-red);
-      color: #991b1b;
-    }
-
-    .tag.math {
-      background: var(--soft-purple);
-      color: #5b21b6;
-    }
-
-    .tag.info {
-      background: var(--soft-amber);
-      color: #92400e;
-    }
-
-    .tag.js {
-      background: var(--soft-blue);
-      color: #1e40af;
-    }
-
-    .simulation-card h3 {
-      margin: 0;
-      font-size: 1.15rem;
-      letter-spacing: -0.02em;
-      line-height: 1.3;
-    }
-
-    .card-body {
-      padding: 0.9rem;
-      flex: 1;
-    }
-
-    .card-body p {
-      margin-top: 0;
-      margin-bottom: 0.8rem;
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-
-    .features {
-      padding-left: 1.2rem;
-      color: var(--muted);
-      margin-bottom: 0;
-      font-size: 0.85rem;
-      line-height: 1.3;
-    }
-
-    .features li {
-      margin-bottom: 0.3rem;
-    }
-
-    .card-actions {
-      padding: 0.9rem;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.5rem;
-      border-top: 1px solid var(--border);
-      background: #f8fafc;
-    }
-
-    .button {
-      display: inline-block;
-      text-align: center;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 0.85rem;
-      border-radius: 12px;
-      padding: 0.6rem 0.85rem;
-      transition: transform 0.15s ease, background 0.15s ease;
-    }
-
-    .button:hover {
-      transform: translateY(-1px);
-    }
-
-    .button.primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .button.primary:hover {
-      background: var(--primary-dark);
-    }
-
-    .button.secondary {
-      background: var(--secondary);
-      color: white;
-    }
-
-    .button.secondary:hover {
-      background: var(--secondary-dark);
-    }
-
-    .info-box {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 1.5rem;
-    }
-
-    .info-box p {
-      color: var(--muted);
-      margin-top: 0;
-    }
-
-    .folder-structure {
-      background: #0f172a;
-      color: #e5e7eb;
-      padding: 1rem;
-      border-radius: 14px;
-      overflow-x: auto;
-      font-size: 0.85rem;
-      line-height: 1.5;
-    }
-
-    footer {
-      background: white;
-      border-top: 1px solid var(--border);
-      text-align: center;
-      padding: 2rem 1.5rem;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    @media (min-width: 720px) {
-      .card-actions {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media (max-width: 600px) {
-      header {
-        padding: 3rem 1rem 2.5rem;
-      }
-
-      main {
-        padding: 2rem 1rem 3rem;
-      }
-
-      .simulation-card h3 {
-        font-size: 1.25rem;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
@@ -408,13 +42,7 @@
       </p>
 
       <div class="filter-bar">
-        <div class="filter-chips" role="group" aria-label="Filtrar laboratorios por área">
-          <button type="button" class="chip active" data-filter="todos">Todos</button>
-          <button type="button" class="chip" data-filter="fisica">Física</button>
-          <button type="button" class="chip" data-filter="biologia">Biología</button>
-          <button type="button" class="chip" data-filter="matematicas">Matemáticas</button>
-          <button type="button" class="chip" data-filter="informatica">Informática / IA</button>
-        </div>
+        <div class="filter-chips" id="filterChips" role="group" aria-label="Filtrar laboratorios por área"></div>
         <input type="search" id="labSearch" class="search-input" placeholder="Buscar laboratorio..." aria-label="Buscar laboratorio">
       </div>
 
@@ -488,9 +116,46 @@ const LABS_CONFIG = [
       const gridContainer = document.getElementById('simulationsGrid');
       const searchInput = document.getElementById('labSearch');
       const noResults = document.getElementById('noResults');
-      const chips = Array.from(document.querySelectorAll('.chip'));
-      const todosChip = chips.find(chip => chip.dataset.filter === 'todos');
+      const filterChipsContainer = document.getElementById('filterChips');
       const activeSubjects = new Set();
+      let chips = [];
+      let todosChip = null;
+
+      const categoryMap = {
+        'Física': 'fisica',
+        'Biología': 'biologia',
+        'Matemáticas': 'matematicas',
+        'Informática / IA': 'informatica'
+      };
+
+      async function loadFilterChips() {
+        try {
+          const response = await fetch('simulaciones/config.json');
+          const config = await response.json();
+
+          todosChip = document.createElement('button');
+          todosChip.type = 'button';
+          todosChip.className = 'chip active';
+          todosChip.dataset.filter = 'todos';
+          todosChip.textContent = 'Todos';
+          filterChipsContainer.appendChild(todosChip);
+
+          for (const etiqueta of config.etiquetas) {
+            const filterCode = categoryMap[etiqueta];
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'chip';
+            btn.dataset.filter = filterCode;
+            btn.textContent = etiqueta;
+            filterChipsContainer.appendChild(btn);
+          }
+
+          chips = Array.from(document.querySelectorAll('.chip'));
+          setupFilters();
+        } catch (error) {
+          console.error('Error cargando config.json:', error);
+        }
+      }
 
       async function loadCards() {
         for (const lab of LABS_CONFIG) {
@@ -511,7 +176,6 @@ const LABS_CONFIG = [
           }
         }
 
-        setupFilters();
         applyFilters();
       }
 
@@ -589,7 +253,7 @@ const LABS_CONFIG = [
         noResults.classList.toggle('visible', visibleCount === 0);
       }
 
-      loadCards();
+      loadFilterChips().then(() => loadCards());
     })();
   </script>
 
