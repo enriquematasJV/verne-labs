@@ -88,6 +88,12 @@
       "carpeta": "plano-inclinado",
       "categoria": "fisica",
       "modulosRequeridos": ["physics", "graphics"],
+      "modulosEspecificos": {
+        "PlanoInclinadoPhysics": {
+          "descripcion": "Cálculos de fuerzas y cinemática específicos para plano inclinado",
+          "ruta": "./js/PlanoInclinadoPhysics.js"
+        }
+      },
       "estado": "publicado"
     },
     {
