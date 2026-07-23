@@ -15,6 +15,7 @@ class PlanoInclinadoPresenter {
 
     // AnimationID para requestAnimationFrame
     this.animationId = null;
+    this.lastTimestamp = null;
 
     this.setupEventListeners();
     this.setupLifecycleListeners();
@@ -22,6 +23,7 @@ class PlanoInclinadoPresenter {
 
   setupLifecycleListeners() {
     this.lifecycle.on('onStart', () => {
+      this.lastTimestamp = null;
       this.animationId = requestAnimationFrame((ts) => this.animate(ts));
       this.updateUI();
     });
@@ -214,7 +216,15 @@ class PlanoInclinadoPresenter {
   }
 
   animate(timestamp) {
-    this.lifecycle.step(timestamp);
+    if (this.lastTimestamp === null) {
+      this.lastTimestamp = timestamp;
+    } else {
+      let deltaTime = timestamp - this.lastTimestamp;
+      this.lastTimestamp = timestamp;
+      deltaTime = Math.min(deltaTime, 0.04 * 1000); // Limitar a 40ms
+
+      this.lifecycle.step(deltaTime);
+    }
 
     if (this.lifecycle.isRunning()) {
       this.animationId = requestAnimationFrame((ts) => this.animate(ts));
