@@ -87,11 +87,24 @@
       "nombre": "Dinámica en plano inclinado",
       "carpeta": "plano-inclinado",
       "categoria": "fisica",
-      "modulosRequeridos": ["physics", "graphics"],
+      "modulosRequeridos": ["physics", "graphics", "simulations"],
+      "detalleModulos": {
+        "physics": "OdeSolverRK4 (integración RK4), KinematicsEngine (posición/velocidad)",
+        "graphics": "Canvas2DRenderer (renderizado 2D)",
+        "simulations": "SimulationLifecycle (máquina de estados start/pause/reset)"
+      },
       "modulosEspecificos": {
         "PlanoInclinadoPhysics": {
-          "descripcion": "Cálculos de fuerzas y cinemática específicos para plano inclinado",
+          "descripcion": "Cálculos de fuerzas específicos del plano inclinado (sin código de integración)",
           "ruta": "./js/PlanoInclinadoPhysics.js"
+        },
+        "PlanoInclinadoModel": {
+          "descripcion": "Modelo de datos + lógica de simulación (usa OdeSolverRK4, KinematicsEngine)",
+          "ruta": "./js/PlanoInclinadoModel.js"
+        },
+        "PlanoInclinadoPresenter": {
+          "descripcion": "Controlador MVP + renderizado (usa SimulationLifecycle para ciclo de vida)",
+          "ruta": "./js/PlanoInclinadoPresenter.js"
         }
       },
       "estado": "publicado"
