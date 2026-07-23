@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio de números complejos</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --grid: #e5e7eb;
+      --axis: #374151;
+      --a: #2563eb;
+      --b: #16a34a;
+      --r: #dc2626;
+      --l: #7c3aed;
+      --border: #d1d5db;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+    header {
+      padding: 14px 22px 10px;
+      background: linear-gradient(135deg, #ffffff, #eef2ff);
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 { margin: 0 0 5px; font-size: 1.38rem; }
+    header p { margin: 0; color: var(--muted); max-width: 1200px; line-height: 1.35; font-size: 0.94rem; }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(560px, 1fr) 420px;
+      gap: 14px;
+      padding: 14px;
+      height: calc(100vh - 86px);
+      min-height: 0;
+    }
+    .canvas-card, .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+      overflow: hidden;
+      min-height: 0;
+    }
+    .canvas-card {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: #fafafa;
+    }
+    .button-row, .mode-row, .zoom-group, .preset-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+    .preset-row { margin-left: 8px; }
+    .preset-label { font-size: 0.86rem; color: var(--muted); font-weight: 700; }
+    button {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
+      padding: 7px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 650;
+      transition: 0.15s;
+    }
+    button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08); }
+    button.active { background: #111827; color: white; border-color: #111827; }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      flex: 1;
+      background: white;
+      cursor: crosshair;
+    }
+
+    canvas.tall-canvas {
+      height: 960px;
+      min-height: 960px;
+      flex: 0 0 auto;
+    }
+    .panel { padding: 13px; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 11px; }
+    .panel::before {
+      content: "Panel del laboratorio";
+      position: sticky;
+      top: -13px;
+      z-index: 5;
+      display: block;
+      margin: -13px -13px 2px;
+      padding: 10px 13px;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--border);
+      font-weight: 800;
+    }
+    .section { border: 1px solid var(--border); border-radius: 14px; padding: 12px; background: #fcfcfd; }
+    .section h2 { margin: 0 0 9px; font-size: 1rem; }
+    .hint { color: var(--muted); font-size: 0.92rem; line-height: 1.4; }
+    .hidden { display: none !important; }
+    .card { display: grid; gap: 5px; padding: 10px; border-radius: 12px; background: white; border: 1px solid var(--border); margin-bottom: 9px; }
+    .card-title { font-weight: 800; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    code { background: #f3f4f6; border-radius: 7px; padding: 2px 5px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .ops { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+    .slider-row { display: grid; grid-template-columns: 92px 1fr 54px; align-items: center; gap: 8px; font-size: 0.91rem; margin: 7px 0; }
+    input[type="range"] { width: 100%; }
+    .small { font-size: 0.86rem; color: var(--muted); }
+    .tag { display: inline-flex; align-items: center; gap: 5px; padding: 3px 7px; border-radius: 999px; background: #f3f4f6; font-size: 0.82rem; font-weight: 750; }
+    @media (max-width: 980px) {
+      body { overflow: auto; }
+      .layout { grid-template-columns: 1fr; height: auto; }
+      canvas { height: 620px; min-height: 620px; flex: initial; }
+      canvas.tall-canvas { height: 880px; min-height: 880px; }
+      .panel { overflow: visible; }
+      .panel::before { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Laboratorio de números complejos, fasores, ondas y Lissajous</h1>
+    <p>Cinco visiones conectadas: el complejo como punto, como fasor temporal, como superposición de ondas, como generador de figuras tipo Lissajous y como alternativa algebraica a los vectores para rotar objetos 2D.</p>
+  </header>
+
+  <main class="layout">
+    <section class="canvas-card">
+      <div class="toolbar">
+        <div class="mode-row">
+          <button id="modeComplexBtn" class="active">1. Complejos</button>
+          <button id="modeTemporalBtn">2. Fasor temporal</button>
+          <button id="modeMandalaBtn">3. Interferencia / mandala</button>
+          <button id="modeLissajousBtn">4. Lissajous</button>
+          <button id="modeCompareBtn">5. Vector vs complejo</button>
+        </div>
+        <div class="zoom-group">
+          <span class="small">Escala</span>
+          <input id="zoomSlider" type="range" min="25" max="100" value="50">
+          <span id="zoomLabel" class="small">50 px/u</span>
+          <div id="lissajousPresets" class="preset-row hidden">
+            <span class="preset-label">Lissajous</span>
+            <button class="preset" data-fa="1" data-fb="1" data-phase="90">1:1 círculo</button>
+            <button class="preset" data-fa="1" data-fb="2" data-phase="0">1:2 ocho</button>
+            <button class="preset" data-fa="3" data-fb="2" data-phase="90">3:2</button>
+            <button class="preset" data-fa="4" data-fb="3" data-phase="90">4:3</button>
+            <button class="preset" data-fa="5" data-fb="4" data-phase="90">5:4</button>
+            <button class="preset" data-fa="3" data-fb="1" data-phase="90">3:1</button>
+          </div>
+          <div id="mandalaPresets" class="preset-row hidden">
+            <span class="preset-label">Mandala</span>
+            <button class="mandala-preset" data-aa="3" data-fa="2" data-pa="0" data-ab="2" data-fb="5" data-pb="90" data-op="sum">2:5 flor</button>
+            <button class="mandala-preset" data-aa="3" data-fa="3" data-pa="0" data-ab="2.4" data-fb="7" data-pb="45" data-op="sum">3:7 roseta</button>
+            <button class="mandala-preset" data-aa="3.5" data-fa="4" data-pa="0" data-ab="1.8" data-fb="9" data-pb="120" data-op="sum">4:9 espiral</button>
+            <button class="mandala-preset" data-aa="3" data-fa="5" data-pa="0" data-ab="3" data-fb="6" data-pb="180" data-op="sub">5:6 corona</button>
+            <button class="mandala-preset" data-aa="2.8" data-fa="8" data-pa="30" data-ab="2.8" data-fb="11" data-pb="135" data-op="sum">8:11 complejo</button>
+          </div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="button-row" id="actionBar"></div>
+        <div class="button-row">
+          <button id="resetBtn">Reiniciar</button>
+        </div>
+      </div>
+      <canvas id="plane"></canvas>
+    </section>
+
+    <aside class="panel">
+      <section class="section">
+        <h2 id="panelTitle">Números complejos</h2>
+        <p id="helpText" class="hint"></p>
+      </section>
+
+      <section id="complexSection" class="section">
+        <h2>Complejos y operaciones</h2>
+        <div id="infoA" class="card"></div>
+        <div id="infoB" class="card"></div>
+        <div id="infoR" class="card"></div>
+        <div id="operationBreakdown" class="card"></div>
+        <div id="complexOpsButtons" class="ops">
+          <button class="op active" data-op="add">A + B</button>
+          <button class="op" data-op="sub">A − B</button>
+          <button class="op" data-op="mul">A · B</button>
+          <button class="op" data-op="div">A / B</button>
+        </div>
+      </section>
+
+      <section id="waveControls" class="section hidden">
+        <h2>Parámetros temporales</h2>
+        <div class="card">
+          <div class="card-title"><span><span class="dot" style="background:#2563eb"></span>Onda/Fasor A</span></div>
+          <div class="slider-row"><span>Amplitud</span><input id="ampASlider" type="range" min="0" max="5" step="0.1" value="2.5"><span id="ampALabel">2.5</span></div>
+          <div class="slider-row"><span>Frecuencia</span><input id="freqASlider" type="range" min="0.2" max="6" step="0.1" value="1"><span id="freqALabel">1</span></div>
+          <div class="button-row"><button id="freqADownBtn">− f A</button><button id="freqAUpBtn">+ f A</button></div>
+          <div class="slider-row"><span>Fase</span><input id="phaseASlider" type="range" min="-180" max="180" step="5" value="35"><span id="phaseALabel">35°</span></div>
+        </div>
+        <div id="waveBCard" class="card">
+          <div class="card-title"><span><span class="dot" style="background:#16a34a"></span>Onda/Fasor B</span></div>
+          <div class="slider-row"><span>Amplitud</span><input id="ampBSlider" type="range" min="0" max="5" step="0.1" value="2"><span id="ampBLabel">2</span></div>
+          <div class="slider-row"><span>Frecuencia</span><input id="freqBSlider" type="range" min="0.2" max="6" step="0.1" value="1"><span id="freqBLabel">1</span></div>
+          <div class="button-row"><button id="freqBDownBtn">− f B</button><button id="freqBUpBtn">+ f B</button></div>
+          <div class="slider-row"><span>Fase</span><input id="phaseBSlider" type="range" min="-180" max="180" step="5" value="-45"><span id="phaseBLabel">-45°</span></div>
+        </div>
+      </section>
+
+      <section id="superpositionSection" class="section hidden">
+        <h2>Superposición</h2>
+        <p class="hint">En este modo no multiplicamos ni dividimos complejos estáticos. Superponemos funciones temporales: <code>R(t)=A(t)+B(t)</code> o <code>R(t)=A(t)-B(t)</code>.</p>
+        <div class="button-row">
+          <button id="waveSumBtn" class="active">Superponer A + B</button>
+          <button id="waveSubBtn">Invertir B: A − B</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Lectura matemática</h2>
+        <div id="mathInfo" class="card"></div>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("plane");
+    const ctx = canvas.getContext("2d");
+    const modeComplexBtn = document.getElementById("modeComplexBtn");
+    const modeTemporalBtn = document.getElementById("modeTemporalBtn");
+    const modeMandalaBtn = document.getElementById("modeMandalaBtn");
+    const modeLissajousBtn = document.getElementById("modeLissajousBtn");
+    const modeCompareBtn = document.getElementById("modeCompareBtn");
+    const actionBar = document.getElementById("actionBar");
+    const resetBtn = document.getElementById("resetBtn");
+    const zoomSlider = document.getElementById("zoomSlider");
+    const zoomLabel = document.getElementById("zoomLabel");
+    const lissajousPresets = document.getElementById("lissajousPresets");
+    const mandalaPresets = document.getElementById("mandalaPresets");
+    const panelTitle = document.getElementById("panelTitle");
+    const helpText = document.getElementById("helpText");
+    const complexSection = document.getElementById("complexSection");
+    const waveControls = document.getElementById("waveControls");
+    const waveBCard = document.getElementById("waveBCard");
+    const superpositionSection = document.getElementById("superpositionSection");
+    const infoA = document.getElementById("infoA");
+    const infoB = document.getElementById("infoB");
+    const infoR = document.getElementById("infoR");
+    const operationBreakdown = document.getElementById("operationBreakdown");
+    const complexOpsButtons = document.getElementById("complexOpsButtons");
+    const mathInfo = document.getElementById("mathInfo");
+    const ampASlider = document.getElementById("ampASlider");
+    const freqASlider = document.getElementById("freqASlider");
+    const phaseASlider = document.getElementById("phaseASlider");
+    const ampBSlider = document.getElementById("ampBSlider");
+    const freqBSlider = document.getElementById("freqBSlider");
+    const phaseBSlider = document.getElementById("phaseBSlider");
+    const ampALabel = document.getElementById("ampALabel");
+    const freqALabel = document.getElementById("freqALabel");
+    const phaseALabel = document.getElementById("phaseALabel");
+    const ampBLabel = document.getElementById("ampBLabel");
+    const freqBLabel = document.getElementById("freqBLabel");
+    const phaseBLabel = document.getElementById("phaseBLabel");
+    const freqADownBtn = document.getElementById("freqADownBtn");
+    const freqAUpBtn = document.getElementById("freqAUpBtn");
+    const freqBDownBtn = document.getElementById("freqBDownBtn");
+    const freqBUpBtn = document.getElementById("freqBUpBtn");
+    const waveSumBtn = document.getElementById("waveSumBtn");
+    const waveSubBtn = document.getElementById("waveSubBtn");
+    const COLORS = { A: "#2563eb", B: "#16a34a", R: "#dc2626", L: "#7c3aed" };
+
+    let mode = "complex";
+    let activePoint = "A";
+    let currentOperation = "add";
+    let complexOperationsVisible = false;
+    let waveOperation = "sum";
+    let scale = 50;
+    let dragging = false;
+    let animating = false;
+    let showTraces = true;
+    let time = 0;
+    let lastFrameTime = 0;
+    let animationId = null;
+    let A = { re: 2, im: 1.5 };
+    let B = { re: -1, im: 2 };
+    let waveA = { amp: 2.5, freq: 1, phase: degToRad(35) };
+    let waveB = { amp: 2, freq: 1.5, phase: degToRad(-45) };
+    let rodP1 = { re: -2.2, im: -0.7 };
+    let rodP2 = { re: 2.0, im: 0.8 };
+    let rotationAngle = degToRad(45);
+    const traceA = [];
+    const traceB = [];
+    const traceR = [];
+    const traceL = [];
+    const maxTrace = 1600;
+
+    function degToRad(d) { return d * Math.PI / 180; }
+    function radToDeg(r) { return r * 180 / Math.PI; }
+    function fmt(n, dec) {
+      dec = dec === undefined ? 2 : dec;
+      if (!Number.isFinite(n)) return "∞";
+      let s = (Math.abs(n) < 1e-10 ? 0 : n).toFixed(dec);
+      while (s.indexOf(".") >= 0 && s.endsWith("0")) s = s.slice(0, -1);
+      if (s.endsWith(".")) s = s.slice(0, -1);
+      return s;
+    }
+    function binom(z) { return fmt(z.re) + (z.im >= 0 ? " + " : " − ") + fmt(Math.abs(z.im)) + "i"; }
+    function mod(z) { return Math.hypot(z.re, z.im); }
+    function arg(z) { return Math.atan2(z.im, z.re); }
+    function add(z1,z2){ return { re:z1.re+z2.re, im:z1.im+z2.im }; }
+    function sub(z1,z2){ return { re:z1.re-z2.re, im:z1.im-z2.im }; }
+    function mul(z1,z2){ return { re:z1.re*z2.re-z1.im*z2.im, im:z1.re*z2.im+z1.im*z2.re }; }
+    function div(z1,z2){ const d=z2.re*z2.re+z2.im*z2.im; if(d===0) return {re:NaN,im:NaN}; return { re:(z1.re*z2.re+z1.im*z2.im)/d, im:(z1.im*z2.re-z1.re*z2.im)/d }; }
+    function resultComplex(){ if(currentOperation==="add")return add(A,B); if(currentOperation==="sub")return sub(A,B); if(currentOperation==="mul")return mul(A,B); return div(A,B); }
+    function operationName(){ if(currentOperation==="add")return "Suma"; if(currentOperation==="sub")return "Resta"; if(currentOperation==="mul")return "Multiplicación"; return "División"; }
+    function operationBreakdownHTML(){
+      const a=A.re, b=A.im, c=B.re, d=B.im;
+      if(currentOperation==="add"){
+        return "<div class='card-title'><span>Desarrollo de la suma</span></div><div><code>(a+bi)+(c+di)</code></div><div>Parte real: <code>a+c = "+fmt(a)+" + "+fmt(c)+" = "+fmt(a+c)+"</code></div><div>Parte imaginaria: <code>b+d = "+fmt(b)+" + "+fmt(d)+" = "+fmt(b+d)+"</code></div><div>Resultado: <code>R = "+binom(add(A,B))+"</code></div>";
+      }
+      if(currentOperation==="sub"){
+        return "<div class='card-title'><span>Desarrollo de la resta</span></div><div><code>(a+bi)−(c+di)</code></div><div>Parte real: <code>a−c = "+fmt(a)+" − "+fmt(c)+" = "+fmt(a-c)+"</code></div><div>Parte imaginaria: <code>b−d = "+fmt(b)+" − "+fmt(d)+" = "+fmt(b-d)+"</code></div><div>Resultado: <code>R = "+binom(sub(A,B))+"</code></div>";
+      }
+      if(currentOperation==="mul"){
+        const real=a*c-b*d;
+        const imag=a*d+b*c;
+        return "<div class='card-title'><span>Desarrollo de la multiplicación</span></div><div><code>(a+bi)(c+di)</code></div><div><code>ac + adi + bci + bd·i²</code></div><div>Como <code>i² = −1</code>, queda:</div><div>Parte real: <code>ac−bd = "+fmt(a)+"·"+fmt(c)+" − "+fmt(b)+"·"+fmt(d)+" = "+fmt(real)+"</code></div><div>Parte imaginaria: <code>ad+bc = "+fmt(a)+"·"+fmt(d)+" + "+fmt(b)+"·"+fmt(c)+" = "+fmt(imag)+"</code></div><div>Resultado: <code>R = "+binom(mul(A,B))+"</code></div>";
+      }
+      const den=c*c+d*d;
+      if(den===0){
+        return "<div class='card-title'><span>Desarrollo de la división</span></div><div>No se puede dividir entre <code>0 + 0i</code>.</div>";
+      }
+      const real=(a*c+b*d)/den;
+      const imag=(b*c-a*d)/den;
+      return "<div class='card-title'><span>Desarrollo de la división</span></div><div><code>(a+bi)/(c+di)</code></div><div>Se multiplica por el conjugado: <code>(c−di)</code></div><div>Denominador: <code>c²+d² = "+fmt(c)+"² + "+fmt(d)+"² = "+fmt(den)+"</code></div><div>Parte real: <code>(ac+bd)/(c²+d²) = ("+fmt(a)+"·"+fmt(c)+" + "+fmt(b)+"·"+fmt(d)+")/"+fmt(den)+" = "+fmt(real)+"</code></div><div>Parte imaginaria: <code>(bc−ad)/(c²+d²) = ("+fmt(b)+"·"+fmt(c)+" − "+fmt(a)+"·"+fmt(d)+")/"+fmt(den)+" = "+fmt(imag)+"</code></div><div>Resultado: <code>R = "+binom(div(A,B))+"</code></div>";
+    }
+    function rotateVectorMatrix(p, angle){ return { re:p.re*Math.cos(angle)-p.im*Math.sin(angle), im:p.re*Math.sin(angle)+p.im*Math.cos(angle) }; }
+    function rotateComplex(p, angle){ return mul(p, { re:Math.cos(angle), im:Math.sin(angle) }); }
+    function waveComplex(w,t){ const th=w.freq*t+w.phase; return { re:w.amp*Math.cos(th), im:w.amp*Math.sin(th) }; }
+    function resultWave(t){ const zA=waveComplex(waveA,t); const zB=waveComplex(waveB,t); return waveOperation==="sum" ? add(zA,zB) : sub(zA,zB); }
+    function lissajousPoint(t){ return { re: waveA.amp*Math.cos(waveA.freq*t+waveA.phase), im: waveB.amp*Math.cos(waveB.freq*t+waveB.phase) }; }
+
+    function resizeCanvas(){
+      canvas.classList.toggle("tall-canvas", mode==="mandala" || mode==="lissajous");
+      const rect=canvas.getBoundingClientRect();
+      const dpr=window.devicePixelRatio||1;
+      canvas.width=rect.width*dpr;
+      canvas.height=rect.height*dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      draw();
+    }
+    function lowerPanelHeight(){
+      if(mode==="complex" || mode==="compare") return 0;
+      if(mode==="temporal") return 170;
+      if(mode==="lissajous") return 260;
+      if(mode==="mandala") return 430;
+      return 0;
+    }
+    function planeHeight(){
+      const lower = lowerPanelHeight();
+      const separator = lower > 0 ? 20 : 0;
+      if(lower === 0) return canvas.clientHeight;
+      if(mode==="mandala") return Math.max(540, canvas.clientHeight - lower - separator);
+      if(mode==="lissajous") return Math.max(460, canvas.clientHeight - lower - separator);
+      return Math.max(360, canvas.clientHeight - lower - separator);
+    }
+    function lowerPanelTop(){
+      return planeHeight() + (lowerPanelHeight() > 0 ? 20 : 0);
+    }
+    function origin(){ return { x: canvas.clientWidth/2, y: planeHeight()/2 }; }
+    function toScreen(z){ const o=origin(); return { x:o.x+z.re*scale, y:o.y-z.im*scale }; }
+    function fromScreen(clientX,clientY){ const r=canvas.getBoundingClientRect(); const y=clientY-r.top; if(y>planeHeight())return null; const o=origin(); return { re:(clientX-r.left-o.x)/scale, im:-(y-o.y)/scale }; }
+    function snap(z){ return { re:Math.round(z.re*10)/10, im:Math.round(z.im*10)/10 }; }
+
+    function drawGrid(){
+      const w=canvas.clientWidth, h=planeHeight(), o=origin();
+      ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
+      ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.clientWidth,canvas.clientHeight);
+      ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--grid"); ctx.lineWidth=1;
+      for(let x=o.x%scale; x<=w; x+=scale){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+      for(let y=o.y%scale; y<=h; y+=scale){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+      ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--axis"); ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(0,o.y); ctx.lineTo(w,o.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(o.x,0); ctx.lineTo(o.x,h); ctx.stroke();
+      ctx.fillStyle="#111827"; ctx.font="bold 14px system-ui"; ctx.textAlign="left"; ctx.fillText("Im",o.x+10,18); ctx.textAlign="right"; ctx.fillText("Re",w-16,o.y-10);
+      ctx.font="12px system-ui"; ctx.fillStyle="#6b7280"; ctx.textAlign="center";
+      const mx=Math.ceil(w/(2*scale)); for(let i=-mx;i<=mx;i++){ if(i!==0){ const x=o.x+i*scale; if(x>8&&x<w-8)ctx.fillText(i,x,o.y+15); } }
+      ctx.textAlign="left"; const my=Math.ceil(h/(2*scale)); for(let i=-my;i<=my;i++){ if(i!==0){ const y=o.y-i*scale; if(y>8&&y<h-8)ctx.fillText(i+"i",o.x+8,y+4); } }
+    }
+    function drawVector(z,color,label){
+      if(!Number.isFinite(z.re)||!Number.isFinite(z.im))return;
+      const o=origin(), p=toScreen(z);
+      ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=2.4;
+      ctx.beginPath(); ctx.moveTo(o.x,o.y); ctx.lineTo(p.x,p.y); ctx.stroke();
+      const a=Math.atan2(p.y-o.y,p.x-o.x), s=9;
+      ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x-s*Math.cos(a-Math.PI/6),p.y-s*Math.sin(a-Math.PI/6)); ctx.lineTo(p.x-s*Math.cos(a+Math.PI/6),p.y-s*Math.sin(a+Math.PI/6)); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x,p.y,6,0,Math.PI*2); ctx.fill();
+      if(!animating){
+        ctx.font="bold 13px system-ui"; ctx.textAlign="left"; ctx.textBaseline="bottom"; ctx.fillText(label+" = ("+fmt(z.re)+", "+fmt(z.im)+")",p.x+8,p.y-8);
+      }
+    }
+    function drawHelper(z,color){ const o=origin(),p=toScreen(z); ctx.save(); ctx.strokeStyle=color; ctx.setLineDash([5,5]); ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x,o.y); ctx.lineTo(o.x,o.y); ctx.stroke(); ctx.restore(); }
+    function drawCircle(radius,color){ const o=origin(); ctx.save(); ctx.strokeStyle=color; ctx.globalAlpha=0.18; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(o.x,o.y,radius*scale,0,Math.PI*2); ctx.stroke(); ctx.restore(); }
+    function pushTrace(arr,z){ arr.push({re:z.re,im:z.im}); if(arr.length>maxTrace) arr.shift(); }
+    function clearTraces(){ traceA.length=0; traceB.length=0; traceR.length=0; traceL.length=0; }
+    function drawTrace(arr,color,alpha){ if(!showTraces||arr.length<2)return; ctx.save(); ctx.strokeStyle=color; ctx.globalAlpha=alpha||0.45; ctx.lineWidth=1.7; ctx.beginPath(); for(let i=0;i<arr.length;i++){ const p=toScreen(arr[i]); if(i===0)ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); } ctx.stroke(); ctx.restore(); }
+
+    function drawComplexMode(){
+      if(!complexOperationsVisible){
+        drawHelper(A,"rgba(37,99,235,.35)");
+        drawVector(A,COLORS.A,"z");
+        ctx.fillStyle="#111827"; ctx.font="13px system-ui"; ctx.textAlign="left";
+        ctx.fillText("Modo lectura: un único número complejo z en el plano",14,20);
+        return;
+      }
+      const r=resultComplex();
+      drawHelper(A,"rgba(37,99,235,.35)"); drawHelper(B,"rgba(22,163,74,.35)"); drawHelper(r,"rgba(220,38,38,.35)");
+      drawVector(A,COLORS.A,"A"); drawVector(B,COLORS.B,"B"); drawVector(r,COLORS.R,"R");
+    }
+    function drawTemporalMode(){
+      const z=waveComplex(waveA,time);
+      if(animating&&showTraces)pushTrace(traceA,z);
+      drawCircle(waveA.amp,COLORS.A); drawTrace(traceA,COLORS.A,0.55); drawHelper(z,"rgba(37,99,235,.35)"); drawVector(z,COLORS.A,"A(t)");
+      ctx.fillStyle="#111827"; ctx.font="13px system-ui"; ctx.textAlign="left"; ctx.fillText("A(t) = r·e^(i(ωt+φ)) · el complejo instantáneo gira y su proyección genera la onda",14,20);
+    }
+    function drawMandalaMode(){
+      const zA=waveComplex(waveA,time), zB=waveComplex(waveB,time), zR=resultWave(time);
+      if(animating&&showTraces){ pushTrace(traceA,zA); pushTrace(traceB,zB); pushTrace(traceR,zR); }
+      drawCircle(waveA.amp,COLORS.A); drawCircle(waveB.amp,COLORS.B);
+      drawTrace(traceA,COLORS.A,0.34); drawTrace(traceB,COLORS.B,0.34); drawTrace(traceR,COLORS.R,0.62);
+      drawHelper(zA,"rgba(37,99,235,.28)"); drawHelper(zB,"rgba(22,163,74,.28)"); drawHelper(zR,"rgba(220,38,38,.35)");
+      drawVector(zA,COLORS.A,"A(t)"); drawVector(zB,COLORS.B,"B(t)"); drawVector(zR,COLORS.R,"R(t)");
+      ctx.fillStyle="#111827"; ctx.font="13px system-ui"; ctx.textAlign="left"; ctx.fillText("Mandala/interferencia: la traza roja es R(t), la resultante de superponer fasores",14,20);
+    }
+    function drawLissajousMode(){
+      const zA=waveComplex(waveA,time), zB=waveComplex(waveB,time), p=lissajousPoint(time);
+      if(animating&&showTraces)pushTrace(traceL,p);
+      drawTrace(traceL,COLORS.L,0.72);
+      drawVector({re:zA.re,im:0},COLORS.A,"x=Re(A)");
+      drawVector({re:0,im:zB.re},COLORS.B,"y=Re(B)");
+      const ps=toScreen(p), o=origin();
+      ctx.save(); ctx.strokeStyle="rgba(17,24,39,.28)"; ctx.setLineDash([5,5]); ctx.beginPath(); ctx.moveTo(ps.x,o.y); ctx.lineTo(ps.x,ps.y); ctx.lineTo(o.x,ps.y); ctx.stroke(); ctx.restore();
+      ctx.fillStyle=COLORS.L; ctx.beginPath(); ctx.arc(ps.x,ps.y,3.5,0,Math.PI*2); ctx.fill();
+      if(!animating){
+        ctx.font="bold 13px system-ui"; ctx.textAlign="left"; ctx.fillText("P(t) = (Re(A(t)), Re(B(t)))",ps.x+9,ps.y-9);
+      }
+      ctx.fillStyle="#111827"; ctx.font="13px system-ui"; ctx.fillText("Lissajous: A mueve X, B mueve Y. Son dos oscilaciones reales perpendiculares.",14,20);
+    }
+    function drawSegment(p1,p2,color,label,width){
+      const a=toScreen(p1), b=toScreen(p2);
+      ctx.save();
+      ctx.strokeStyle=color; ctx.lineWidth=width||4; ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+      ctx.fillStyle=color;
+      ctx.beginPath(); ctx.arc(a.x,a.y,6,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(b.x,b.y,6,0,Math.PI*2); ctx.fill();
+      if(!animating){
+        ctx.font="bold 13px system-ui"; ctx.textAlign="left"; ctx.textBaseline="bottom";
+        ctx.fillText(label,a.x+8,a.y-8);
+      }
+      ctx.restore();
+    }
+    function drawCompareMode(){
+      const v1=rotateVectorMatrix(rodP1,rotationAngle), v2=rotateVectorMatrix(rodP2,rotationAngle);
+      const c1=rotateComplex(rodP1,rotationAngle), c2=rotateComplex(rodP2,rotationAngle);
+      drawSegment(rodP1,rodP2,"#6b7280","varilla original",3);
+      drawSegment(v1,v2,COLORS.A,"rotación vectorial/matriz",6);
+      drawSegment(c1,c2,COLORS.R,"rotación compleja",2.8);
+      drawHelper(rodP1,"rgba(107,114,128,.22)"); drawHelper(rodP2,"rgba(107,114,128,.22)");
+      drawHelper(v1,"rgba(37,99,235,.24)"); drawHelper(v2,"rgba(37,99,235,.24)");
+      ctx.fillStyle="#111827"; ctx.font="13px system-ui"; ctx.textAlign="left";
+      ctx.fillText("Mismo resultado geométrico: el segmento rojo debe caer encima del azul.",14,20);
+      ctx.fillText("Ángulo de giro: "+fmt(radToDeg(rotationAngle))+"°",14,40);
+    }
+    // Fasor temporal puro: la gráfica inferior es un historial temporal,
+    // no una onda propagándose espacialmente.
+    function sampleWave(w,x,k){
+      const tLocal = time - (canvas.clientWidth - x) * 0.015;
+      return w.amp*Math.cos(w.freq*tLocal + w.phase);
+    }
+    function drawWaveTrack(label,color,top,height,fn,maxAmp,value){
+      const w=canvas.clientWidth, mid=top+height/2, vs=height*0.42/Math.max(0.1,maxAmp), k=2*Math.PI*2/Math.max(1,w);
+      ctx.save();
+      ctx.fillStyle="#f8fafc";
+      ctx.fillRect(0,top,w,height);
+      ctx.beginPath();
+      ctx.rect(0,top,w,height);
+      ctx.clip();
+
+      ctx.strokeStyle="#e5e7eb";
+      ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.moveTo(0,top);
+      ctx.lineTo(w,top);
+      ctx.stroke();
+
+      ctx.strokeStyle="#cbd5e1";
+      ctx.setLineDash([4,4]);
+      ctx.beginPath();
+      ctx.moveTo(0,mid);
+      ctx.lineTo(w,mid);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.strokeStyle=color;
+      ctx.lineWidth= label.indexOf("R")===0 ? 3 : 2.2;
+      ctx.beginPath();
+
+      for(let x=0;x<=w;x++){
+        const y=mid-fn(x,k)*vs;
+        if(x===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+
+      // Punto sincronizado exactamente con el instante temporal actual
+      // Debe ir siguiendo la propia onda, no quedarse fijo en el centro.
+      const currentX = w * 0.5;
+      const currentY = mid - fn(currentX,k)*vs;
+
+      ctx.strokeStyle="rgba(17,24,39,.32)";
+      ctx.setLineDash([4,4]);
+      ctx.beginPath();
+      ctx.moveTo(currentX,mid);
+      ctx.lineTo(currentX,currentY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle=color;
+      ctx.beginPath();
+      ctx.arc(currentX,currentY,5.5,0,Math.PI*2);
+      ctx.fill();
+
+      ctx.fillStyle="#111827";
+      ctx.font="bold 12px system-ui";
+      ctx.textAlign="left";
+      ctx.fillText(label,12,top+16);
+
+      ctx.font="11px system-ui";
+      ctx.fillStyle="#6b7280";
+      ctx.fillText("instante actual = "+fmt(value),12,top+34);
+
+      ctx.restore();
+    }
+    function drawLowerPanel(){
+      if(mode==="complex")return;
+      const top=lowerPanelTop(), h=lowerPanelHeight(), gap=14;
+      ctx.fillStyle="#ffffff"; ctx.fillRect(0,planeHeight(),canvas.clientWidth,canvas.clientHeight-planeHeight());
+      ctx.save();
+      ctx.fillStyle="#f1f5f9";
+      ctx.fillRect(0,planeHeight(),canvas.clientWidth,18);
+      ctx.fillStyle="#64748b";
+      ctx.font="12px system-ui";
+      ctx.textAlign="left";
+      ctx.fillText("Osciloscopio temporal",12,planeHeight()+12);
+      ctx.restore();
+      if(mode==="temporal"){
+        const z=waveComplex(waveA,time);
+        drawWaveTrack("Onda generada por Re(A(t))",COLORS.A,top+gap,h-gap*2,function(x,k){return sampleWave(waveA,x,k);},5,z.re);
+      } else if(mode==="mandala"){
+        const zA=waveComplex(waveA,time), zB=waveComplex(waveB,time), zR=resultWave(time);
+        const th=h/3;
+        const sharedMaxAmp = 10;
+        drawWaveTrack("A azul · f="+fmt(waveA.freq)+" amp="+fmt(waveA.amp),COLORS.A,top+gap/2,th-gap,function(x,k){return sampleWave(waveA,x,k);},sharedMaxAmp,zA.re);
+        drawWaveTrack("B verde · f="+fmt(waveB.freq)+" amp="+fmt(waveB.amp),COLORS.B,top+th+gap/2,th-gap,function(x,k){return sampleWave(waveB,x,k);},sharedMaxAmp,zB.re);
+        drawWaveTrack("R roja = "+(waveOperation==="sum"?"A+B":"A−B"),COLORS.R,top+2*th+gap/2,th-gap,function(x,k){ const a=sampleWave(waveA,x,k), b=sampleWave(waveB,x,k); return waveOperation==="sum"?a+b:a-b;},sharedMaxAmp,zR.re);
+      } else if(mode==="lissajous"){
+        const zA=waveComplex(waveA,time), zB=waveComplex(waveB,time); const th=h/2;
+        drawWaveTrack("X = Re(A(t))",COLORS.A,top+gap/2,th-gap,function(x,k){return sampleWave(waveA,x,k);},5,zA.re);
+        drawWaveTrack("Y = Re(B(t))",COLORS.B,top+th+gap/2,th-gap,function(x,k){return sampleWave(waveB,x,k);},5,zB.re);
+      }
+    }
+    function draw(){
+      drawGrid();
+      if(mode==="complex")drawComplexMode();
+      if(mode==="temporal")drawTemporalMode();
+      if(mode==="mandala")drawMandalaMode();
+      if(mode==="lissajous")drawLissajousMode();
+      if(mode==="compare")drawCompareMode();
+      drawLowerPanel();
+      updatePanel();
+    }
+
+    function complexCard(name,z,color,extra){
+      if(!Number.isFinite(z.re)||!Number.isFinite(z.im))return "<div>No definido.</div>";
+      const r=mod(z), thetaRad=arg(z), thetaDeg=radToDeg(thetaRad);
+      return "<div class='card-title'><span><span class='dot' style='background:"+color+"'></span>"+name+"</span>"+(extra||"")+"</div><div>Vectorial: <code>"+name+" = ("+fmt(z.re)+", "+fmt(z.im)+")</code></div><div>Binómica: <code>"+name+" = "+binom(z)+"</code></div><div>Módulo por Pitágoras: <code>r = √(a²+b²) = √("+fmt(z.re)+"² + "+fmt(z.im)+"²) = "+fmt(r)+"</code></div><div>Argumento en grados: <code>θ = "+fmt(thetaDeg)+"°</code></div><div>Argumento en radianes: <code>θ = "+fmt(thetaRad)+" rad</code></div><div>Forma polar: <code>"+name+" = "+fmt(r)+"(cos("+fmt(thetaRad)+") + i·sen("+fmt(thetaRad)+"))</code></div><div>Aplicando Euler: <code>e<sup>iθ</sup> = cos(θ) + i·sen(θ)</code></div><div>Forma de Euler: <code>"+name+" = "+fmt(r)+"·e<sup>i·"+fmt(thetaRad)+"</sup></code></div>";
+    }
+    function setActionBar(){
+      let html="";
+      if(mode==="complex") html= complexOperationsVisible ? "<button id='selA'>Mover A</button><button id='selB'>Mover B</button><button id='toggleOpsBtn'>Ocultar operaciones</button>" : "<button id='selA'>Mover z</button><button id='toggleOpsBtn'>Mostrar operaciones</button>";
+      else if(mode==="compare") html="<button id='rodP1Btn'>Mover extremo 1</button><button id='rodP2Btn'>Mover extremo 2</button><button id='angleDownBtn'>− ángulo</button><button id='angleUpBtn'>+ ángulo</button>";
+      else html="<button id='animBtn'>Animar</button><button id='traceBtn'>Trazas</button><button id='clearBtn'>Borrar trazas</button>";
+      actionBar.innerHTML=html;
+      const selA=document.getElementById("selA"), selB=document.getElementById("selB"), toggleOpsBtn=document.getElementById("toggleOpsBtn"), animBtn=document.getElementById("animBtn"), traceBtn=document.getElementById("traceBtn"), clearBtn=document.getElementById("clearBtn"), rodP1Btn=document.getElementById("rodP1Btn"), rodP2Btn=document.getElementById("rodP2Btn"), angleDownBtn=document.getElementById("angleDownBtn"), angleUpBtn=document.getElementById("angleUpBtn");
+      if(selA){
+        selA.classList.toggle("active",activePoint==="A");
+        if(selB) selB.classList.toggle("active",activePoint==="B");
+        selA.onclick=function(){activePoint="A";setActionBar();};
+        if(selB) selB.onclick=function(){activePoint="B";setActionBar();};
+      }
+      if(toggleOpsBtn){ toggleOpsBtn.onclick=function(){ complexOperationsVisible=!complexOperationsVisible; activePoint="A"; setActionBar(); draw(); }; }
+      if(animBtn){ animBtn.classList.toggle("active",animating); animBtn.textContent=animating?"Pausar":"Animar"; animBtn.onclick=toggleAnimation; }
+      if(traceBtn){ traceBtn.classList.toggle("active",showTraces); traceBtn.onclick=function(){showTraces=!showTraces; if(showTraces)clearTraces(); setActionBar(); draw();}; }
+      if(clearBtn){ clearBtn.onclick=function(){clearTraces(); draw();}; }
+      if(rodP1Btn){ rodP1Btn.classList.toggle("active",activePoint==="P1"); rodP2Btn.classList.toggle("active",activePoint==="P2"); rodP1Btn.onclick=function(){activePoint="P1";setActionBar();}; rodP2Btn.onclick=function(){activePoint="P2";setActionBar();}; }
+      if(angleDownBtn){ angleDownBtn.onclick=function(){ rotationAngle-=degToRad(5); draw(); }; angleUpBtn.onclick=function(){ rotationAngle+=degToRad(5); draw(); }; }
+    }
+    function updatePanel(){
+      modeComplexBtn.classList.toggle("active",mode==="complex");
+      modeTemporalBtn.classList.toggle("active",mode==="temporal");
+      modeMandalaBtn.classList.toggle("active",mode==="mandala");
+      modeLissajousBtn.classList.toggle("active",mode==="lissajous");
+      modeCompareBtn.classList.toggle("active",mode==="compare");
+      lissajousPresets.classList.toggle("hidden", mode!=="lissajous");
+      mandalaPresets.classList.toggle("hidden", mode!=="mandala");
+      complexSection.classList.toggle("hidden",mode!=="complex");
+      complexOpsButtons.classList.toggle("hidden", !complexOperationsVisible);
+      waveControls.classList.toggle("hidden",mode==="complex"||mode==="compare");
+      waveBCard.classList.toggle("hidden",mode==="temporal");
+      superpositionSection.classList.toggle("hidden",mode!=="mandala");
+      zoomLabel.textContent=scale+" px/u";
+      ampALabel.textContent=fmt(waveA.amp); freqALabel.textContent=fmt(waveA.freq); phaseALabel.textContent=Math.round(radToDeg(waveA.phase))+"°";
+      ampBLabel.textContent=fmt(waveB.amp); freqBLabel.textContent=fmt(waveB.freq); phaseBLabel.textContent=Math.round(radToDeg(waveB.phase))+"°";
+      if(mode==="complex"){
+        panelTitle.textContent="1. Números complejos y operaciones";
+        helpText.innerHTML= complexOperationsVisible ? "Aquí A y B son números complejos estáticos. Tiene sentido sumar, restar, multiplicar o dividir complejos como objetos matemáticos." : "Aquí se muestra un único número complejo z. Muévelo en el plano para ver cómo cambian su parte real, parte imaginaria, módulo, argumento y forma de Euler.";
+        if(!complexOperationsVisible){
+          infoA.innerHTML=complexCard("z",A,COLORS.A);
+          infoB.innerHTML="";
+          infoR.innerHTML="";
+          operationBreakdown.innerHTML="";
+        } else {
+          const r=resultComplex(); infoA.innerHTML=complexCard("A",A,COLORS.A); infoB.innerHTML=complexCard("B",B,COLORS.B); infoR.innerHTML=complexCard("R",r,COLORS.R,"<span class='small'>"+operationName()+"</span>");
+          operationBreakdown.innerHTML=operationBreakdownHTML();
+        }
+        mathInfo.innerHTML="<div><code>z = a + bi</code></div><div><code>r = √(a²+b²)</code></div><div><code>θ = atan2(b,a)</code></div><div><code>z = r(cos θ + i·sen θ)</code></div><div><code>z = r·e<sup>iθ</sup></code></div><div class='small'>La forma de Euler no sale directamente de los grados: primero se calcula el argumento en radianes y se aplica <code>e<sup>iθ</sup>=cosθ+i·senθ</code>.</div>";
+      }
+      if(mode==="temporal"){
+        const z=waveComplex(waveA,time);
+        panelTitle.textContent="2. Ecuación temporal de un complejo";
+        helpText.innerHTML="Aquí no hay solo un complejo, sino una función <code>A(t)=r·e<sup>i(ωt+φ)</sup></code>. El punto azul es el valor instantáneo.";
+        mathInfo.innerHTML=complexCard("A(t)",z,COLORS.A,"<span class='small'>fasor</span>")+"<div class='small'>La frecuencia no está en el número complejo instantáneo: está en la ley temporal que lo mueve.</div>";
+      }
+      if(mode==="mandala"){
+        const zR=resultWave(time);
+        panelTitle.textContent="3. Superposición de ondas y mandala";
+        helpText.innerHTML="Dos fasores temporales se superponen. La traza roja de <code>R(t)</code> puede generar patrones tipo mandala al variar frecuencias, amplitudes y fases.";
+        mathInfo.innerHTML="<div><code>A(t)=A·e<sup>i(ω₁t+φ₁)</sup></code></div><div><code>B(t)=B·e<sup>i(ω₂t+φ₂)</sup></code></div><div><code>R(t)="+(waveOperation==="sum"?"A(t)+B(t)":"A(t)-B(t)")+"</code></div><div>Ahora: <code>R(t)="+binom(zR)+"</code></div>";
+      }
+      if(mode==="lissajous"){
+        const p=lissajousPoint(time);
+        panelTitle.textContent="4. Figuras de Lissajous";
+        helpText.innerHTML="Aquí A no se suma con B. A controla el eje X y B controla el eje Y: dos movimientos armónicos perpendiculares.";
+        mathInfo.innerHTML="<div><code>x(t)=Re(A(t))</code></div><div><code>y(t)=Re(B(t))</code></div><div><code>P(t)=(x(t),y(t))</code></div><div class='small'>Aquí no estamos representando directamente un número complejo único. Usamos las partes reales de dos fasores distintos para mover X e Y independientemente.</div><div>Ahora: <code>P(t)=("+fmt(p.re)+", "+fmt(p.im)+")</code></div>";
+      }
+      if(mode==="compare"){
+        const v1=rotateVectorMatrix(rodP1,rotationAngle), v2=rotateVectorMatrix(rodP2,rotationAngle);
+        const c1=rotateComplex(rodP1,rotationAngle), c2=rotateComplex(rodP2,rotationAngle);
+        panelTitle.textContent="5. Vector vs número complejo";
+        helpText.innerHTML="La varilla está definida por dos extremos. La rotación final es la misma, pero el camino algebraico cambia: matriz de rotación para vectores, multiplicación por <code>e<sup>iθ</sup></code> para complejos.";
+        mathInfo.innerHTML="<div><strong>Rotación vectorial con matriz:</strong></div><div><code>x' = x cosθ − y senθ</code></div><div><code>y' = x senθ + y cosθ</code></div><hr style='border:none;border-top:1px solid #e5e7eb;width:100%;'><div><strong>Rotación compleja:</strong></div><div><code>z' = z · e<sup>iθ</sup></code></div><div><code>e<sup>iθ</sup> = cosθ + i senθ</code></div><hr style='border:none;border-top:1px solid #e5e7eb;width:100%;'><div>Extremo 1, vector: <code>("+fmt(v1.re)+", "+fmt(v1.im)+")</code></div><div>Extremo 1, complejo: <code>"+binom(c1)+"</code></div><div>Extremo 2, vector: <code>("+fmt(v2.re)+", "+fmt(v2.im)+")</code></div><div>Extremo 2, complejo: <code>"+binom(c2)+"</code></div>";
+      }
+    }
+    function setMode(m){ mode=m; clearTraces(); if((mode==="complex"||mode==="compare") && animating)toggleAnimation(); if(mode==="compare")activePoint="P1"; setActionBar(); resizeCanvas(); }
+    function toggleAnimation(){ animating=!animating; lastFrameTime=0; setActionBar(); if(animating)animationId=requestAnimationFrame(loop); else if(animationId){cancelAnimationFrame(animationId); animationId=null;} }
+    function loop(ts){ if(!lastFrameTime)lastFrameTime=ts; const dt=(ts-lastFrameTime)/1000; lastFrameTime=ts; if(animating){ time+=dt*1.7; draw(); animationId=requestAnimationFrame(loop); } }
+    function readSliders(){ waveA.amp=Number(ampASlider.value); waveA.freq=Number(freqASlider.value); waveA.phase=degToRad(Number(phaseASlider.value)); waveB.amp=Number(ampBSlider.value); waveB.freq=Number(freqBSlider.value); waveB.phase=degToRad(Number(phaseBSlider.value)); draw(); }
+    function changeFreq(w,slider,d){ w.freq=Math.max(0.2,Math.min(6,Math.round((w.freq+d)*10)/10)); slider.value=w.freq; draw(); }
+    function setPointFromMouse(e){ const raw=fromScreen(e.clientX,e.clientY); if(!raw)return; const z=snap(raw); if(mode==="complex"){ if(activePoint==="A")A=z; else B=z; } else if(mode==="compare"){ if(activePoint==="P1")rodP1=z; else rodP2=z; } else if(mode==="temporal"||mode==="mandala"){ const w=activePoint==="A"?waveA:waveB; w.amp=Math.min(5,mod(z)); w.phase=arg(z)-w.freq*time; syncSliders(); } draw(); }
+    function syncSliders(){ ampASlider.value=waveA.amp; freqASlider.value=waveA.freq; phaseASlider.value=Math.max(-180,Math.min(180,Math.round(radToDeg(waveA.phase)))); ampBSlider.value=waveB.amp; freqBSlider.value=waveB.freq; phaseBSlider.value=Math.max(-180,Math.min(180,Math.round(radToDeg(waveB.phase)))); }
+    function reset(){ A={re:2,im:1.5}; B={re:-1,im:2}; waveA={amp:2.5,freq:1,phase:degToRad(35)}; waveB={amp:2,freq:1.5,phase:degToRad(-45)}; rodP1={re:-2.2,im:-0.7}; rodP2={re:2.0,im:0.8}; rotationAngle=degToRad(45); time=0; waveOperation="sum"; clearTraces(); syncSliders(); draw(); }
+
+    modeComplexBtn.onclick=function(){setMode("complex");};
+    modeTemporalBtn.onclick=function(){setMode("temporal");};
+    modeMandalaBtn.onclick=function(){setMode("mandala");};
+    modeLissajousBtn.onclick=function(){setMode("lissajous");};
+    modeCompareBtn.onclick=function(){setMode("compare");};
+    resetBtn.onclick=reset;
+    document.querySelectorAll("button.preset").forEach(function(btn){
+      btn.onclick=function(){
+        mode = "lissajous";
+        waveA.freq = Number(btn.dataset.fa);
+        waveB.freq = Number(btn.dataset.fb);
+        waveA.amp = 3;
+        waveB.amp = 3;
+        waveA.phase = 0;
+        waveB.phase = degToRad(Number(btn.dataset.phase));
+        time = 0;
+        clearTraces();
+        syncSliders();
+        setActionBar();
+        resizeCanvas();
+      };
+    });
+
+    document.querySelectorAll("button.mandala-preset").forEach(function(btn){
+      btn.onclick=function(){
+        mode = "mandala";
+        waveA.amp = Number(btn.dataset.aa);
+        waveA.freq = Number(btn.dataset.fa);
+        waveA.phase = degToRad(Number(btn.dataset.pa));
+        waveB.amp = Number(btn.dataset.ab);
+        waveB.freq = Number(btn.dataset.fb);
+        waveB.phase = degToRad(Number(btn.dataset.pb));
+        waveOperation = btn.dataset.op;
+        waveSumBtn.classList.toggle("active", waveOperation==="sum");
+        waveSubBtn.classList.toggle("active", waveOperation==="sub");
+        time = 0;
+        clearTraces();
+        syncSliders();
+        setActionBar();
+        resizeCanvas();
+      };
+    });
+    zoomSlider.oninput=function(){scale=Number(zoomSlider.value); draw();};
+    [ampASlider,freqASlider,phaseASlider,ampBSlider,freqBSlider,phaseBSlider].forEach(function(s){s.oninput=readSliders;});
+    freqADownBtn.onclick=function(){changeFreq(waveA,freqASlider,-0.1);}; freqAUpBtn.onclick=function(){changeFreq(waveA,freqASlider,0.1);};
+    freqBDownBtn.onclick=function(){changeFreq(waveB,freqBSlider,-0.1);}; freqBUpBtn.onclick=function(){changeFreq(waveB,freqBSlider,0.1);};
+    waveSumBtn.onclick=function(){waveOperation="sum"; waveSumBtn.classList.add("active"); waveSubBtn.classList.remove("active"); clearTraces(); draw();};
+    waveSubBtn.onclick=function(){waveOperation="sub"; waveSubBtn.classList.add("active"); waveSumBtn.classList.remove("active"); clearTraces(); draw();};
+    document.querySelectorAll("button.op").forEach(function(btn){ btn.onclick=function(){ currentOperation=btn.dataset.op; document.querySelectorAll("button.op").forEach(function(b){b.classList.remove("active");}); btn.classList.add("active"); draw(); }; });
+    canvas.addEventListener("mousedown",function(e){dragging=true; setPointFromMouse(e);});
+    window.addEventListener("mousemove",function(e){if(dragging)setPointFromMouse(e);});
+    window.addEventListener("mouseup",function(){dragging=false;});
+    canvas.addEventListener("touchstart",function(e){e.preventDefault(); dragging=true; setPointFromMouse(e.touches[0]);},{passive:false});
+    canvas.addEventListener("touchmove",function(e){e.preventDefault(); if(dragging)setPointFromMouse(e.touches[0]);},{passive:false});
+    window.addEventListener("touchend",function(){dragging=false;});
+    window.addEventListener("resize",resizeCanvas);
+    syncSliders(); setActionBar(); resizeCanvas();
+  </script>
+</body>
+</html>

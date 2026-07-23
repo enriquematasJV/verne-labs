@@ -1,39 +1,44 @@
 {
-  "laboratorios": [
-    {
-      "id": "ecologia-poblaciones",
-      "nombre": "Laboratorio de Ecología de Poblaciones",
-      "carpeta": "ecologia-poblaciones"
-    },
-    {
-      "id": "cinematica-encuentros-alcances",
-      "nombre": "Cinemática: encuentros y alcances",
-      "carpeta": "cinematica-encuentros-alcances"
-    },
-    {
-      "id": "cinematica-2d",
-      "nombre": "Cinemática 2D: tiro vertical y parabólico",
-      "carpeta": "cinematica-2d"
-    },
-    {
-      "id": "plano-inclinado",
-      "nombre": "Dinámica en plano inclinado",
-      "carpeta": "plano-inclinado"
-    },
-    {
-      "id": "derivadas",
-      "nombre": "Derivada como límite",
-      "carpeta": "derivadas"
-    },
-    {
-      "id": "funciones-inecuaciones",
-      "nombre": "Plano XY: inecuaciones y funciones",
-      "carpeta": "funciones-inecuaciones"
-    },
-    {
-      "id": "representacion-mapas-geologicos",
-      "nombre": "Representación de mapas geológicos",
-      "carpeta": "representación-de-mapas-geológicos"
-    }
-  ]
+    "laboratorios":  [
+                         {
+                             "id":  "ecologia-poblaciones",
+                             "nombre":  "Laboratorio de Ecología de Poblaciones",
+                             "carpeta":  "ecologia-poblaciones"
+                         },
+                         {
+                             "id":  "cinematica-encuentros-alcances",
+                             "nombre":  "Cinemática: encuentros y alcances",
+                             "carpeta":  "cinematica-encuentros-alcances"
+                         },
+                         {
+                             "id":  "cinematica-2d",
+                             "nombre":  "Cinemática 2D: tiro vertical y parabólico",
+                             "carpeta":  "cinematica-2d"
+                         },
+                         {
+                             "id":  "plano-inclinado",
+                             "nombre":  "Dinámica en plano inclinado",
+                             "carpeta":  "plano-inclinado"
+                         },
+                         {
+                             "id":  "derivadas",
+                             "nombre":  "Derivada como límite",
+                             "carpeta":  "derivadas"
+                         },
+                         {
+                             "id":  "funciones-inecuaciones",
+                             "nombre":  "Plano XY: inecuaciones y funciones",
+                             "carpeta":  "funciones-inecuaciones"
+                         },
+                         {
+                             "id":  "representacion-mapas-geologicos",
+                             "nombre":  "Representación de mapas geológicos",
+                             "carpeta":  "representación-de-mapas-geológicos"
+                         },
+                         {
+                             "carpeta":  "nmeros-complejos-fasores-y-ondas",
+                             "nombre":  "nmeros-complejos-fasores-y-ondas",
+                             "id":  "nmeros-complejos-fasores-y-ondas"
+                         }
+                     ]
 }
