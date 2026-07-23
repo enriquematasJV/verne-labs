@@ -14,7 +14,7 @@
 }
 
 .app {
-  max-width: 1280px;
+  max-width: 100% !important;
   margin: 0 auto;
   padding: 24px;
 }
@@ -32,7 +32,7 @@ h1 {
 
 .layout {
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 280px 1fr !important;
   gap: 24px;
   align-items: start;
 }
@@ -109,11 +109,13 @@ button:disabled {
 }
 
 canvas {
-  width: 100%;
-  height: auto;
+  width: 900px !important;
+  height: 520px !important;
+  max-width: none !important;
   display: block;
   border-radius: 18px;
   background: var(--sky);
+  margin: 0 auto;
 }
 
 .metrics {

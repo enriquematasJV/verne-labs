@@ -32,8 +32,22 @@ class PhysicsEngine {
   reset() {
     // Reiniciar estado
   }
-}
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = PhysicsEngine;
+  calculateInclinedPlane(mass, angleRad, mu, g = 9.8) {
+    const parallel = mass * g * Math.sin(angleRad);
+    const normal = mass * g * Math.cos(angleRad);
+    const friction = mu * normal;
+    const netForce = Math.max(0, parallel - friction);
+    const acceleration = netForce / mass;
+    const staticHold = acceleration < 0.001;
+
+    return {
+      parallel,
+      normal,
+      friction,
+      netForce,
+      acceleration,
+      staticHold
+    };
+  }
 }
