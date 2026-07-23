@@ -1,0 +1,9 @@
+/* GraphRenderer Component — Estilos para renderizador de gráficos */
+
+/* El componente GraphRenderer dibuja y controla TODO */
+/* No requiere estilos especiales, solo usa las variables CSS globales */
+
+/* Nota: Los estilos visuales (grid, axes) se controlan SOLO desde GraphRenderer.js
+   que lee las variables CSS globales (--grid-color, --grid-line-width, etc.)
+   Las hojas de estilo específicas del lab pueden personalizar el layout,
+   pero NO deben tocar los estilos del grid/ejes. */

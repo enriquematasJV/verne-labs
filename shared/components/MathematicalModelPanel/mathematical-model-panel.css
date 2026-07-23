@@ -1,0 +1,15 @@
+/* MathematicalModelPanel Component Styles */
+.model-panel {
+  padding: var(--spacing-md, 16px);
+  border-radius: var(--border-radius, 8px);
+  background: var(--bg-secondary, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.model-equation {
+  font-family: 'Courier New', monospace;
+  padding: var(--spacing-sm, 8px);
+  background: var(--bg-primary, #ffffff);
+  border-left: 3px solid var(--accent, #2563eb);
+  margin: var(--spacing-sm, 8px) 0;
+}

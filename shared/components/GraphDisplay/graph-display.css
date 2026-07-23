@@ -1,0 +1,61 @@
+/* GraphDisplay Component — Estilos comunes para CUALQUIER gráfico */
+
+/* Contenedor del gráfico */
+.graph-display {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Canvas y SVG dentro del gráfico */
+.graph-display canvas,
+.graph-display svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 400px;
+  aspect-ratio: 1;
+  background: white;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.graph-display canvas:active,
+.graph-display svg:active {
+  cursor: grabbing;
+}
+
+/* Elementos dentro de SVG */
+.graph-display svg line {
+  stroke-width: 0.5;
+  stroke: currentColor;
+}
+
+.graph-display svg circle,
+.graph-display svg rect {
+  stroke-width: 1.5;
+}
+
+.graph-display svg text {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  user-select: none;
+  pointer-events: none;
+}
+
+.graph-display svg path {
+  stroke-width: 1;
+  fill: none;
+}
+
+/* Imagen rendering para canvas */
+.graph-display canvas {
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}

@@ -1,0 +1,14 @@
+/* Vector2D Component Styles */
+/* Styles for vector visualization on canvas */
+
+.vector-arrow {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vector-label {
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  pointer-events: none;
+  user-select: none;
+}

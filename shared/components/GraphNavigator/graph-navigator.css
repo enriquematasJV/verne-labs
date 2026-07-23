@@ -1,0 +1,7 @@
+/* GraphNavigator Component — Estilos para navegación en gráficos */
+
+/* Nota: Los estilos base para SVG y canvas se definen en GraphDisplay.css
+   para garantizar consistencia en TODOS los gráficos de la plataforma.
+
+   Este componente añade funcionalidad de pan/zoom a gráficos existentes.
+   Los estilos visuales son responsabilidad de GraphDisplay.css. */

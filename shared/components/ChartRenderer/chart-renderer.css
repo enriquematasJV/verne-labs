@@ -1,0 +1,16 @@
+/* ChartRenderer Component Styles */
+svg[data-chart-renderer] {
+  display: block;
+  overflow: visible;
+}
+
+.chart-axis {
+  stroke: var(--text-secondary, #64748b);
+  stroke-width: 1;
+}
+
+.chart-label {
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  fill: var(--text-secondary, #64748b);
+}
