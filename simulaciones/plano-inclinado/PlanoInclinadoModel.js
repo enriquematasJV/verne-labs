@@ -44,13 +44,13 @@ class PlanoInclinadoModel {
 
   getDynamics() {
     const angleRad = this.angleDeg * Math.PI / 180;
-    const result = this.physics.calculateInclinedPlane(this.mass, angleRad, this.mu);
+    const result = PlanoInclinadoPhysics.calculateInclinedPlane(this.mass, angleRad, this.mu);
     return { angleRad, ...result };
   }
 
   getTheoretical() {
     const dyn = this.getDynamics();
-    return this.physics.theoreticalInclinedPlane(dyn.acceleration, this.rampLength);
+    return PlanoInclinadoPhysics.theoreticalInclinedPlane(dyn.acceleration, this.rampLength);
   }
 
   step(deltaTime) {
