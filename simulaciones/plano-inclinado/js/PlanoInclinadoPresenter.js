@@ -151,6 +151,30 @@ class PlanoInclinadoPresenter {
     }
   }
 
+  drawDashedArrow(x1, y1, x2, y2, color, label = '') {
+    this.drawDashedLine(x1, y1, x2, y2, color);
+
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const angle = Math.atan2(dy, dx);
+    const headLength = 8;
+
+    const ctx = this.renderer.getContext();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - headLength * Math.cos(angle - Math.PI / 6), y2 - headLength * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(x2 - headLength * Math.cos(angle + Math.PI / 6), y2 - headLength * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+
+    if (label) {
+      ctx.fillStyle = color;
+      ctx.font = 'bold 12px Arial';
+      ctx.fillText(label, x2 + 8, y2 - 6);
+    }
+  }
+
   render() {
     const dyn = this.model.getDynamics();
     const ctx = this.renderer.getContext();
@@ -245,12 +269,11 @@ class PlanoInclinadoPresenter {
     const weightParEnd = origin.add(weightParallel);
     const weightPerpEnd = origin.add(weightPerp);
 
-    // Líneas discontinuas: componentes desde el origen
-    this.drawDashedLine(origin.x, origin.y, weightParEnd.x, weightParEnd.y, '#ea580c', 4);
-    this.drawDashedLine(origin.x, origin.y, weightPerpEnd.x, weightPerpEnd.y, '#dc2626', 4);
+    // Componente paralela del peso (Px) - línea discontinua con flecha
+    this.drawDashedArrow(origin.x, origin.y, weightParEnd.x, weightParEnd.y, '#ea580c', 'Px');
 
-    // Componente paralela del peso (Px) - línea sólida
-    this.renderer.drawArrow(origin.x, origin.y, weightParEnd.x, weightParEnd.y, '#ea580c', 'Px');
+    // Componente perpendicular del peso (Py) - línea discontinua con flecha
+    this.drawDashedArrow(origin.x, origin.y, weightPerpEnd.x, weightPerpEnd.y, '#dc2626', 'Py');
 
     // Normal (perpendicular a rampa)
     const normalMag = dyn.normal;
