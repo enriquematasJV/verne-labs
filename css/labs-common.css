@@ -1,0 +1,163 @@
+/**
+ * VerneLabs — Estilos Comunes para Laboratorios
+ * Compartido por todos los labs en simulaciones/
+ */
+
+@import url('./theme.css');
+
+/* ===== BODY Y ESTRUCTURA BASE ===== */
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background: var(--bg);
+  color: var(--text);
+  overflow: auto;
+  line-height: 1.45;
+}
+
+/* ===== HEADER ===== */
+header {
+  padding: 14px 22px 10px;
+  background: linear-gradient(135deg, #ffffff, #eef2ff);
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  margin: 0 0 5px;
+  font-size: 1.38rem;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* ===== HEADINGS ===== */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  line-height: 1.15;
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; margin-top: 24px; }
+h3 { font-size: 1.25rem; margin-top: 20px; }
+
+/* ===== BOTONES ===== */
+button, .button {
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text);
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 650;
+  transition: 0.15s;
+  font-family: var(--font-family);
+  font-size: 14px;
+}
+
+button:hover, .button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+button.active, .button.active {
+  background: #111827;
+  color: white;
+  border-color: #111827;
+}
+
+/* ===== TARJETAS Y PANELES ===== */
+.card, .panel, .controls-card, .canvas-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.card {
+  padding: 20px;
+}
+
+/* ===== CANVAS ===== */
+canvas {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  background: white;
+  border-radius: 14px;
+}
+
+/* ===== INPUTS Y SLIDERS ===== */
+input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="search"],
+textarea,
+select {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: var(--font-family);
+  color: var(--text);
+  background: white;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ===== TABLAS ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+td {
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+}
+
+tr:hover {
+  background: var(--soft);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 1.25rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  button, .button {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+}

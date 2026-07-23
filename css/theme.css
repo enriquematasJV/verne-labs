@@ -1,0 +1,39 @@
+/**
+ * VerneLabs — Variables y Tema Global
+ * Utilidades compartidas en todo el proyecto
+ */
+
+:root {
+  /* Paleta de colores */
+  --bg: #f1f5f9;
+  --panel: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+  --soft: #e2e8f0;
+  --border: #d4d4d8;
+  --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+
+  /* Acentos */
+  --accent: #0f172a;
+  --accent-blue: #2563eb;
+  --accent-red: #dc2626;
+  --accent-green: #16a34a;
+
+  /* Diseño */
+  --radius: 22px;
+  --radius-sm: 10px;
+  --spacing: 24px;
+
+  /* Tipografía */
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
