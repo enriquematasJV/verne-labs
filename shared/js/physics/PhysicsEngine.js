@@ -50,4 +50,11 @@ class PhysicsEngine {
       staticHold
     };
   }
+
+  theoreticalInclinedPlane(acceleration, distance) {
+    if (acceleration < 0.001) return { time: Infinity, velocity: 0 };
+    const time = Math.sqrt(2 * distance / acceleration);
+    const velocity = acceleration * time;
+    return { time, velocity };
+  }
 }
