@@ -58,4 +58,44 @@ class Vector2D {
   toString() {
     return `Vector2D(${this.x.toFixed(2)}, ${this.y.toFixed(2)})`;
   }
+
+  // Proyecta este vector sobre un eje (devuelve componente escalar)
+  projectScalar(axis) {
+    const normalized = axis.normalize();
+    return this.dot(normalized);
+  }
+
+  // Proyecta este vector sobre un eje (devuelve vector proyectado)
+  projectOntoAxis(axis) {
+    const normalized = axis.normalize();
+    const scalar = this.dot(normalized);
+    return normalized.scale(scalar);
+  }
+
+  // Descompone este vector en componentes paralela y perpendicular a un eje
+  decompose(axisParallel, axisPerp) {
+    return {
+      parallel: this.projectOntoAxis(axisParallel),
+      perpendicular: this.projectOntoAxis(axisPerp),
+      parallelScalar: this.projectScalar(axisParallel),
+      perpendicularScalar: this.projectScalar(axisPerp)
+    };
+  }
+
+  // Calcula la resultante de múltiples vectores
+  static resultant(vectors) {
+    if (vectors.length === 0) return Vector2D.zero();
+    return vectors.reduce((sum, v) => sum.add(v), Vector2D.zero());
+  }
+
+  // Suma múltiples vectores
+  static sum(vectors) {
+    return Vector2D.resultant(vectors);
+  }
+
+  // Promedio de múltiples vectores
+  static average(vectors) {
+    if (vectors.length === 0) return Vector2D.zero();
+    return Vector2D.resultant(vectors).scale(1 / vectors.length);
+  }
 }

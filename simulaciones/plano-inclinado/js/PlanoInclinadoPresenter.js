@@ -223,37 +223,58 @@ class PlanoInclinadoPresenter {
 
     this.renderer.drawPolygon([p1, p2, p3, p4], '#f59e0b', '#92400e', 3);
 
-    // Cálculos de fuerzas usando Vector2D para precisión
-    const scale = 0.8; // Factor de escala para visualización
+    // === DIAGRAMA DE FUERZAS CON DESCOMPOSICIÓN ===
+    const scale = 0.8;
+    const origin = new Vector2D(blockCenterX, blockCenterY);
 
-    // Peso (vertical, hacia abajo)
+    // Ejes de referencia: paralelo y perpendicular a la rampa
+    const axisParallel = new Vector2D(ux, uy);      // paralelo a rampa
+    const axisPerp = new Vector2D(nx, ny);          // perpendicular a rampa
+
+    // Peso: vector vertical hacia abajo
     const weightMag = this.model.mass * 9.8;
-    const weightEnd = new Vector2D(blockCenterX, blockCenterY + weightMag * scale);
-    this.renderer.drawArrow(blockCenterX, blockCenterY, weightEnd.x, weightEnd.y, '#dc2626', 'Peso');
+    const weightVec = new Vector2D(0, weightMag);
+    const weightEnd = origin.add(weightVec.scale(scale));
+    this.renderer.drawArrow(origin.x, origin.y, weightEnd.x, weightEnd.y, '#dc2626', 'P');
 
-    // Normal (perpendicular a rampa, hacia arriba)
+    // Descomponer peso en componentes paralela y perpendicular
+    const weightDecomp = weightVec.decompose(axisParallel, axisPerp);
+    const weightParallel = weightDecomp.parallel.scale(scale);
+    const weightPerp = weightDecomp.perpendicular.scale(scale);
+
+    // Dibujar líneas discontinuas para descomposición (triángulo)
+    const weightParEnd = origin.add(weightParallel);
+    const weightPerpEnd = origin.add(weightPerp);
+    this.drawDashedLine(weightEnd.x, weightEnd.y, weightParEnd.x, weightParEnd.y, '#dc2626', 3);
+    this.drawDashedLine(weightEnd.x, weightEnd.y, weightPerpEnd.x, weightPerpEnd.y, '#dc2626', 3);
+    this.drawDashedLine(weightParEnd.x, weightParEnd.y, weightPerpEnd.x, weightPerpEnd.y, '#dc2626', 2);
+
+    // Componente paralela del peso (Px)
+    this.renderer.drawArrow(origin.x, origin.y, weightParEnd.x, weightParEnd.y, '#ea580c', 'Px');
+
+    // Normal (perpendicular a rampa)
     const normalMag = dyn.normal;
-    const normalVec = new Vector2D(nx, ny).normalize().scale(normalMag * scale);
-    const normalEnd = new Vector2D(blockCenterX, blockCenterY).add(normalVec);
-    this.renderer.drawArrow(blockCenterX, blockCenterY, normalEnd.x, normalEnd.y, '#2563eb', 'Normal');
+    const normalVec = axisPerp.scale(normalMag * scale);
+    const normalEnd = origin.add(normalVec);
+    this.renderer.drawArrow(origin.x, origin.y, normalEnd.x, normalEnd.y, '#2563eb', 'N');
 
-    // Línea discontinua: componente perpendicular del peso
-    const weightPerpMag = weightMag * Math.cos(angleRad);
-    const weightPerpVec = new Vector2D(nx, ny).normalize().scale(weightPerpMag * scale);
-    const weightPerpEnd = new Vector2D(blockCenterX, blockCenterY).add(weightPerpVec);
-    this.drawDashedLine(blockCenterX, blockCenterY + weightMag * scale, weightPerpEnd.x, weightPerpEnd.y, '#dc2626', 3);
-
-    // Rozamiento (paralelo a rampa, hacia arriba)
+    // Rozamiento (opuesto a movimiento, sobre la rampa)
     const frictionMag = dyn.friction;
-    const frictionVec = new Vector2D(-ux, -uy).normalize().scale(frictionMag * scale);
-    const frictionEnd = new Vector2D(blockCenterX, blockCenterY).add(frictionVec);
-    this.renderer.drawArrow(blockCenterX, blockCenterY, frictionEnd.x, frictionEnd.y, '#16a34a', 'Roz.');
+    const frictionVec = axisParallel.scale(-frictionMag * scale);
+    const frictionEnd = origin.add(frictionVec);
+    this.renderer.drawArrow(origin.x, origin.y, frictionEnd.x, frictionEnd.y, '#16a34a', 'f');
 
-    // Línea discontinua: componente paralela del peso
-    const weightParallelMag = weightMag * Math.sin(angleRad);
-    const weightParallelVec = new Vector2D(ux, uy).normalize().scale(weightParallelMag * scale);
-    const weightParallelEnd = new Vector2D(blockCenterX, blockCenterY).add(weightParallelVec);
-    this.drawDashedLine(blockCenterX, blockCenterY + weightMag * scale, weightParallelEnd.x, weightParallelEnd.y, '#dc2626', 3);
+    // Fuerza neta (Resultante = Px - f = m·a)
+    const netForceMag = dyn.netForce;
+    const netForceVec = axisParallel.scale(netForceMag * scale);
+    const netForceEnd = origin.add(netForceVec);
+    this.renderer.drawArrow(origin.x, origin.y, netForceEnd.x, netForceEnd.y, '#7c3aed', 'F_neta');
+
+    // Línea punteada para mostrar resultante
+    if (netForceMag > 0.01) {
+      this.drawDashedLine(weightParEnd.x, weightParEnd.y, netForceEnd.x, netForceEnd.y, '#7c3aed', 2);
+      this.drawDashedLine(frictionEnd.x, frictionEnd.y, netForceEnd.x, netForceEnd.y, '#7c3aed', 2);
+    }
 
     this.renderer.drawText('Final', bottomX - 18, bottomY + 35, 15, 'bold', '#334155');
   }
