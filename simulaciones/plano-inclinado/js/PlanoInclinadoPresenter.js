@@ -6,10 +6,43 @@ class PlanoInclinadoPresenter {
     this.dom = dom;
     this.constants = constants;
 
-    this.lastTimestamp = null;
+    // SimulationLifecycle gestiona start/pause/reset/step
+    this.lifecycle = new SimulationLifecycle(
+      (dt) => this.onStep(dt),
+      () => this.model.reset(),
+      () => this.model.canStart()
+    );
+
+    // AnimationID para requestAnimationFrame
     this.animationId = null;
 
     this.setupEventListeners();
+    this.setupLifecycleListeners();
+  }
+
+  setupLifecycleListeners() {
+    this.lifecycle.on('onStart', () => {
+      this.animationId = requestAnimationFrame((ts) => this.animate(ts));
+      this.updateUI();
+    });
+
+    this.lifecycle.on('onPause', () => {
+      if (this.animationId !== null) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = null;
+      }
+      this.updateUI();
+    });
+
+    this.lifecycle.on('onReset', () => {
+      this.updateUI();
+      this.render();
+    });
+
+    this.lifecycle.on('onStep', () => {
+      this.updateUI();
+      this.render();
+    });
   }
 
   setupEventListeners() {
@@ -38,34 +71,17 @@ class PlanoInclinadoPresenter {
       this.render();
     });
 
-    // Botones
+    // Botones - delegados a SimulationLifecycle
     this.dom.startBtn.addEventListener('click', () => {
-      this.model.start();
-      this.updateUI();
-      if (this.model.running) {
-        this.lastTimestamp = null;
-        this.animationId = requestAnimationFrame((ts) => this.animate(ts));
-      }
+      this.lifecycle.start();
     });
 
     this.dom.pauseBtn.addEventListener('click', () => {
-      this.model.pause();
-      if (this.animationId !== null) {
-        cancelAnimationFrame(this.animationId);
-        this.animationId = null;
-      }
-      this.updateUI();
+      this.lifecycle.pause();
     });
 
     this.dom.resetBtn.addEventListener('click', () => {
-      this.model.reset();
-      this.lastTimestamp = null;
-      if (this.animationId !== null) {
-        cancelAnimationFrame(this.animationId);
-        this.animationId = null;
-      }
-      this.updateUI();
-      this.render();
+      this.lifecycle.reset();
     });
   }
 
@@ -107,8 +123,8 @@ class PlanoInclinadoPresenter {
       this.dom.resultText.textContent = 'No hay descenso con estos parámetros.';
     }
 
-    this.dom.startBtn.disabled = !this.model.canStart();
-    this.dom.pauseBtn.disabled = !this.model.canPause();
+    this.dom.startBtn.disabled = !this.lifecycle.canStart();
+    this.dom.pauseBtn.disabled = !this.lifecycle.isRunning();
   }
 
   render() {
@@ -190,22 +206,17 @@ class PlanoInclinadoPresenter {
     this.renderer.drawText('Final', bottomX - 18, bottomY + 35, 15, 'bold', '#334155');
   }
 
-  animate(timestamp) {
-    if (!this.model.running) return;
-
-    if (this.lastTimestamp === null || this.lastTimestamp === undefined) {
-      this.lastTimestamp = timestamp;
-    } else {
-      let delta = (timestamp - this.lastTimestamp) / 1000;
-      this.lastTimestamp = timestamp;
-      delta = Math.min(delta, 0.04);
-
-      this.model.step(delta);
-      this.updateUI();
-      this.render();
+  onStep(deltaTime) {
+    this.model.step(deltaTime);
+    if (this.model.finished) {
+      this.lifecycle.markFinished();
     }
+  }
 
-    if (this.model.running) {
+  animate(timestamp) {
+    this.lifecycle.step(timestamp);
+
+    if (this.lifecycle.isRunning()) {
       this.animationId = requestAnimationFrame((ts) => this.animate(ts));
     }
   }

@@ -94,9 +94,17 @@
   </div>
 
   <!-- MÓDULOS: Arquitectura MVP -->
-  <script src="../../shared/js/physics/PhysicsEngine.js"></script>
+  <!-- Shared: Gráficos y UI -->
   <script src="../../shared/js/graphics/Canvas2DRenderer.js"></script>
   <script src="../../shared/js/ui/SliderControl.js"></script>
+
+  <!-- Shared: Física y Integración -->
+  <script src="../../shared/js/physics/PhysicsEngine.js"></script>
+  <script src="../../shared/js/physics/OdeSolverRK4.js"></script>
+  <script src="../../shared/js/physics/KinematicsEngine.js"></script>
+  <script src="../../shared/js/simulations/SimulationLifecycle.js"></script>
+
+  <!-- Específico: Plano-Inclinado -->
   <script src="./js/PlanoInclinadoPhysics.js"></script>
   <script src="./js/PlanoInclinadoModel.js"></script>
   <script src="./js/PlanoInclinadoPresenter.js"></script>
@@ -118,7 +126,6 @@
     };
 
     // 1. Crear instancias de componentes base
-    const physics = new PhysicsEngine();
     const canvas = document.getElementById('scene');
     const renderer = new Canvas2DRenderer(canvas);
 
@@ -172,7 +179,7 @@
     };
 
     // 4. Crear instancia del Model
-    const model = new PlanoInclinadoModel(physics);
+    const model = new PlanoInclinadoModel();
 
     // 5. Crear instancia del Presenter
     const presenter = new PlanoInclinadoPresenter(
