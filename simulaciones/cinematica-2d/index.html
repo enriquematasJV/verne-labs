@@ -4,8 +4,304 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Laboratorio virtual de cinemática 2D</title>
-  <link rel="stylesheet" href="../../css/labs-common.css" />
-  <link rel="stylesheet" href="./cinematica-2d.css" />
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --panel: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --soft: #e2e8f0;
+      --accent: #0f172a;
+      --sky: #e0f2fe;
+      --ground: #cbd5e1;
+      --traj: #7c3aed;
+      --ball: #f59e0b;
+      --vx: #2563eb;
+      --vy: #dc2626;
+      --ay: #16a34a;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+
+    .page-header {
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      border: 1px solid #d4d4d8;
+      border-radius: 28px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .page-header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .back-link {
+      text-decoration: none;
+      border: 1px solid #d4d4d8;
+      border-radius: 14px;
+      padding: 10px 14px;
+      color: #0f172a;
+      background: white;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+
+    .back-link:hover {
+      background: #f1f5f9;
+    }
+
+    .subtitle {
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .control label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .control input[type="range"],
+    .control select {
+      width: 100%;
+    }
+
+    .control select {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      font-size: 0.95rem;
+    }
+
+    .group-box {
+      background: #f8fafc;
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .group-box .title {
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 11px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    button.secondary {
+      background: #334155;
+      color: white;
+    }
+
+    button.light {
+      background: var(--soft);
+      color: var(--text);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .info-box {
+      background: #f8fafc;
+      border-radius: var(--radius);
+      padding: 14px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .info-box .title {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 18px;
+      background: var(--sky);
+    }
+
+    .metrics {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .metric, .detail-box {
+      background: #f8fafc;
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .metric .label {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .metric .value {
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .details {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 14px;
+    }
+
+    .detail-box .title {
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .detail-box div {
+      margin-bottom: 7px;
+      font-size: 0.96rem;
+      line-height: 1.45;
+    }
+
+    .formula {
+      font-family: "Courier New", monospace;
+      background: white;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      overflow-x: auto;
+      border: 1px solid #e2e8f0;
+    }
+
+    .legend-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+    }
+
+    .dot.ball { background: var(--ball); }
+    .dot.traj { background: var(--traj); }
+    .dot.impact { background: #16a34a; }
+
+    @media (max-width: 1040px) {
+      .page-header-content {
+        flex-direction: column;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .details {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app {
+        padding: 14px;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="app">
