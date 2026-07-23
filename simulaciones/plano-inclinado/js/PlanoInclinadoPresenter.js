@@ -242,14 +242,14 @@ class PlanoInclinadoPresenter {
     const weightParallel = weightDecomp.parallel.scale(scale);
     const weightPerp = weightDecomp.perpendicular.scale(scale);
 
-    // Dibujar líneas discontinuas para descomposición (triángulo)
     const weightParEnd = origin.add(weightParallel);
     const weightPerpEnd = origin.add(weightPerp);
-    this.drawDashedLine(weightEnd.x, weightEnd.y, weightParEnd.x, weightParEnd.y, '#dc2626', 3);
-    this.drawDashedLine(weightEnd.x, weightEnd.y, weightPerpEnd.x, weightPerpEnd.y, '#dc2626', 3);
-    this.drawDashedLine(weightParEnd.x, weightParEnd.y, weightPerpEnd.x, weightPerpEnd.y, '#dc2626', 2);
 
-    // Componente paralela del peso (Px)
+    // Líneas discontinuas: componentes desde el origen
+    this.drawDashedLine(origin.x, origin.y, weightParEnd.x, weightParEnd.y, '#ea580c', 4);
+    this.drawDashedLine(origin.x, origin.y, weightPerpEnd.x, weightPerpEnd.y, '#dc2626', 4);
+
+    // Componente paralela del peso (Px) - línea sólida
     this.renderer.drawArrow(origin.x, origin.y, weightParEnd.x, weightParEnd.y, '#ea580c', 'Px');
 
     // Normal (perpendicular a rampa)
