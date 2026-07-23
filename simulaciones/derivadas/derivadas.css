@@ -2,8 +2,6 @@
  * VerneLabs — Estilos específicos para Derivada
  */
 
-@import url('../../css/labs-common.css');
-
 :root {
   --accent: #2563eb;
   --accent2: #dc2626;
