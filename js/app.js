@@ -164,8 +164,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     noResults.classList.toggle('visible', visibleCount === 0);
   }
 
-  await loadConfig();
-  await loadManifest();
-  await loadFilterChips();
-  await loadCards();
+  // Inicializar
+  try {
+    console.log('Iniciando carga de VerneLabs...');
+
+    const configResult = await loadConfig();
+    console.log('Config cargado:', configResult ? `${configResult.etiquetas.length} etiquetas` : 'ERROR');
+
+    const manifestResult = await loadManifest();
+    console.log('Manifest cargado:', manifestResult ? `${manifestResult.laboratorios.length} labs` : 'ERROR');
+
+    if (!config || !manifest) {
+      console.error('❌ FALLO: No se cargaron config.json o manifest.json. Verifica que existan en la raíz.');
+      filterChipsContainer.innerHTML = '<p style="color:red;">Error: No se pudieron cargar los datos. Abre la consola (F12).</p>';
+      return;
+    }
+
+    await loadFilterChips();
+    console.log('✅ Chips de filtro cargados:', chips.length);
+
+    await loadCards();
+    console.log('✅ Tarjetas de laboratorios cargadas');
+  } catch (error) {
+    console.error('❌ ERROR CRÍTICO:', error);
+    filterChipsContainer.innerHTML = '<p style="color:red;">Error al cargar. Abre la consola (F12) para detalles.</p>';
+  }
 });
