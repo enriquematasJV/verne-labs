@@ -113,6 +113,14 @@
       "categoria": "geologia",
       "modulosRequeridos": ["graphics"],
       "estado": "publicado"
+    },
+    {
+      "id": "numeros-complejos-fasores-y-ondas",
+      "nombre": "Números Complejos, Fasores y Ondas",
+      "carpeta": "numeros-complejos-fasores-y-ondas",
+      "categoria": "matematicas",
+      "modulosRequeridos": ["graphics"],
+      "estado": "publicado"
     }
   ]
 }

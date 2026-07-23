@@ -36,9 +36,9 @@
                              "carpeta":  "representación-de-mapas-geológicos"
                          },
                          {
-                             "carpeta":  "nmeros-complejos-fasores-y-ondas",
-                             "nombre":  "nmeros-complejos-fasores-y-ondas",
-                             "id":  "nmeros-complejos-fasores-y-ondas"
+                             "id":  "numeros-complejos-fasores-y-ondas",
+                             "nombre":  "Números Complejos, Fasores y Ondas",
+                             "carpeta":  "numeros-complejos-fasores-y-ondas"
                          }
                      ]
 }
