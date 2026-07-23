@@ -129,6 +129,28 @@ class PlanoInclinadoPresenter {
     this.dom.pauseBtn.disabled = !this.lifecycle.isRunning();
   }
 
+  drawDashedLine(x1, y1, x2, y2, color, dashLength = 5) {
+    const ctx = this.renderer.getContext();
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const steps = Math.ceil(distance / (dashLength * 2));
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i < steps; i++) {
+      const t1 = (i * dashLength * 2) / distance;
+      const t2 = ((i * dashLength * 2) + dashLength) / distance;
+      if (t1 < 1) {
+        ctx.beginPath();
+        ctx.moveTo(x1 + dx * Math.min(t1, 1), y1 + dy * Math.min(t1, 1));
+        ctx.lineTo(x1 + dx * Math.min(t2, 1), y1 + dy * Math.min(t2, 1));
+        ctx.stroke();
+      }
+    }
+  }
+
   render() {
     const dyn = this.model.getDynamics();
     const ctx = this.renderer.getContext();
@@ -201,9 +223,37 @@ class PlanoInclinadoPresenter {
 
     this.renderer.drawPolygon([p1, p2, p3, p4], '#f59e0b', '#92400e', 3);
 
-    this.renderer.drawArrow(blockCenterX, blockCenterY, blockCenterX, blockCenterY + 70, '#dc2626', 'Peso');
-    this.renderer.drawArrow(blockCenterX, blockCenterY, blockCenterX - nx * 52, blockCenterY - ny * 52, '#2563eb', 'Normal');
-    this.renderer.drawArrow(blockCenterX, blockCenterY, blockCenterX - ux * 45, blockCenterY - uy * 45, '#16a34a', 'Roz.');
+    // Cálculos de fuerzas usando Vector2D para precisión
+    const scale = 0.8; // Factor de escala para visualización
+
+    // Peso (vertical, hacia abajo)
+    const weightMag = this.model.mass * 9.8;
+    const weightEnd = new Vector2D(blockCenterX, blockCenterY + weightMag * scale);
+    this.renderer.drawArrow(blockCenterX, blockCenterY, weightEnd.x, weightEnd.y, '#dc2626', 'Peso');
+
+    // Normal (perpendicular a rampa, hacia arriba)
+    const normalMag = dyn.normal;
+    const normalVec = new Vector2D(nx, ny).normalize().scale(normalMag * scale);
+    const normalEnd = new Vector2D(blockCenterX, blockCenterY).add(normalVec);
+    this.renderer.drawArrow(blockCenterX, blockCenterY, normalEnd.x, normalEnd.y, '#2563eb', 'Normal');
+
+    // Línea discontinua: componente perpendicular del peso
+    const weightPerpMag = weightMag * Math.cos(angleRad);
+    const weightPerpVec = new Vector2D(nx, ny).normalize().scale(weightPerpMag * scale);
+    const weightPerpEnd = new Vector2D(blockCenterX, blockCenterY).add(weightPerpVec);
+    this.drawDashedLine(blockCenterX, blockCenterY + weightMag * scale, weightPerpEnd.x, weightPerpEnd.y, '#dc2626', 3);
+
+    // Rozamiento (paralelo a rampa, hacia arriba)
+    const frictionMag = dyn.friction;
+    const frictionVec = new Vector2D(-ux, -uy).normalize().scale(frictionMag * scale);
+    const frictionEnd = new Vector2D(blockCenterX, blockCenterY).add(frictionVec);
+    this.renderer.drawArrow(blockCenterX, blockCenterY, frictionEnd.x, frictionEnd.y, '#16a34a', 'Roz.');
+
+    // Línea discontinua: componente paralela del peso
+    const weightParallelMag = weightMag * Math.sin(angleRad);
+    const weightParallelVec = new Vector2D(ux, uy).normalize().scale(weightParallelMag * scale);
+    const weightParallelEnd = new Vector2D(blockCenterX, blockCenterY).add(weightParallelVec);
+    this.drawDashedLine(blockCenterX, blockCenterY + weightMag * scale, weightParallelEnd.x, weightParallelEnd.y, '#dc2626', 3);
 
     this.renderer.drawText('Final', bottomX - 18, bottomY + 35, 15, 'bold', '#334155');
   }
