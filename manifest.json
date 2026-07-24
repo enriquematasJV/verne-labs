@@ -32,11 +32,17 @@
             "id": "funciones-inecuaciones",
             "nombre": "Plano XY: inecuaciones y funciones",
             "carpeta": "funciones-inecuaciones",
-            "estado": "🔧 En construcción",
-            "modularizacion": "⏳ Módulos creados, no integrados",
+            "estado": "✅ COMPLETO",
+            "modularizacion": "✅ MVP integrado",
             "documentacion": ["ARCHITECTURE.md"],
-            "modulosShared": 3,
-            "modulosEspecificos": 4
+            "modulosShared": 4,
+            "modulosEspecificos": 4,
+            "mejoras": [
+                "Reducción 73% HTML (498→110 líneas)",
+                "Canvas 2D para rendering de gráficos",
+                "Modo dual: inecuaciones y funciones",
+                "Pan/zoom interactivo con GraphNavigator"
+            ]
         },
         {
             "id": "cinematica-2d",
@@ -91,10 +97,10 @@
     ],
     "resumen": {
         "totalLaboratorios": 8,
-        "completosMVP": 2,
-        "enConstruccion": 2,
+        "completosMVP": 3,
+        "enConstruccion": 1,
         "porModularizar": 4,
-        "porcentajeCompletado": 25,
-        "observaciones": "Derivadas completado con MVP integrado, panel de fórmulas dinámicas, y cero hardcoding"
+        "porcentajeCompletado": 37.5,
+        "observaciones": "Derivadas y funciones-inecuaciones completados con MVP integrado. Cinematica-2D en construcción."
     }
 }
