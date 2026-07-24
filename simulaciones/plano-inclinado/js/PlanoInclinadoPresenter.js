@@ -1,10 +1,11 @@
 class PlanoInclinadoPresenter {
-  constructor(model, renderer, sliders, dom, constants) {
+  constructor(model, renderer, sliders, dom, constants, formulasPanel) {
     this.model = model;
     this.renderer = renderer;
     this.sliders = sliders;
     this.dom = dom;
     this.constants = constants;
+    this.formulasPanel = formulasPanel;
 
     // SimulationLifecycle gestiona start/pause/reset/step
     this.lifecycle = new SimulationLifecycle(
@@ -127,6 +128,17 @@ class PlanoInclinadoPresenter {
 
     this.dom.startBtn.disabled = !this.lifecycle.canStart();
     this.dom.pauseBtn.disabled = !this.lifecycle.isRunning();
+
+    // Actualizar panel de fórmulas si existe
+    if (this.formulasPanel) {
+      this.formulasPanel.update({
+        angleDeg: this.model.angleDeg,
+        mass: this.model.mass,
+        mu: this.model.mu,
+        velocity: this.model.velocity,
+        time: this.model.time,
+      });
+    }
   }
 
   drawDashedLine(x1, y1, x2, y2, color, dashLength = 5) {
