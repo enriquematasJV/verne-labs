@@ -39,7 +39,7 @@ class SceneRenderer {
     this._drawAxes(viewport);
 
     // Dibujar trayectoria teórica
-    this._drawTrajectory(th, viewport);
+    this._drawTrajectory(th, viewport, model.y0, model.g);
 
     // Dibujar puntos notables
     if (th.apexTime > 0) {
@@ -208,7 +208,7 @@ class SceneRenderer {
   /**
    * Dibujar trayectoria teórica
    */
-  _drawTrajectory(th, vp) {
+  _drawTrajectory(th, vp, y0, g) {
     const ctx = this.ctx;
     ctx.strokeStyle = this.constants.COLORS.trajectory;
     ctx.lineWidth = this.constants.RENDERING.vectorLineWidth;
@@ -217,7 +217,7 @@ class SceneRenderer {
     for (let i = 0; i <= 180; i++) {
       const t = th.flightTime * i / 180;
       const x = CinematicaPhysics.xAt(t, th.v0x);
-      const y = Math.max(0, CinematicaPhysics.yAt(t, vp.model?.y0 || 0, th.v0y, vp.model?.g || -9.8));
+      const y = Math.max(0, CinematicaPhysics.yAt(t, y0, th.v0y, g));
       const px = vp.xToPx(x);
       const py = vp.yToPx(y);
 
