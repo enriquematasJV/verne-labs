@@ -94,11 +94,16 @@
 
       <section class="info-card">
         <h2 class="section-title">Lectura matemática</h2>
-        <div class="formula-box">
-          Pendiente secante:<br />
-          <code>m(h) = [f(x+h) - f(x)] / h</code><br /><br />
-          Derivada en el punto:<br />
-          <code>f'(x) = lim h→0 [f(x+h) - f(x)] / h</code>
+        <div class="formula-box" id="formulasPanel">
+          <div>Pendiente secante: m(h) = <span id="formulaSecante">0.0000</span></div>
+          <div>Derivada en el punto: f'(x) ≈ <span id="formulaTangente">0.0000</span></div>
+          <br />
+          <div style="font-size: 0.9em; color: #666;">
+            x = <span id="formulaX">1.0000</span>,
+            x+h = <span id="formulaXH">2.5000</span><br />
+            f(x) = <span id="formulaFX">1.0000</span>,
+            f(x+h) = <span id="formulaFXH">6.2500</span>
+          </div>
         </div>
 
         <div class="metrics">
@@ -126,6 +131,7 @@
   <script src="../../shared/components/VerneMath/VerneMath.js"></script>
   <script src="../../shared/components/GraphRenderer/GraphRenderer.js"></script>
   <script src="../../shared/components/GraphNavigator/GraphNavigator.js"></script>
+  <script src="../../shared/components/MathematicalModelPanel/MathematicalModelPanel.js"></script>
 
   <!-- Módulos específicos: Derivadas -->
   <script src="./js/DerivadaConstants.js"></script>
@@ -170,16 +176,49 @@
     // 4. Crear instancia del Model
     const model = new DerivadaModel(DerivadaConstants);
 
-    // 5. Crear instancia del Presenter (orquestador)
+    // 5. Crear instancia del Panel de Fórmulas (MVP View)
+    const formulasPanel = new MathematicalModelPanel({
+      formulas: [
+        { id: 'formulaSecante', digits: 4 },
+        { id: 'formulaTangente', digits: 4 },
+        { id: 'formulaX', digits: 4 },
+        { id: 'formulaXH', digits: 4 },
+        { id: 'formulaFX', digits: 4 },
+        { id: 'formulaFXH', digits: 4 }
+      ],
+      calculator: (state) => {
+        const x = state.x || 1;
+        const h = state.h || 1.5;
+        const fx = state.fx || model.safeEval(x);
+        const fxh = state.fxh || model.safeEval(x + h);
+        const dy = fxh - fx;
+        const secante = h !== 0 ? dy / h : 0;
+        const tangente = model.derivativeApprox(x);
+
+        return {
+          formulaSecante: secante,
+          formulaTangente: tangente,
+          formulaX: x,
+          formulaXH: x + h,
+          formulaFX: fx,
+          formulaFXH: fxh
+        };
+      }
+    });
+
+    // 6. Crear instancia del Presenter (orquestador MVP)
     const presenter = new DerivadaPresenter(
       model,
       canvas,
       dom,
       graphRenderer,
-      DerivadaConstants
+      DerivadaConstants,
+      formulasPanel
     );
 
-    // 6. Todo delegado al Presenter - listo
+    // 7. Inicializar UI y renderizar
+    presenter.updateUI();
+    presenter.render();
   </script>
 </body>
 </html>

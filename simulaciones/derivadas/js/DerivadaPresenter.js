@@ -1,11 +1,12 @@
 class DerivadaPresenter {
-  constructor(model, canvas, dom, graphRenderer, constants) {
+  constructor(model, canvas, dom, graphRenderer, constants, formulasPanel) {
     this.model = model;
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.dom = dom;
     this.graphRenderer = graphRenderer;
     this.constants = constants;
+    this.formulasPanel = formulasPanel;
 
     // Estado de animación
     this.animationId = null;
@@ -160,6 +161,16 @@ class DerivadaPresenter {
       // Actualizar UI
       this._updateMetrics(x, fx, h, fxh);
       this._updateSliders(h);
+
+      // Actualizar panel de fórmulas (MVP)
+      if (this.formulasPanel) {
+        this.formulasPanel.update({
+          x: x,
+          h: h,
+          fx: fx,
+          fxh: fxh
+        });
+      }
 
     } catch (error) {
       console.error('Error en render:', error);
