@@ -127,6 +127,9 @@ class DerivadaPresenter {
       const vp = this.model.getViewport();
       this.graphRenderer.setViewport(vp.xMin, vp.xMax, vp.yMin, vp.yMax);
 
+      // Limpiar canvas
+      this.graphRenderer.clear();
+
       // Dibujar grid y ejes
       this.graphRenderer.drawGridAndAxes();
 
