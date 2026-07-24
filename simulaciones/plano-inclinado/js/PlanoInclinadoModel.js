@@ -53,13 +53,46 @@ class PlanoInclinadoModel {
 
   getDynamics() {
     const angleRad = this.angleDeg * Math.PI / 180;
-    const result = PlanoInclinadoPhysics.calculateInclinedPlane(this.mass, angleRad, this.mu);
-    return { angleRad, ...result };
+    const g = 9.8;
+
+    // Peso: vector vertical hacia abajo
+    const weight = new Vector2D(0, this.mass * g);
+
+    // Ejes de referencia: paralelo y perpendicular a la rampa
+    const axisParallel = new Vector2D(Math.cos(angleRad), Math.sin(angleRad));
+    const axisPerp = new Vector2D(-Math.sin(angleRad), Math.cos(angleRad));
+
+    // Descomponer peso
+    const decomp = weight.decompose(axisParallel, axisPerp);
+    const parallel = decomp.parallelScalar;
+    const perpendicular = decomp.perpendicularScalar;
+
+    // Cálculos de fuerzas
+    const normal = Math.abs(perpendicular);
+    const friction = this.mu * normal;
+    const netForce = Math.max(0, parallel - friction);
+    const acceleration = netForce / this.mass;
+    const staticHold = acceleration < 0.001;
+
+    return {
+      angleRad,
+      parallel,
+      normal,
+      friction,
+      netForce,
+      acceleration,
+      staticHold
+    };
   }
 
   getTheoretical() {
     const dyn = this.getDynamics();
-    return PlanoInclinadoPhysics.theoreticalInclinedPlane(dyn.acceleration, this.rampLength);
+    if (dyn.acceleration < 0.001) {
+      return { time: Infinity, velocity: 0 };
+    }
+    const time = Math.sqrt(2 * this.rampLength / dyn.acceleration);
+    const velocity = dyn.acceleration * time;
+    return { time, velocity };
   }
 
   getAcceleration() {
