@@ -195,4 +195,41 @@ class VectorRenderer {
   getRenderer() {
     return this.renderer;
   }
+
+  // ========================================
+  // Métodos delegados a Canvas2DRenderer
+  // para compatibilidad con código existente
+  // ========================================
+
+  clear(color) {
+    return this.renderer.clear(color);
+  }
+
+  drawLine(x1, y1, x2, y2, color, lineWidth) {
+    return this.renderer.drawLine(x1, y1, x2, y2, color, lineWidth);
+  }
+
+  drawRect(x, y, width, height, color, borderColor, borderWidth) {
+    return this.renderer.drawRect(x, y, width, height, color, borderColor, borderWidth);
+  }
+
+  drawCircle(x, y, radius, color, borderColor, borderWidth) {
+    return this.renderer.drawCircle(x, y, radius, color, borderColor, borderWidth);
+  }
+
+  drawPolygon(points, fillColor, strokeColor, lineWidth) {
+    return this.renderer.drawPolygon(points, fillColor, strokeColor, lineWidth);
+  }
+
+  drawText(text, x, y, color, fontSize, fontFamily) {
+    return this.renderer.drawText(text, x, y, color, fontSize, fontFamily);
+  }
+
+  setTransform(scaleX, scaleY, translateX, translateY) {
+    return this.renderer.setTransform(scaleX, scaleY, translateX, translateY);
+  }
+
+  resetTransform() {
+    return this.renderer.resetTransform();
+  }
 }

@@ -160,7 +160,7 @@
 
     // 1. Crear instancias de componentes base
     const canvas = document.getElementById('scene');
-    const renderer = new VectorRenderer(canvas, CONSTANTS);
+    const renderer = new Canvas2DRenderer(canvas);
 
     // 2. Crear instancias de SliderControl (sin callback, el Presenter los configurará)
     const angleSlider = new SliderControl(
