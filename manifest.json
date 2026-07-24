@@ -48,8 +48,8 @@
             "id": "cinematica-2d",
             "nombre": "Cinemática 2D: tiro vertical y parabólico",
             "carpeta": "cinematica-2d",
-            "estado": "✅ COMPLETO",
-            "modularizacion": "✅ Modularizado (sin MVP)",
+            "estado": "⚙️ MVP en integración",
+            "modularizacion": "✅ Modularizado (sin hardcoding)",
             "documentacion": ["ARCHITECTURE.md"],
             "modulosShared": 0,
             "modulosEspecificos": 7,
@@ -59,7 +59,8 @@
                 "Cero hardcoding (todo en CinematicaConstants)",
                 "Pausa automática en puntos clave (apex, impacto)",
                 "Viewport dinámico basado en trayectoria",
-                "Visualización de vectores (velocidad, aceleración)"
+                "Visualización de vectores (velocidad, aceleración)",
+                "Iniciando integración MVP (basada en plano-inclinado)"
             ]
         },
         {
