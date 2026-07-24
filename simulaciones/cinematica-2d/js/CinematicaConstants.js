@@ -77,6 +77,13 @@ const CinematicaConstants = {
     textMuted: '#475569',       // Texto secundario
     boxBackground: 'rgba(255,255,255,0.95)',
     boxBorder: '#cbd5e1',
+    canvas: {
+      background: {
+        gradientTop: '#e0f2fe',     // Sky gradient top
+        gradientBottom: '#f8fafc',  // Sky gradient bottom
+        groundColor: '#cbd5e1',     // Ground color
+      },
+    },
   },
 
   // ===== ESTILOS DE LÍNEA =====
