@@ -246,21 +246,26 @@ class DerivadaPresenter {
     ctx.restore();
   }
 
-  _drawPoint(x, y, color, label, dx = 8, dy = -12) {
+  _drawPoint(x, y, color, label, dx, dy) {
     const ctx = this.ctx;
+    const c = this.constants;
     const px = this.model.toScreenX(x);
     const py = this.model.toScreenY(y);
 
+    // Usar offsets por defecto de constants si no se especifican
+    const offsetX = dx !== undefined ? dx : c.RENDERING.pointLabelOffsetX;
+    const offsetY = dy !== undefined ? dy : c.RENDERING.pointLabelOffsetY;
+
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.arc(px, py, this.constants.RENDERING.pointRadius, 0, Math.PI * 2);
+    ctx.arc(px, py, c.RENDERING.pointRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.font = this.constants.RENDERING.annotationFont;
+    ctx.font = c.RENDERING.annotationFont;
     ctx.fillStyle = color;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(label, px + dx, py + dy);
+    ctx.fillText(label, px + offsetX, py + offsetY);
   }
 
   _drawTriangle(x, fx, xh, fxh) {
@@ -279,7 +284,7 @@ class DerivadaPresenter {
     ctx.rect(m, m, this.canvas.width - 2 * m, this.canvas.height - 2 * m);
     ctx.clip();
 
-    ctx.fillStyle = 'rgba(234, 88, 12, 0.12)';
+    ctx.fillStyle = c.RENDERING.triFillColor;
     ctx.strokeStyle = c.COLORS.triangle;
     ctx.lineWidth = c.RENDERING.lineWidthTriangle;
     ctx.setLineDash([]);
@@ -294,7 +299,7 @@ class DerivadaPresenter {
 
     // Línea Δx horizontal
     ctx.strokeStyle = c.COLORS.triangle;
-    ctx.lineWidth = 2.4;
+    ctx.lineWidth = c.RENDERING.lineWidthDeltaX;
     ctx.beginPath();
     ctx.moveTo(px1, py1);
     ctx.lineTo(px2, pyHorizontal);
@@ -312,11 +317,11 @@ class DerivadaPresenter {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
     ctx.fillStyle = c.COLORS.triangle;
-    ctx.fillText(c.TEXT.deltaX, (px1 + px2) / 2, pyHorizontal - 7);
+    ctx.fillText(c.TEXT.deltaX, (px1 + px2) / 2, pyHorizontal - c.RENDERING.deltaXLabelOffsetY);
 
     // Etiqueta Δy
     ctx.save();
-    ctx.translate(px2 + 13, (pyHorizontal + py2) / 2);
+    ctx.translate(px2 + c.RENDERING.deltaYLabelOffsetX, (pyHorizontal + py2) / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.fillStyle = c.COLORS.triangleText;
     ctx.fillText(c.TEXT.deltaY, 0, 0);
@@ -334,14 +339,20 @@ class DerivadaPresenter {
     this._drawTriangle(x, fx, xh, fxh);
 
     this._drawPoint(x, fx, c.COLORS.point, c.TEXT.pointP);
-    this._drawPoint(xh, fxh, c.COLORS.secant, c.TEXT.pointQ, 8, 14);
+    this._drawPoint(xh, fxh, c.COLORS.secant, c.TEXT.pointQ, c.RENDERING.pointLabelOffsetX, c.RENDERING.pointLabelOffsetYSecant);
 
     // Caja de anotaciones
     const ctx = this.ctx;
     ctx.fillStyle = c.COLORS.boxBg;
     ctx.strokeStyle = c.COLORS.boxStroke;
-    ctx.lineWidth = 1;
-    this._roundRect(18, 18, 355, 108, c.RENDERING.triBoxRadius);
+    ctx.lineWidth = c.RENDERING.annotationBoxLineWidth;
+    this._roundRect(
+      c.RENDERING.annotationBoxX,
+      c.RENDERING.annotationBoxY,
+      c.RENDERING.annotationBoxWidth,
+      c.RENDERING.annotationBoxHeight,
+      c.RENDERING.triBoxRadius
+    );
     ctx.fill();
     ctx.stroke();
 
@@ -351,17 +362,17 @@ class DerivadaPresenter {
     ctx.textBaseline = 'top';
     ctx.fillText(
       c.TEXT.annotationSecant + this.model.formatNumber(secantSlope),
-      36, 36
+      c.RENDERING.annotationTextX, c.RENDERING.annotationTextY1
     );
 
     ctx.fillStyle = c.COLORS.tangent;
     ctx.fillText(
       c.TEXT.annotationTangent + this.model.formatNumber(tangentSlope),
-      36, 62
+      c.RENDERING.annotationTextX, c.RENDERING.annotationTextY2
     );
 
     ctx.fillStyle = c.COLORS.textLight;
-    ctx.fillText(c.TEXT.annotationApproach, 36, 88);
+    ctx.fillText(c.TEXT.annotationApproach, c.RENDERING.annotationTextX, c.RENDERING.annotationTextY3);
   }
 
   _roundRect(x, y, w, h, r) {

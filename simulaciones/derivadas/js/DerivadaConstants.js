@@ -18,13 +18,29 @@ const DerivadaConstants = {
     lineWidth: 2.6,              // Ancho línea función
     lineWidthSecant: 2.2,        // Ancho línea secante/tangente
     lineWidthTriangle: 2,        // Ancho línea triángulo
+    lineWidthDeltaX: 2.4,        // Ancho línea Δx en triángulo
     margin: 10,                  // Margen en pixels (reducido para máximo espacio de gráfica)
     samples: 900,                // Muestras para dibujar función
     pointRadius: 5.5,            // Radio puntos P, Q
+    pointLabelOffsetX: 8,        // Offset X de etiqueta de punto
+    pointLabelOffsetY: -12,      // Offset Y de etiqueta de punto
+    pointLabelOffsetYSecant: 14, // Offset Y de etiqueta punto Q (secante)
     dashPattern: [8, 7],         // Patrón línea punteada
     triDashOn: false,            // Triángulo sin puntos
+    triFillColor: 'rgba(234, 88, 12, 0.12)', // Color relleno triángulo
+    deltaXLabelOffsetY: 7,       // Offset Y etiqueta Δx (offset negativo)
+    deltaYLabelOffsetX: 13,      // Offset X etiqueta Δy (antes de rotación)
     triBoxRadius: 14,            // Radio esquinas caja anotaciones
     triBoxPadding: 18,           // Padding caja anotaciones
+    annotationBoxLineWidth: 1,   // Ancho línea caja anotaciones
+    annotationBoxX: 18,          // Pos X caja anotaciones
+    annotationBoxY: 18,          // Pos Y caja anotaciones
+    annotationBoxWidth: 355,     // Ancho caja anotaciones
+    annotationBoxHeight: 108,    // Alto caja anotaciones
+    annotationTextX: 36,         // Pos X texto dentro de caja
+    annotationTextY1: 36,        // Pos Y primera línea (pendiente secante)
+    annotationTextY2: 62,        // Pos Y segunda línea (derivada)
+    annotationTextY3: 88,        // Pos Y tercera línea (aproximación)
     annotationFontSize: '13px',
     annotationFont: '13px system-ui',
     labelFontSize: '14px',
