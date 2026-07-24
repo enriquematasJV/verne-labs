@@ -39,14 +39,9 @@ class CinematicaPresenter {
    */
 
   setupEventListeners() {
-    // Preset: cambiar escenario predefinido
+    // Preset: cambiar escenario predefinido (determina automáticamente el tipo de disparo)
     if (this.dom.presetSelect) {
       this.dom.presetSelect.addEventListener('change', () => this.onPresetChanged());
-    }
-
-    // Modo: cambiar tipo de disparo
-    if (this.dom.modeSelect) {
-      this.dom.modeSelect.addEventListener('change', () => this.onModeChanged());
     }
 
     // Altura inicial
@@ -124,24 +119,11 @@ class CinematicaPresenter {
       this.model.setAngle(preset.angleDeg);
       this.model.setGravity(preset.g);
 
-      this.dom.modeSelect.value = preset.mode;
       this.syncUI();
       this.render();
     }
   }
 
-  onModeChanged() {
-    const mode = this.dom.modeSelect.value;
-    this.model.setMode(mode);
-
-    // Deshabilitar ángulo si no es parabólico
-    if (this.dom.angleInput) {
-      this.dom.angleInput.disabled = mode !== 'parabolic';
-    }
-
-    this.syncUI();
-    this.render();
-  }
 
   onStart() {
     this.model.start();

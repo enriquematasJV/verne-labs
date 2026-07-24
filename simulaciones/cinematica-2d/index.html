@@ -20,7 +20,7 @@
       <!-- PANEL IZQUIERDO: Controles -->
       <div class="panel">
         <div class="controls">
-          <!-- Preset -->
+          <!-- Escenario base (presets) -->
           <div class="control">
             <label for="preset">Escenario base</label>
             <select id="preset">
@@ -28,16 +28,6 @@
               <option value="horizontal">Tiro horizontal</option>
               <option value="parabolico" selected>Tiro parabólico (45°)</option>
               <option value="libre">Libre (ajusta parámetros)</option>
-            </select>
-          </div>
-
-          <!-- Modo -->
-          <div class="control">
-            <label for="mode">Tipo de disparo</label>
-            <select id="mode">
-              <option value="vertical">Vertical</option>
-              <option value="horizontal">Horizontal</option>
-              <option value="parabolic" selected>Parabólico</option>
             </select>
           </div>
 
@@ -166,7 +156,6 @@
     const dom = {
       canvas: document.getElementById('scene'),
       presetSelect: document.getElementById('preset'),
-      modeSelect: document.getElementById('mode'),
       heightInput: document.getElementById('height'),
       speedInput: document.getElementById('speed'),
       angleInput: document.getElementById('angle'),
