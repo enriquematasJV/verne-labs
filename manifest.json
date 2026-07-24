@@ -16,11 +16,17 @@
             "id": "derivadas",
             "nombre": "Derivada como límite",
             "carpeta": "derivadas",
-            "estado": "🔧 En construcción",
-            "modularizacion": "⏳ Módulos creados, no integrados",
-            "documentacion": ["ARCHITECTURE.md"],
-            "modulosShared": 2,
-            "modulosEspecificos": 3
+            "estado": "✅ COMPLETO",
+            "modularizacion": "✅ MVP integrado",
+            "documentacion": ["LABORATORIO.md", "PLAN_INTEGRACION.md", "ARCHITECTURE.md"],
+            "modulosShared": 4,
+            "modulosEspecificos": 3,
+            "mejoras": [
+                "Reducción 74% HTML (656→171 líneas)",
+                "Panel de fórmulas dinámicas",
+                "Cero hardcoding (todo en constants)",
+                "Pan/zoom con GraphNavigator"
+            ]
         },
         {
             "id": "funciones-inecuaciones",
@@ -85,9 +91,10 @@
     ],
     "resumen": {
         "totalLaboratorios": 8,
-        "completosMVP": 1,
-        "enConstruccion": 3,
+        "completosMVP": 2,
+        "enConstruccion": 2,
         "porModularizar": 4,
-        "porcentajeCompletado": 12.5
+        "porcentajeCompletado": 25,
+        "observaciones": "Derivadas completado con MVP integrado, panel de fórmulas dinámicas, y cero hardcoding"
     }
 }

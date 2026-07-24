@@ -124,30 +124,40 @@
       "nombre": "Derivada como límite",
       "carpeta": "derivadas",
       "categoria": "matematicas",
-      "modulosRequeridos": ["graphics", "math"],
-      "estado": "en-construccion",
+      "modulosRequeridos": ["graphics", "math", "components"],
+      "estado": "publicado",
       "modularizacion": {
-        "estado": "parcial",
+        "estado": "completo",
         "modulosCreados": ["DerivadaModel", "DerivadaPresenter", "DerivadaConstants"],
-        "modulosIntegrados": false,
-        "documentacion": false
+        "modulosIntegrados": true,
+        "documentacion": true,
+        "lineasReducidas": "656 → 171 (74%)",
+        "codigoInlineEliminado": "100%"
       },
       "detalleModulos": {
-        "graphics": "GraphRenderer (renderizado de gráficas)",
-        "math": "VerneMath (parsing de expresiones), Vector2D (cálculos)"
+        "graphics": "GraphRenderer (renderizado de gráficas XY con grid/ejes), GraphNavigator (pan/zoom)",
+        "math": "VerneMath (parsing y evaluación de expresiones matemáticas)",
+        "components": "MathematicalModelPanel (panel de fórmulas dinámicas)"
+      },
+      "patrones": {
+        "arquitectura": "MVP (Model-View-Presenter)",
+        "inyeccionDependencias": "Constructor completo sin hardcoding"
       },
       "modulosEspecificos": {
         "DerivadaModel": {
-          "descripcion": "Lógica de derivadas y análisis de funciones",
-          "ruta": "./js/DerivadaModel.js"
+          "descripcion": "Lógica pura: derivadas, conversiones de coordenadas, cálculos matemáticos",
+          "ruta": "./js/DerivadaModel.js",
+          "lineas": 251
         },
         "DerivadaPresenter": {
-          "descripcion": "Presentación y eventos de UI",
-          "ruta": "./js/DerivadaPresenter.js"
+          "descripcion": "MVP Presenter: eventos, renderizado dinámico, sincronización Model↔View",
+          "ruta": "./js/DerivadaPresenter.js",
+          "lineas": 453
         },
         "DerivadaConstants": {
-          "descripcion": "Configuración y constantes",
-          "ruta": "./js/DerivadaConstants.js"
+          "descripcion": "Configuración centralizada: colores, estilos, márgenes, offsets, dimensiones",
+          "ruta": "./js/DerivadaConstants.js",
+          "lineas": 150
         }
       }
     },
