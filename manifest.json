@@ -1,44 +1,93 @@
 {
-    "laboratorios":  [
-                         {
-                             "id":  "ecologia-poblaciones",
-                             "nombre":  "Laboratorio de Ecología de Poblaciones",
-                             "carpeta":  "ecologia-poblaciones"
-                         },
-                         {
-                             "id":  "cinematica-encuentros-alcances",
-                             "nombre":  "Cinemática: encuentros y alcances",
-                             "carpeta":  "cinematica-encuentros-alcances"
-                         },
-                         {
-                             "id":  "cinematica-2d",
-                             "nombre":  "Cinemática 2D: tiro vertical y parabólico",
-                             "carpeta":  "cinematica-2d"
-                         },
-                         {
-                             "id":  "plano-inclinado",
-                             "nombre":  "Dinámica en plano inclinado",
-                             "carpeta":  "plano-inclinado"
-                         },
-                         {
-                             "id":  "derivadas",
-                             "nombre":  "Derivada como límite",
-                             "carpeta":  "derivadas"
-                         },
-                         {
-                             "id":  "funciones-inecuaciones",
-                             "nombre":  "Plano XY: inecuaciones y funciones",
-                             "carpeta":  "funciones-inecuaciones"
-                         },
-                         {
-                             "id":  "representacion-mapas-geologicos",
-                             "nombre":  "Representación de mapas geológicos",
-                             "carpeta":  "representación-de-mapas-geológicos"
-                         },
-                         {
-                             "id":  "numeros-complejos-fasores-y-ondas",
-                             "nombre":  "Números Complejos, Fasores y Ondas",
-                             "carpeta":  "numeros-complejos-fasores-y-ondas"
-                         }
-                     ]
+    "version": "2.0",
+    "lastUpdated": "2026-07-24",
+    "laboratorios": [
+        {
+            "id": "plano-inclinado",
+            "nombre": "Dinámica en plano inclinado",
+            "carpeta": "plano-inclinado",
+            "estado": "✅ COMPLETO",
+            "modularizacion": "✅ MVP integrado",
+            "documentacion": ["LABORATORIO.md", "MVP.md", "ARCHITECTURE.md"],
+            "modulosShared": 7,
+            "modulosEspecificos": 3
+        },
+        {
+            "id": "derivadas",
+            "nombre": "Derivada como límite",
+            "carpeta": "derivadas",
+            "estado": "🔧 En construcción",
+            "modularizacion": "⏳ Módulos creados, no integrados",
+            "documentacion": ["ARCHITECTURE.md"],
+            "modulosShared": 2,
+            "modulosEspecificos": 3
+        },
+        {
+            "id": "funciones-inecuaciones",
+            "nombre": "Plano XY: inecuaciones y funciones",
+            "carpeta": "funciones-inecuaciones",
+            "estado": "🔧 En construcción",
+            "modularizacion": "⏳ Módulos creados, no integrados",
+            "documentacion": ["ARCHITECTURE.md"],
+            "modulosShared": 3,
+            "modulosEspecificos": 4
+        },
+        {
+            "id": "cinematica-2d",
+            "nombre": "Cinemática 2D: tiro vertical y parabólico",
+            "carpeta": "cinematica-2d",
+            "estado": "🔧 En construcción",
+            "modularizacion": "⏳ Módulos creados, no integrados",
+            "documentacion": ["ARCHITECTURE.md"],
+            "modulosShared": 0,
+            "modulosEspecificos": 3
+        },
+        {
+            "id": "cinematica-encuentros-alcances",
+            "nombre": "Cinemática: encuentros y alcances",
+            "carpeta": "cinematica-encuentros-alcances",
+            "estado": "❌ Sin modularizar",
+            "modularizacion": "❌ Monolítico",
+            "documentacion": [],
+            "modulosShared": 0,
+            "modulosEspecificos": 0
+        },
+        {
+            "id": "ecologia-poblaciones",
+            "nombre": "Laboratorio de Ecología de Poblaciones",
+            "carpeta": "ecologia-poblaciones",
+            "estado": "❌ Sin modularizar",
+            "modularizacion": "❌ Monolítico",
+            "documentacion": [],
+            "modulosShared": 0,
+            "modulosEspecificos": 0
+        },
+        {
+            "id": "representacion-mapas-geologicos",
+            "nombre": "Representación de mapas geológicos",
+            "carpeta": "representación-de-mapas-geológicos",
+            "estado": "❌ Sin modularizar",
+            "modularizacion": "❌ Monolítico",
+            "documentacion": [],
+            "modulosShared": 0,
+            "modulosEspecificos": 0
+        },
+        {
+            "id": "numeros-complejos-fasores-y-ondas",
+            "nombre": "Números Complejos, Fasores y Ondas",
+            "carpeta": "numeros-complejos-fasores-y-ondas",
+            "estado": "❌ Sin modularizar",
+            "modularizacion": "❌ Monolítico",
+            "documentacion": [],
+            "modulosShared": 0,
+            "modulosEspecificos": 0
+        }
+    ],
+    "resumen": {
+        "totalLaboratorios": 8,
+        "completosMVP": 1,
+        "enConstruccion": 3,
+        "porModularizar": 4,
+        "porcentajeCompletado": 12.5
+    }
 }

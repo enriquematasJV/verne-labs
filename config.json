@@ -37,23 +37,33 @@
   "modulosCompartidos": {
     "physics": {
       "descripcion": "Motores de física (cinemática, dinámica, fuerzas)",
-      "ruta": "../../shared/js/physics"
+      "ruta": "../../shared/js/physics",
+      "modulos": ["OdeSolverRK4", "KinematicsEngine", "PhysicsEngine"]
     },
     "graphics": {
       "descripcion": "Gráficas y visualización 2D/3D",
-      "ruta": "../../shared/js/graphics"
+      "ruta": "../../shared/js/graphics",
+      "modulos": ["Canvas2DRenderer", "GraphRenderer", "ChartRenderer"]
     },
     "math": {
       "descripcion": "Cálculos matemáticos avanzados",
-      "ruta": "../../shared/js/math"
+      "ruta": "../../shared/js/math",
+      "modulos": ["Vector2D", "MathUtils"]
     },
     "ui": {
       "descripcion": "Componentes de interfaz reutilizables",
-      "ruta": "../../shared/js/ui"
+      "ruta": "../../shared/js/ui",
+      "modulos": ["SliderControl", "GraphNavigator"]
     },
-    "utils": {
-      "descripcion": "Funciones auxiliares generales",
-      "ruta": "../../shared/js/utils"
+    "simulations": {
+      "descripcion": "Orquestación de ciclos de vida de simulaciones",
+      "ruta": "../../shared/js/simulations",
+      "modulos": ["SimulationLifecycle"]
+    },
+    "components": {
+      "descripcion": "Componentes complejos reutilizables",
+      "ruta": "../../shared/components",
+      "modulos": ["MathematicalModelPanel", "Graph2DEngine", "VerneMath", "OdeSolverRK4"]
     }
   },
 
@@ -115,7 +125,31 @@
       "carpeta": "derivadas",
       "categoria": "matematicas",
       "modulosRequeridos": ["graphics", "math"],
-      "estado": "publicado"
+      "estado": "en-construccion",
+      "modularizacion": {
+        "estado": "parcial",
+        "modulosCreados": ["DerivadaModel", "DerivadaPresenter", "DerivadaConstants"],
+        "modulosIntegrados": false,
+        "documentacion": false
+      },
+      "detalleModulos": {
+        "graphics": "GraphRenderer (renderizado de gráficas)",
+        "math": "VerneMath (parsing de expresiones), Vector2D (cálculos)"
+      },
+      "modulosEspecificos": {
+        "DerivadaModel": {
+          "descripcion": "Lógica de derivadas y análisis de funciones",
+          "ruta": "./js/DerivadaModel.js"
+        },
+        "DerivadaPresenter": {
+          "descripcion": "Presentación y eventos de UI",
+          "ruta": "./js/DerivadaPresenter.js"
+        },
+        "DerivadaConstants": {
+          "descripcion": "Configuración y constantes",
+          "ruta": "./js/DerivadaConstants.js"
+        }
+      }
     },
     {
       "id": "funciones-inecuaciones",
@@ -123,7 +157,35 @@
       "carpeta": "funciones-inecuaciones",
       "categoria": "matematicas",
       "modulosRequeridos": ["graphics", "math"],
-      "estado": "publicado"
+      "estado": "en-construccion",
+      "modularizacion": {
+        "estado": "parcial",
+        "modulosCreados": ["FuncionesInecuacionesModel", "FuncionesInecuacionesPresenter", "FuncionesInecuacionesConstants", "InequalityRegionRenderer"],
+        "modulosIntegrados": false,
+        "documentacion": false
+      },
+      "detalleModulos": {
+        "graphics": "Graph2DEngine (motor gráfico 2D), GraphRenderer (ejes y grid)",
+        "math": "VerneMath (parsing de expresiones)"
+      },
+      "modulosEspecificos": {
+        "FuncionesInecuacionesModel": {
+          "descripcion": "Lógica de parsing de funciones e inecuaciones",
+          "ruta": "./js/FuncionesInecuacionesModel.js"
+        },
+        "FuncionesInecuacionesPresenter": {
+          "descripcion": "Presentación de gráficas y eventos",
+          "ruta": "./js/FuncionesInecuacionesPresenter.js"
+        },
+        "FuncionesInecuacionesConstants": {
+          "descripcion": "Configuración y constantes",
+          "ruta": "./js/FuncionesInecuacionesConstants.js"
+        },
+        "InequalityRegionRenderer": {
+          "descripcion": "Renderizado de regiones sombreadas de inecuaciones",
+          "ruta": "./components/InequalityRegionRenderer/InequalityRegionRenderer.js"
+        }
+      }
     },
     {
       "id": "representacion-mapas-geologicos",
