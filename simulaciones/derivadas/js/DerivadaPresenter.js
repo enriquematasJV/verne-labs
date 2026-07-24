@@ -427,7 +427,7 @@ class DerivadaPresenter {
 
   animateTowardsZero() {
     this.animating = true;
-    this.cancelAnimationFrame(this.animationId);
+    cancelAnimationFrame(this.animationId);
 
     const step = () => {
       const continues = this.model.stepAnimateTowardsZero();
