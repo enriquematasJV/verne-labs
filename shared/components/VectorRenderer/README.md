@@ -1,6 +1,9 @@
-# VectorRenderer — Visualización genérica de vectores
+# VectorRenderer — Visualización especializada de vectores
 
-Componente reutilizable para dibujar vectores, fuerzas y campos vectoriales en canvas.
+Componente reutilizable **especializado en vectores**: flechas, descomposiciones, campos.
+
+**Responsabilidad**: Visualizar VECTORES (magnitudes con dirección).
+**NO incluye**: Primitivos gráficos decorativos (arcos, líneas generales). Usa Canvas2DRenderer para eso.
 
 ## Uso básico
 

@@ -309,10 +309,6 @@ class VectorRenderer {
     return this.renderer.drawPolygon(points, fillColor, strokeColor, lineWidth);
   }
 
-  drawArc(x, y, radius, startAngle, endAngle, color, lineWidth) {
-    return this.renderer.drawArc(x, y, radius, startAngle, endAngle, color, lineWidth);
-  }
-
   drawText(text, x, y, color, fontSize, fontFamily) {
     return this.renderer.drawText(text, x, y, color, fontSize, fontFamily);
   }

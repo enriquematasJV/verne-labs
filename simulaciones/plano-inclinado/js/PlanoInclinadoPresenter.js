@@ -253,8 +253,6 @@ class PlanoInclinadoPresenter {
 
     this.renderer.drawLine(bottomX - 120, groundY, bottomX - 12, groundY, '#1e293b', 3);
     this.renderer.drawLine(bottomX - 12, groundY, bottomX - 12, groundY - 18, '#1e293b', 3);
-    // Arco del ángulo (requiere drawArc, delegado a Canvas2DRenderer)
-    // this.renderer.drawArc(bottomX - 12, groundY, 34, -Math.PI, -Math.PI / 2, '#1e293b', 2);
 
     this.renderer.drawText('θ = ' + this.model.angleDeg.toFixed(0) + '°', bottomX - 110, groundY - 28, 16, 'bold', '#0f172a');
 
