@@ -3,405 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Laboratorio virtual de cinemática 2D</title>
-  <style>
-    :root {
-      --bg: #f1f5f9;
-      --panel: #ffffff;
-      --text: #0f172a;
-      --muted: #475569;
-      --soft: #e2e8f0;
-      --accent: #0f172a;
-      --sky: #e0f2fe;
-      --ground: #cbd5e1;
-      --traj: #7c3aed;
-      --ball: #f59e0b;
-      --vx: #2563eb;
-      --vy: #dc2626;
-      --ay: #16a34a;
-      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-      --radius: 22px;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .app {
-      max-width: 1340px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-
-    h1 {
-      margin: 0 0 8px;
-      font-size: 2rem;
-    }
-
-    .page-header {
-      background: linear-gradient(180deg, #ffffff, #f8fafc);
-      border: 1px solid #d4d4d8;
-      border-radius: 28px;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-
-    .page-header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 18px;
-    }
-
-    .eyebrow {
-      display: inline-block;
-      margin-bottom: 10px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: #e2e8f0;
-      color: #334155;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .back-link {
-      text-decoration: none;
-      border: 1px solid #d4d4d8;
-      border-radius: 14px;
-      padding: 10px 14px;
-      color: #0f172a;
-      background: white;
-      white-space: nowrap;
-      font-size: 14px;
-    }
-
-    .back-link:hover {
-      background: #f1f5f9;
-    }
-
-    .subtitle {
-      margin: 0 0 24px;
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.45;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 390px 1fr;
-      gap: 24px;
-      align-items: start;
-    }
-
-    .panel {
-      background: var(--panel);
-      border-radius: 28px;
-      box-shadow: var(--shadow);
-      padding: 20px;
-    }
-
-    .controls {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .control label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .control input[type="range"],
-    .control select {
-      width: 100%;
-    }
-
-    .control select {
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid #cbd5e1;
-      background: white;
-      font-size: 0.95rem;
-    }
-
-    .group-box {
-      background: #f8fafc;
-      border-radius: var(--radius);
-      padding: 14px;
-    }
-
-    .group-box .title {
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-
-    .button-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 4px;
-    }
-
-    button {
-      border: none;
-      border-radius: 16px;
-      padding: 11px 16px;
-      font-size: 0.95rem;
-      cursor: pointer;
-    }
-
-    button.primary {
-      background: var(--accent);
-      color: white;
-    }
-
-    button.secondary {
-      background: #334155;
-      color: white;
-    }
-
-    button.light {
-      background: var(--soft);
-      color: var(--text);
-    }
-
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    .info-box {
-      background: #f8fafc;
-      border-radius: var(--radius);
-      padding: 14px;
-      font-size: 0.95rem;
-      line-height: 1.45;
-    }
-
-    .info-box .title {
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    canvas {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 18px;
-      background: var(--sky);
-    }
-
-    .metrics {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-
-    .metric, .detail-box {
-      background: #f8fafc;
-      border-radius: var(--radius);
-      padding: 14px;
-    }
-
-    .metric .label {
-      color: #64748b;
-      font-size: 0.9rem;
-      margin-bottom: 8px;
-    }
-
-    .metric .value {
-      font-size: 1.45rem;
-      font-weight: 700;
-    }
-
-    .details {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 14px;
-    }
-
-    .detail-box .title {
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .detail-box div {
-      margin-bottom: 7px;
-      font-size: 0.96rem;
-      line-height: 1.45;
-    }
-
-    .formula {
-      font-family: "Courier New", monospace;
-      background: white;
-      border-radius: 12px;
-      padding: 10px 12px;
-      margin-top: 10px;
-      overflow-x: auto;
-      border: 1px solid #e2e8f0;
-    }
-
-    .legend-row {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 999px;
-    }
-
-    .dot.ball { background: var(--ball); }
-    .dot.traj { background: var(--traj); }
-    .dot.impact { background: #16a34a; }
-
-    @media (max-width: 1040px) {
-      .page-header-content {
-        flex-direction: column;
-      }
-
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .metrics {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .details {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .app {
-        padding: 14px;
-      }
-
-      .metrics {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <title>Laboratorio de cinemática 2D: tiro parabólico</title>
+  <link rel="stylesheet" href="../../css/labs-common.css" />
+  <link rel="stylesheet" href="./css/cinematica-2d.css" />
 </head>
 <body>
   <div class="app">
-    <header class="page-header">
-      <div class="page-header-content">
-        <div>
-          <div class="eyebrow">Verne Labs · Física</div>
-          <h1>Laboratorio virtual de cinemática 2D: tiro vertical y parabólico</h1>
-          <p class="subtitle">
-            Explora el movimiento de una pelota en dos dimensiones con gravedad constante. Puedes simular tiro vertical,
-            lanzamiento horizontal desde cierta altura y tiro parabólico completo. La animación muestra la trayectoria,
-            los vectores de velocidad, las componentes y las ecuaciones que explican el movimiento.
-          </p>
-        </div>
+    <a href="../../index.html#simulaciones" style="display:inline-block;margin-bottom:14px;text-decoration:none;color:#2563eb;font-size:14px;font-weight:600;">← Volver a simulaciones</a>
 
-        <a class="back-link" href="../../index.html#simulaciones">
-          ← Volver a simulaciones
-        </a>
-      </div>
-    </header>
+    <h1>Laboratorio de cinemática 2D</h1>
+    <p class="subtitle">
+      Simula el tiro parabólico ajustando altura inicial, velocidad, ángulo y gravedad. Observa cómo evolucionan las posiciones x(t) e y(t) en tiempo real.
+    </p>
 
     <div class="layout">
+      <!-- PANEL IZQUIERDO: Controles -->
       <div class="panel">
         <div class="controls">
+          <!-- Preset -->
           <div class="control">
             <label for="preset">Escenario base</label>
             <select id="preset">
-              <option value="vertical">Tiro vertical</option>
-              <option value="horizontal">Lanzamiento horizontal desde altura</option>
-              <option value="parabolico">Tiro parabólico completo</option>
-              <option value="libre">Libre</option>
+              <option value="vertical">Lanzamiento vertical</option>
+              <option value="horizontal">Tiro horizontal</option>
+              <option value="parabolico" selected>Tiro parabólico (45°)</option>
+              <option value="libre">Libre (ajusta parámetros)</option>
             </select>
           </div>
 
+          <!-- Modo -->
           <div class="control">
             <label for="mode">Tipo de disparo</label>
             <select id="mode">
               <option value="vertical">Vertical</option>
               <option value="horizontal">Horizontal</option>
-              <option value="parabolic">Parabólico</option>
+              <option value="parabolic" selected>Parabólico</option>
             </select>
           </div>
 
-          <div class="group-box">
-            <div class="title">Condiciones iniciales</div>
-
-            <div class="control">
-              <label for="height">Altura inicial y₀: <span id="heightValue">0.0</span> m</label>
-              <input id="height" type="range" min="0" max="200" step="1" value="0" />
-            </div>
-
-            <div class="control">
-              <label for="speed">Velocidad inicial v₀: <span id="speedValue">25.0</span> m/s</label>
-              <input id="speed" type="range" min="0" max="500" step="1" value="25" />
-            </div>
-
-            <div class="control">
-              <label for="angle">Ángulo de lanzamiento: <span id="angleValue">45</span>°</label>
-              <input id="angle" type="range" min="0" max="90" step="1" value="45" />
-            </div>
-
-            <div class="control">
-              <label for="gravity">Aceleración gravitatoria aᵧ: <span id="gravityValue">-9.8</span> m/s²</label>
-              <input id="gravity" type="range" min="1" max="20" step="0.1" value="9.8" />
-            </div>
+          <!-- Altura inicial -->
+          <div class="control">
+            <label for="height">Altura inicial y₀: <span id="heightValue">0.0</span> m</label>
+            <input id="height" type="range" min="0" max="200" step="1" value="0" />
           </div>
 
+          <!-- Velocidad inicial -->
+          <div class="control">
+            <label for="speed">Velocidad inicial v₀: <span id="speedValue">25.0</span> m/s</label>
+            <input id="speed" type="range" min="1" max="60" step="1" value="25" />
+          </div>
+
+          <!-- Ángulo -->
+          <div class="control">
+            <label for="angle">Ángulo de lanzamiento: <span id="angleValue">45</span>°</label>
+            <input id="angle" type="range" min="0" max="90" step="1" value="45" />
+          </div>
+
+          <!-- Gravedad -->
+          <div class="control">
+            <label for="gravity">Aceleración gravitatoria: <span id="gravityValue">9.8</span> m/s²</label>
+            <input id="gravity" type="range" min="0.1" max="20" step="0.1" value="9.8" />
+          </div>
+
+          <!-- Auto-pause -->
+          <div class="control">
+            <label for="autoPauseMode">Pausa automática en puntos clave</label>
+            <select id="autoPauseMode">
+              <option value="on" selected>Activada</option>
+              <option value="off">Desactivada</option>
+            </select>
+          </div>
+
+          <!-- Botones de control -->
           <div class="button-row">
             <button id="startBtn" class="primary">Iniciar</button>
             <button id="pauseBtn" class="secondary" disabled>Pausar</button>
             <button id="resetBtn" class="light">Reiniciar</button>
           </div>
 
-          <div class="group-box">
-            <div class="title">Guía didáctica</div>
-            <div class="control">
-              <label for="autoPauseMode">Pausas automáticas</label>
-              <select id="autoPauseMode">
-                <option value="on">Sí: en puntos clave</option>
-                <option value="off">No: animación continua</option>
-              </select>
-            </div>
-          </div>
-
+          <!-- Estado -->
           <div class="info-box">
             <div class="title">Estado</div>
-            <div id="statusText">Configura el lanzamiento y observa cómo evolucionan x(t) e y(t).</div>
+            <div id="statusText">Configura el lanzamiento y pulsa Iniciar</div>
           </div>
         </div>
       </div>
 
+      <!-- PANEL DERECHO: Canvas y métricas -->
       <div class="panel">
-        <canvas id="scene" width="950" height="580"></canvas>
+        <canvas id="scene" width="950" height="580" aria-label="Simulación de tiro parabólico"></canvas>
 
-        <div class="legend-row">
-          <div class="legend-item"><span class="dot ball"></span> Pelota</div>
-          <div class="legend-item"><span class="dot traj"></span> Trayectoria</div>
-          <div class="legend-item"><span class="dot impact"></span> Punto de impacto</div>
-        </div>
-
+        <!-- Métricas instantáneas -->
         <div class="metrics">
           <div class="metric">
             <div class="label">Tiempo actual</div>
@@ -416,686 +108,102 @@
             <div class="value" id="velocityValue">0.0, 0.0 m/s</div>
           </div>
           <div class="metric">
-            <div class="label">Módulo de v</div>
+            <div class="label">Módulo de velocidad</div>
             <div class="value" id="speedModuleValue">0.0 m/s</div>
           </div>
         </div>
 
+        <!-- Detalles: Modelo, Ecuaciones, Resultados -->
         <div class="details">
+          <!-- Modelo matemático -->
           <div class="detail-box">
             <div class="title">Modelo matemático</div>
             <div id="modelSummary">El movimiento se descompone en eje horizontal y vertical.</div>
-            <div class="formula" id="formulaX">x(t) = x₀ + v₀x·t</div>
-            <div class="formula" id="formulaY">y(t) = y₀ + v₀y·t - 1/2·g·t²</div>
-            <div class="formula" id="componentFormula">v₀x = v₀·cos(θ), v₀y = v₀·sin(θ)</div>
-            <div id="equationResult" style="margin-top: 10px;">Aunque el movimiento se describe con ecuaciones en función del tiempo, en muchos problemas se introduce una segunda relación equivalente sin tiempo: <strong>v² = v₀² - 2·g·(y - y₀)</strong>. Esta ecuación se obtiene eliminando el tiempo entre v(t) y y(t), y permite calcular alturas directamente. Por ejemplo, en la altura máxima se cumple v = 0, y entonces: <strong>0 = v₀² - 2·g·(y - y₀)</strong> → se obtiene la altura sin usar t.</div>
+            <div class="formula">x(t) = <span id="formulaX">0</span></div>
+            <div class="formula">y(t) = <span id="formulaY">0</span></div>
+            <div class="formula" style="margin-top: 8px;">Componentes: <span id="componentFormula">v₀x, v₀y</span></div>
           </div>
 
+          <!-- Ecuación y condición -->
+          <div class="detail-box">
+            <div class="title">Método cinemático</div>
+            <div id="equationResult">Se impone una condición del problema (ej: y=0 para impacto, vᵧ=0 para altura máxima) y se resuelve el tiempo t, luego se sustituye en las demás ecuaciones.</div>
+          </div>
+
+          <!-- Valores teóricos -->
           <div class="detail-box">
             <div class="title">Resultados teóricos</div>
-            <div>Tiempo total de vuelo: <strong id="flightTimeValue">0.00 s</strong></div>
+            <div>Tiempo de vuelo: <strong id="flightTimeValue">0.00 s</strong></div>
             <div>Altura máxima: <strong id="maxHeightValue">0.00 m</strong></div>
             <div>Instante de altura máxima: <strong id="apexTimeValue">0.00 s</strong></div>
             <div>Alcance horizontal: <strong id="rangeValue">0.00 m</strong></div>
             <div>Velocidad de impacto: <strong id="impactValue">0.00 m/s</strong></div>
-            <div id="pedagogicText" style="margin-top: 10px; color: #475569;"></div>
+          </div>
+
+          <!-- Texto pedagógico -->
+          <div class="detail-box">
+            <div class="title">Observación pedagógica</div>
+            <div id="pedagogicText">Observa cómo cambian las velocidades según el modo de lanzamiento.</div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Módulos compartidos -->
+  <script src="../../shared/components/VerneMath/VerneMath.js"></script>
+
+  <!-- Módulos específicos: Cinemática 2D -->
+  <script src="./js/CinematicaConstants.js"></script>
+  <script src="./js/CinematicaPhysics.js"></script>
+  <script src="./js/CinematicaModel.js"></script>
+  <script src="./js/SceneRenderer.js"></script>
+  <script src="./js/VectorRenderer.js"></script>
+  <script src="./js/FormulasPanel.js"></script>
+  <script src="./js/CinematicaPresenter.js"></script>
+
   <script>
-    const canvas = document.getElementById('scene');
-    const ctx = canvas.getContext('2d');
+    // ===== INICIALIZACIÓN: Cinemática 2D =====
 
-    const presetSelect = document.getElementById('preset');
-    const modeSelect = document.getElementById('mode');
-    const heightInput = document.getElementById('height');
-    const speedInput = document.getElementById('speed');
-    const angleInput = document.getElementById('angle');
-    const gravityInput = document.getElementById('gravity');
-    const autoPauseModeSelect = document.getElementById('autoPauseMode');
-
-    const heightValue = document.getElementById('heightValue');
-    const speedValue = document.getElementById('speedValue');
-    const angleValue = document.getElementById('angleValue');
-    const gravityValue = document.getElementById('gravityValue');
-
-    const statusText = document.getElementById('statusText');
-    const timeValue = document.getElementById('timeValue');
-    const positionValue = document.getElementById('positionValue');
-    const velocityValue = document.getElementById('velocityValue');
-    const speedModuleValue = document.getElementById('speedModuleValue');
-
-    const modelSummary = document.getElementById('modelSummary');
-    const formulaX = document.getElementById('formulaX');
-    const formulaY = document.getElementById('formulaY');
-    const componentFormula = document.getElementById('componentFormula');
-    const equationResult = document.getElementById('equationResult');
-
-    const flightTimeValue = document.getElementById('flightTimeValue');
-    const maxHeightValue = document.getElementById('maxHeightValue');
-    const apexTimeValue = document.getElementById('apexTimeValue');
-    const rangeValue = document.getElementById('rangeValue');
-    const impactValue = document.getElementById('impactValue');
-    const pedagogicText = document.getElementById('pedagogicText');
-
-    const startBtn = document.getElementById('startBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-    const resetBtn = document.getElementById('resetBtn');
-
-    const state = {
-      mode: 'parabolic',
-      y0: 0,
-      v0: 25,
-      angleDeg: 45,
-      g: 9.8,
-      time: 0,
-      running: false,
-      finished: false,
-      lastTimestamp: null,
-      animationId: null,
-      trail: [],
-      autoPauseMode: 'on',
-      pausedStage: 'start',
-      pausedByMilestone: false,
-      milestoneApexDone: false,
-      milestoneMidDownDone: false,
-      milestoneImpactDone: false,
+    // 1. Recopilar referencias DOM
+    const dom = {
+      canvas: document.getElementById('scene'),
+      presetSelect: document.getElementById('preset'),
+      modeSelect: document.getElementById('mode'),
+      heightInput: document.getElementById('height'),
+      speedInput: document.getElementById('speed'),
+      angleInput: document.getElementById('angle'),
+      gravityInput: document.getElementById('gravity'),
+      autoPauseModeSelect: document.getElementById('autoPauseMode'),
+      heightValue: document.getElementById('heightValue'),
+      speedValue: document.getElementById('speedValue'),
+      angleValue: document.getElementById('angleValue'),
+      gravityValue: document.getElementById('gravityValue'),
+      statusText: document.getElementById('statusText'),
+      timeValue: document.getElementById('timeValue'),
+      positionValue: document.getElementById('positionValue'),
+      velocityValue: document.getElementById('velocityValue'),
+      speedModuleValue: document.getElementById('speedModuleValue'),
+      modelSummary: document.getElementById('modelSummary'),
+      formulaX: document.getElementById('formulaX'),
+      formulaY: document.getElementById('formulaY'),
+      componentFormula: document.getElementById('componentFormula'),
+      equationResult: document.getElementById('equationResult'),
+      flightTimeValue: document.getElementById('flightTimeValue'),
+      maxHeightValue: document.getElementById('maxHeightValue'),
+      apexTimeValue: document.getElementById('apexTimeValue'),
+      rangeValue: document.getElementById('rangeValue'),
+      impactValue: document.getElementById('impactValue'),
+      pedagogicText: document.getElementById('pedagogicText'),
+      startBtn: document.getElementById('startBtn'),
+      pauseBtn: document.getElementById('pauseBtn'),
+      resetBtn: document.getElementById('resetBtn'),
     };
 
-    function clamp(value, min, max) {
-      return Math.max(min, Math.min(max, value));
-    }
+    // 2. Crear Presenter (orquestador)
+    const presenter = new CinematicaPresenter(CinematicaConstants, dom);
 
-    function format(value, digits = 2) {
-      return Number.isFinite(value) ? value.toFixed(digits) : '∞';
-    }
-
-    function getAngleRad() {
-      return state.angleDeg * Math.PI / 180;
-    }
-
-    function getInitialComponents() {
-      if (state.mode === 'vertical') {
-        return { v0x: 0, v0y: state.v0 };
-      }
-      if (state.mode === 'horizontal') {
-        return { v0x: state.v0, v0y: 0 };
-      }
-      const rad = getAngleRad();
-      return {
-        v0x: state.v0 * Math.cos(rad),
-        v0y: state.v0 * Math.sin(rad),
-      };
-    }
-
-    function xAt(t) {
-      const { v0x } = getInitialComponents();
-      return v0x * t;
-    }
-
-    function yAt(t) {
-      const { v0y } = getInitialComponents();
-      return state.y0 + v0y * t + 0.5 * state.g * t * t;
-    }
-
-    function vxAt() {
-      return getInitialComponents().v0x;
-    }
-
-    function vyAt(t) {
-      return getInitialComponents().v0y + state.g * t;
-    }
-
-    function getTheoretical() {
-      const { v0x, v0y } = getInitialComponents();
-      const A = 0.5 * state.g;
-      const B = v0y;
-      const C = state.y0;
-      const disc = B * B - 4 * A * C;
-      let flightTime = 0;
-
-      if (disc >= 0) {
-        const sqrtDisc = Math.sqrt(disc);
-        const t1 = (-B + sqrtDisc) / (2 * A);
-        const t2 = (-B - sqrtDisc) / (2 * A);
-        const roots = [t1, t2].filter(t => t >= 0).sort((a, b) => a - b);
-        flightTime = roots.length ? roots[roots.length - 1] : 0;
-      }
-
-      let apexTime = 0;
-      let maxHeight = state.y0;
-      if (v0y > 0) {
-        apexTime = -v0y / state.g;
-        maxHeight = yAt(apexTime);
-      }
-
-      const range = xAt(flightTime);
-      const impactVx = v0x;
-      const impactVy = vyAt(flightTime);
-      const impactSpeed = Math.sqrt(impactVx * impactVx + impactVy * impactVy);
-
-      return {
-        v0x,
-        v0y,
-        flightTime,
-        apexTime,
-        maxHeight,
-        range,
-        impactVx,
-        impactVy,
-        impactSpeed,
-      };
-    }
-
-    function resetSimulation() {
-      state.time = 0;
-      state.running = false;
-      state.finished = false;
-      state.lastTimestamp = null;
-      state.trail = [{ x: xAt(0), y: yAt(0) }];
-      state.pausedStage = 'start';
-      state.pausedByMilestone = false;
-      state.milestoneApexDone = false;
-      state.milestoneMidDownDone = false;
-      state.milestoneImpactDone = false;
-      if (state.animationId !== null) {
-        cancelAnimationFrame(state.animationId);
-        state.animationId = null;
-      }
-      syncUI();
-      drawScene();
-    }
-
-    function readControls() {
-      state.mode = modeSelect.value;
-      state.y0 = Number(heightInput.value);
-      state.v0 = Number(speedInput.value);
-      state.angleDeg = Number(angleInput.value);
-      state.g = -Math.abs(Number(gravityInput.value));
-      state.autoPauseMode = autoPauseModeSelect.value;
-
-      heightValue.textContent = state.y0.toFixed(1);
-      speedValue.textContent = state.v0.toFixed(1);
-      angleValue.textContent = state.angleDeg.toFixed(0);
-      gravityValue.textContent = state.g.toFixed(1);
-
-      angleInput.disabled = state.mode !== 'parabolic';
-    }
-
-    function applyPreset() {
-      if (presetSelect.value === 'vertical') {
-        modeSelect.value = 'vertical';
-        heightInput.value = 0;
-        speedInput.value = 28;
-        angleInput.value = 90;
-        gravityInput.value = 9.8;
-      } else if (presetSelect.value === 'horizontal') {
-        modeSelect.value = 'horizontal';
-        heightInput.value = 20;
-        speedInput.value = 18;
-        angleInput.value = 0;
-        gravityInput.value = 9.8;
-      } else if (presetSelect.value === 'parabolico') {
-        modeSelect.value = 'parabolic';
-        heightInput.value = 0;
-        speedInput.value = 25;
-        angleInput.value = 45;
-        gravityInput.value = 9.8;
-      } else if (presetSelect.value === 'libre') {
-        modeSelect.value = 'parabolic';
-      }
-      readControls();
-      resetSimulation();
-    }
-
-    function buildEquationText() {
-      const th = getTheoretical();
-      formulaX.textContent = `x(t) = ${format(th.v0x, 2)}·t`;
-      formulaY.textContent = `y(t) = ${format(state.y0, 1)} + ${format(th.v0y, 2)}·t - ${format(Math.abs(0.5 * state.g), 2)}·t²`;
-
-      if (state.mode === 'parabolic') {
-        componentFormula.textContent = `v₀x = ${format(state.v0,1)}·cos(${state.angleDeg}°) = ${format(th.v0x,2)} m/s,  v₀y = ${format(state.v0,1)}·sin(${state.angleDeg}°) = ${format(th.v0y,2)} m/s`;
-      } else if (state.mode === 'horizontal') {
-        componentFormula.textContent = `v₀x = ${format(state.v0,1)} m/s,  v₀y = 0 m/s`;
-      } else {
-        componentFormula.textContent = `v₀x = 0 m/s,  v₀y = ${format(state.v0,1)} m/s`;
-      }
-
-      equationResult.innerHTML = `Cinemática usada: primero se escribe la posición vertical <strong>y(t)</strong>. Luego se impone una condición del problema. Por ejemplo, para tocar el suelo se usa <strong>y(t)=0</strong>; para la altura máxima se usa <strong>vᵧ(t)=0</strong>. Así se calcula el instante buscado y después se sustituye ese tiempo en las demás expresiones.`;
-    }
-
-    function getStageInfo() {
-      const th = getTheoretical();
-      const x = xAt(state.time);
-      const y = Math.max(0, yAt(state.time));
-      const vx = vxAt();
-      const vy = vyAt(state.time);
-      const totalSpeed = Math.sqrt(vx * vx + vy * vy);
-      const midDownTime = th.apexTime + Math.max(0, (th.flightTime - th.apexTime) / 2);
-
-      if (state.finished || Math.abs(state.time - th.flightTime) < 1e-6) {
-        return {
-          title: 'Llegada al suelo',
-          lines: [
-            `Condición: y(t) = 0`,
-            `Ecuación: ${format(state.y0,1)} + ${format(th.v0y,2)}·t - ${format(Math.abs(0.5 * state.g),2)}·t² = 0`,
-            `Solución usada: t = ${format(th.flightTime,2)} s`,
-            `Alcance: x = ${format(th.range,2)} m`,
-            `Velocidad de impacto: |v| = ${format(th.impactSpeed,2)} m/s`
-          ]
-        };
-      }
-
-      if (th.apexTime > 0 && Math.abs(state.time - th.apexTime) < 0.06) {
-        return {
-          title: 'Altura máxima',
-          lines: [
-            `Condición: vᵧ(t) = 0`,
-            `Ecuación: vᵧ(t) = ${format(th.v0y,2)} - ${format(Math.abs(state.g),2)}·t`,
-            `Solución: t = ${format(th.apexTime,2)} s`,
-            `Altura máxima: y = ${format(th.maxHeight,2)} m`,
-            `En ese instante: x = ${format(xAt(th.apexTime),2)} m`
-          ]
-        };
-      }
-
-      if (th.flightTime > 0 && state.time >= midDownTime - 0.06 && state.time <= midDownTime + 0.06 && th.flightTime > th.apexTime + 0.15) {
-        return {
-          title: 'Fase de bajada',
-          lines: [
-            `Ahora y disminuye porque vᵧ < 0`,
-            `Ecuación vertical: y(t) = ${format(state.y0,1)} + ${format(th.v0y,2)}·t - ${format(Math.abs(0.5 * state.g),2)}·t²`,
-            `Instante actual: t = ${format(state.time,2)} s`,
-            `Posición actual: (${format(x,2)}, ${format(y,2)}) m`,
-            `Velocidad actual: (vₓ, vᵧ) = (${format(vx,2)}, ${format(vy,2)}) m/s`
-          ]
-        };
-      }
-
-      return {
-        title: 'Fase inicial del lanzamiento',
-        lines: [
-          `Ecuaciones usadas:`,
-          `x(t) = ${format(th.v0x,2)}·t`,
-          `y(t) = ${format(state.y0,1)} + ${format(th.v0y,2)}·t - ${format(0.5 * state.g,2)}·t²`,
-          `Velocidad inicial: v₀ = ${format(state.v0,1)} m/s`,
-          `Estado actual: y = ${format(y,2)} m, |v| = ${format(totalSpeed,2)} m/s`
-        ]
-      };
-    }
-
-    function syncUI() {
-      readControls();
-      const th = getTheoretical();
-      const x = xAt(state.time);
-      const y = Math.max(0, yAt(state.time));
-      const vx = vxAt();
-      const vy = vyAt(state.time);
-      const speedModule = Math.sqrt(vx * vx + vy * vy);
-
-      timeValue.textContent = format(state.time) + ' s';
-      positionValue.textContent = `${format(x, 1)}, ${format(y, 1)} m`;
-      velocityValue.textContent = `${format(vx, 1)}, ${format(vy, 1)} m/s`;
-      speedModuleValue.textContent = format(speedModule, 1) + ' m/s';
-
-      buildEquationText();
-
-      flightTimeValue.textContent = format(th.flightTime) + ' s';
-      maxHeightValue.textContent = format(th.maxHeight) + ' m';
-      apexTimeValue.textContent = format(th.apexTime) + ' s';
-      rangeValue.textContent = format(th.range) + ' m';
-      impactValue.textContent = format(th.impactSpeed) + ' m/s';
-
-      if (state.mode === 'vertical') {
-        modelSummary.textContent = 'El eje X no interviene. En vertical, la velocidad cambia por efecto de la gravedad hasta anularse en la altura máxima y luego invierte el sentido.';
-        pedagogicText.textContent = 'En el punto más alto se cumple vᵧ = 0. Después, la pelota cae con aceleración constante negativa: aᵧ = -g.';
-      } else if (state.mode === 'horizontal') {
-        modelSummary.textContent = 'El movimiento horizontal es uniforme, mientras que el vertical es una caída libre. Ambos se combinan para formar una parábola.';
-        pedagogicText.textContent = 'El movimiento horizontal mantiene signo positivo constante, mientras que verticalmente actúa una aceleración negativa: aᵧ = -g.';
-      } else {
-        modelSummary.textContent = 'El tiro parabólico se estudia separando el eje X y el eje Y. En X no hay aceleración; en Y actúa la gravedad.';
-        pedagogicText.textContent = 'En el eje X el movimiento suele tomarse positivo hacia la derecha. En el eje Y, subir es positivo y la gravedad introduce aceleración negativa.';
-      }
-
-      if (state.finished) {
-        statusText.textContent = 'La simulación se ha detenido en el instante de impacto con el suelo.';
-      } else if (state.pausedByMilestone) {
-        statusText.textContent = 'Pausa automática en un punto clave del movimiento para observar condiciones y cálculos.';
-      } else {
-        statusText.textContent = 'La animación representará la trayectoria hasta que la pelota llegue al suelo.';
-      }
-
-      startBtn.disabled = state.running;
-      pauseBtn.disabled = !state.running;
-    }
-
-    function drawArrow(x1, y1, x2, y2, color, label) {
-      const angle = Math.atan2(y2 - y1, x2 - x1);
-      const head = 10;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(x2, y2);
-      ctx.lineTo(x2 - head * Math.cos(angle - Math.PI / 6), y2 - head * Math.sin(angle - Math.PI / 6));
-      ctx.moveTo(x2, y2);
-      ctx.lineTo(x2 - head * Math.cos(angle + Math.PI / 6), y2 - head * Math.sin(angle + Math.PI / 6));
-      ctx.stroke();
-
-      ctx.fillStyle = color;
-      ctx.font = 'bold 14px Arial';
-      ctx.fillText(label, x2 + 8, y2 - 6);
-    }
-
-    function drawMeasure(x1, y1, x2, y2, color, text) {
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(x1, y1 - 7);
-      ctx.lineTo(x1, y1 + 7);
-      ctx.moveTo(x2, y2 - 7);
-      ctx.lineTo(x2, y2 + 7);
-      ctx.stroke();
-      ctx.fillStyle = color;
-      ctx.font = 'bold 14px Arial';
-      ctx.fillText(text, (x1 + x2) / 2 - ctx.measureText(text).width / 2, y1 - 10);
-    }
-
-    function niceTick(rawStep) {
-      const power = Math.pow(10, Math.floor(Math.log10(rawStep || 1)));
-      const norm = rawStep / power;
-      if (norm < 1.5) return 1 * power;
-      if (norm < 3) return 2 * power;
-      if (norm < 7) return 5 * power;
-      return 10 * power;
-    }
-
-    function drawScene() {
-      const th = getTheoretical();
-      const currentX = xAt(state.time);
-      const currentY = Math.max(0, yAt(state.time));
-      const maxX = Math.max(15, th.range, currentX) + 8;
-      const maxY = Math.max(10, th.maxHeight, state.y0, currentY) + 6;
-
-      const w = canvas.width;
-      const h = canvas.height;
-      const left = 70;
-      const right = w - 50;
-      const bottom = h - 70;
-      const top = 50;
-
-      const scaleX = (right - left) / maxX;
-      const scaleY = (bottom - top) / maxY;
-      const scale = Math.min(scaleX, scaleY);
-
-      const xToPx = x => left + x * scale;
-      const yToPx = y => bottom - y * scale;
-
-      ctx.clearRect(0, 0, w, h);
-      const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, '#e0f2fe');
-      grad.addColorStop(1, '#f8fafc');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
-
-      ctx.fillStyle = '#cbd5e1';
-      ctx.fillRect(0, bottom, w, h - bottom);
-
-      ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(left, bottom);
-      ctx.lineTo(right, bottom);
-      ctx.moveTo(left, bottom);
-      ctx.lineTo(left, top);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(right, bottom);
-      ctx.lineTo(right - 10, bottom - 6);
-      ctx.moveTo(right, bottom);
-      ctx.lineTo(right - 10, bottom + 6);
-      ctx.moveTo(left, top);
-      ctx.lineTo(left - 6, top + 10);
-      ctx.moveTo(left, top);
-      ctx.lineTo(left + 6, top + 10);
-      ctx.stroke();
-
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 14px Arial';
-      ctx.fillText('x (m)', right - 36, bottom - 12);
-      ctx.fillText('y (m)', left + 10, top + 8);
-
-      const tickX = niceTick(maxX / 8);
-      for (let x = 0; x <= maxX + 0.001; x += tickX) {
-        const px = xToPx(x);
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(px, bottom);
-        ctx.lineTo(px, top);
-        ctx.stroke();
-        ctx.fillStyle = '#475569';
-        ctx.font = '12px Arial';
-        ctx.fillText(String(Math.round(x)), px - 8, bottom + 18);
-      }
-
-      const tickY = niceTick(maxY / 6);
-      for (let y = 0; y <= maxY + 0.001; y += tickY) {
-        const py = yToPx(y);
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(left, py);
-        ctx.lineTo(right, py);
-        ctx.stroke();
-        ctx.fillStyle = '#475569';
-        ctx.font = '12px Arial';
-        ctx.fillText(String(Math.round(y)), left - 34, py + 4);
-      }
-
-      ctx.strokeStyle = '#7c3aed';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      for (let i = 0; i <= 180; i++) {
-        const t = th.flightTime * i / 180;
-        const px = xToPx(xAt(t));
-        const py = yToPx(Math.max(0, yAt(t)));
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.stroke();
-
-      if (th.apexTime > 0) {
-        const apexX = xToPx(xAt(th.apexTime));
-        const apexY = yToPx(th.maxHeight);
-        ctx.fillStyle = '#7c3aed';
-        ctx.beginPath();
-        ctx.arc(apexX, apexY, 6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.font = 'bold 14px Arial';
-        ctx.fillText('Altura máxima', apexX - 44, apexY - 14);
-      }
-
-      const impactX = xToPx(th.range);
-      const impactY = yToPx(0);
-      ctx.fillStyle = '#16a34a';
-      ctx.beginPath();
-      ctx.arc(impactX, impactY, 7, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.font = 'bold 14px Arial';
-      ctx.fillText('Impacto', impactX - 24, impactY - 12);
-
-      const ballX = xToPx(currentX);
-      const ballY = yToPx(currentY);
-      ctx.fillStyle = '#f59e0b';
-      ctx.strokeStyle = '#92400e';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.arc(ballX, ballY, 10, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-
-      const vx = vxAt();
-      const vy = vyAt(state.time);
-      drawArrow(ballX, ballY, ballX + clamp(vx * 2.8, -90, 90), ballY, '#2563eb', 'vₓ');
-      drawArrow(ballX, ballY, ballX, ballY - clamp(vy * 2.8, -90, 90), '#dc2626', 'vᵧ');
-      drawArrow(ballX, ballY, ballX, ballY + 64, '#16a34a', 'aᵧ = -g');
-
-      if (state.finished) {
-        drawMeasure(xToPx(0), bottom - 30, impactX, bottom - 30, '#2563eb', `alcance = ${format(th.range, 1)} m`);
-        if (th.maxHeight > state.y0 + 0.05) {
-          drawMeasure(left - 18, yToPx(0), left - 18, yToPx(th.maxHeight), '#dc2626', `Hmáx = ${format(th.maxHeight, 1)} m`);
-        } else if (state.y0 > 0) {
-          drawMeasure(left - 18, yToPx(0), left - 18, yToPx(state.y0), '#dc2626', `y₀ = ${format(state.y0, 1)} m`);
-        }
-      }
-
-      ctx.fillStyle = 'rgba(255,255,255,0.95)';
-      ctx.beginPath();
-      ctx.roundRect(654, 20, 250, 132, 18);
-      ctx.fill();
-      ctx.strokeStyle = '#cbd5e1';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 16px Arial';
-      ctx.fillText('Datos instantáneos', 670, 44);
-      ctx.font = '14px Arial';
-      ctx.fillText(`t = ${format(state.time,2)} s`, 670, 68);
-      ctx.fillText(`x = ${format(currentX,1)} m`, 670, 90);
-      ctx.fillText(`y = ${format(currentY,1)} m`, 670, 112);
-      ctx.fillText(`v = ${format(Math.sqrt(vx * vx + vy * vy),1)} m/s`, 670, 134);
-
-      const stage = getStageInfo();
-      const boxW = 420;
-      const boxH = 146;
-      const boxX = canvas.width - boxW - 20;
-      const boxY = 20;
-      ctx.fillStyle = 'rgba(255,255,255,0.97)';
-      ctx.beginPath();
-      ctx.roundRect(boxX, boxY, boxW, boxH, 18);
-      ctx.fill();
-      ctx.strokeStyle = '#cbd5e1';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 16px Arial';
-      ctx.fillText(stage.title, boxX + 16, boxY + 24);
-      ctx.font = '13px Arial';
-      stage.lines.forEach((line, i) => {
-        ctx.fillText(line, boxX + 16, boxY + 48 + i * 20);
-      });
-    }
-
-    function animate(timestamp) {
-      if (!state.running) return;
-      if (state.lastTimestamp === null) state.lastTimestamp = timestamp;
-      let delta = (timestamp - state.lastTimestamp) / 1000;
-      state.lastTimestamp = timestamp;
-      delta = Math.min(delta, 0.035);
-
-      const th = getTheoretical();
-      const prevTime = state.time;
-      state.time += delta;
-
-      if (state.autoPauseMode === 'on') {
-        const midDownTime = th.apexTime + Math.max(0, (th.flightTime - th.apexTime) / 2);
-
-        if (!state.milestoneApexDone && th.apexTime > 0.05 && prevTime < th.apexTime && state.time >= th.apexTime) {
-          state.time = th.apexTime;
-          state.running = false;
-          state.pausedByMilestone = true;
-          state.pausedStage = 'apex';
-          state.milestoneApexDone = true;
-        } else if (!state.milestoneMidDownDone && th.flightTime > th.apexTime + 0.2 && prevTime < midDownTime && state.time >= midDownTime) {
-          state.time = midDownTime;
-          state.running = false;
-          state.pausedByMilestone = true;
-          state.pausedStage = 'midDown';
-          state.milestoneMidDownDone = true;
-        } else if (!state.milestoneImpactDone && state.time >= th.flightTime) {
-          state.time = th.flightTime;
-          state.running = false;
-          state.finished = true;
-          state.pausedByMilestone = true;
-          state.pausedStage = 'impact';
-          state.milestoneImpactDone = true;
-        }
-      } else if (state.time >= th.flightTime) {
-        state.time = th.flightTime;
-        state.running = false;
-        state.finished = true;
-        state.pausedByMilestone = false;
-        state.pausedStage = 'impact';
-      }
-
-      state.trail.push({ x: xAt(state.time), y: Math.max(0, yAt(state.time)) });
-      syncUI();
-      drawScene();
-
-      if (state.running) state.animationId = requestAnimationFrame(animate);
-    }
-
-    [modeSelect, heightInput, speedInput, angleInput, gravityInput, autoPauseModeSelect].forEach(el => {
-      el.addEventListener('input', () => {
-        readControls();
-        resetSimulation();
-      });
-      el.addEventListener('change', () => {
-        readControls();
-        resetSimulation();
-      });
-    });
-
-    presetSelect.addEventListener('change', applyPreset);
-
-    startBtn.addEventListener('click', () => {
-      state.running = true;
-      state.finished = false;
-      state.pausedByMilestone = false;
-      state.lastTimestamp = null;
-      syncUI();
-      state.animationId = requestAnimationFrame(animate);
-    });
-
-    pauseBtn.addEventListener('click', () => {
-      state.running = false;
-      if (state.animationId !== null) {
-        cancelAnimationFrame(state.animationId);
-        state.animationId = null;
-      }
-      syncUI();
-    });
-
-    resetBtn.addEventListener('click', resetSimulation);
-
-    CanvasRenderingContext2D.prototype.roundRect = CanvasRenderingContext2D.prototype.roundRect || function (x, y, w, h, r) {
-      this.beginPath();
-      this.moveTo(x + r, y);
-      this.arcTo(x + w, y, x + w, y + h, r);
-      this.arcTo(x + w, y + h, x, y + h, r);
-      this.arcTo(x, y + h, x, y, r);
-      this.arcTo(x, y, x + w, y, r);
-      this.closePath();
-      return this;
-    };
-
-    applyPreset();
-    syncUI();
-    drawScene();
+    // 3. Listo
   </script>
 </body>
 </html>
