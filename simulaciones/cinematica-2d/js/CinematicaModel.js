@@ -86,23 +86,13 @@ class CinematicaModel {
    * ===== CONTROL DE SIMULACIÓN =====
    */
 
-  start() {
-    if (!this.finished && !this.running) {
-      this.running = true;
-      this.pausedByMilestone = false;
-      this.lastTimestamp = null;
-    }
-  }
-
-  pause() {
-    this.running = false;
+  canStart() {
+    return !this.finished;
   }
 
   reset() {
     this.time = 0;
-    this.running = false;
     this.finished = false;
-    this.lastTimestamp = null;
     this.pausedByMilestone = false;
     this.pausedStage = 'start';
     this.milestoneApexDone = false;
@@ -112,11 +102,10 @@ class CinematicaModel {
 
   /**
    * Avanzar la simulación un paso de tiempo
+   * Llamado por SimulationLifecycle.step(deltaTime)
    * @param {number} deltaTime - Tiempo transcurrido en segundos
    */
   step(deltaTime) {
-    if (!this.running) return;
-
     const maxDelta = this.constants.ANIMATION.maxDeltaPerFrame;
     deltaTime = Math.min(deltaTime, maxDelta);
 
@@ -128,7 +117,6 @@ class CinematicaModel {
     if (this.time >= th.flightTime) {
       this.time = th.flightTime;
       this.finished = true;
-      this.running = false;
     }
 
     // Hitos pedagógicos (pausa automática)
@@ -173,13 +161,14 @@ class CinematicaModel {
   }
 
   _pauseAtMilestone(stage) {
-    this.running = false;
     this.pausedByMilestone = true;
     this.pausedStage = stage;
 
     if (stage === 'apex') this.milestoneApexDone = true;
     else if (stage === 'midDown') this.milestoneMidDownDone = true;
     else if (stage === 'impact') this.milestoneImpactDone = true;
+
+    // El presenter verificará pausedByMilestone y pausará el lifecycle
   }
 
   /**
