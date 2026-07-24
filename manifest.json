@@ -48,19 +48,21 @@
             "id": "cinematica-2d",
             "nombre": "Cinemática 2D: tiro vertical y parabólico",
             "carpeta": "cinematica-2d",
-            "estado": "⚙️ MVP en integración",
-            "modularizacion": "✅ Modularizado (sin hardcoding)",
+            "estado": "✅ COMPLETO",
+            "modularizacion": "✅ MVP integrado (SimulationLifecycle)",
             "documentacion": ["ARCHITECTURE.md"],
-            "modulosShared": 0,
+            "modulosShared": 1,
             "modulosEspecificos": 7,
             "mejoras": [
                 "Reducción 85% HTML (1101→180 líneas)",
                 "Canvas 2D con rendering dinámico",
                 "Cero hardcoding (todo en CinematicaConstants)",
                 "Pausa automática en puntos clave (apex, impacto)",
+                "Resume desde pausa automática sin quedarse en bucle",
                 "Viewport dinámico basado en trayectoria",
                 "Visualización de vectores (velocidad, aceleración)",
-                "Iniciando integración MVP (basada en plano-inclinado)"
+                "SimulationLifecycle integrado para control de ciclo",
+                "Botones inteligentes (toggle pause/continue)"
             ]
         },
         {
@@ -106,11 +108,11 @@
     ],
     "resumen": {
         "totalLaboratorios": 8,
-        "completosMVP": 3,
-        "completosSinMVP": 1,
+        "completosMVP": 4,
+        "completosSinMVP": 0,
         "enConstruccion": 0,
         "porModularizar": 4,
         "porcentajeCompletado": 50,
-        "observaciones": "Cinematica-2D completado sin MVP. Derivadas y funciones-inecuaciones con MVP integrado. 4 laboratorios aún por modularizar."
+        "observaciones": "Cinematica-2D completado con MVP integrado. Todos los laboratorios completados tienen MVP. 4 laboratorios aún por modularizar."
     }
 }
