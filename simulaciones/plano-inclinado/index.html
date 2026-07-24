@@ -6,6 +6,7 @@
   <title>Simulación de dinámica en plano inclinado</title>
   <link rel="stylesheet" href="../../css/labs-common.css" />
   <link rel="stylesheet" href="./css/plano-inclinado.css" />
+  <link rel="stylesheet" href="../../shared/components/MathematicalModelPanel/mathematical-model-panel.css" />
 </head>
 <body>
   <div class="app">
@@ -88,6 +89,33 @@
             <div>Velocidad teórica final: <strong id="theoreticalVelocity">0.00 m/s</strong></div>
             <div id="resultText" style="margin-top: 10px; color: #475569;"></div>
           </div>
+
+          <div class="detail-box">
+            <div class="title">Modelo matemático</div>
+            <div class="model-panel">
+              <div class="model-equation">
+                P = m·g = <strong id="formulaPeso">0.00</strong> N
+              </div>
+              <div class="model-equation">
+                Pₓ = m·g·sin(θ) = <strong id="formulaParalela">0.00</strong> N
+              </div>
+              <div class="model-equation">
+                N = m·g·cos(θ) = <strong id="formulaNormal">0.00</strong> N
+              </div>
+              <div class="model-equation">
+                f = μ·N = <strong id="formulaFriccion">0.00</strong> N
+              </div>
+              <div class="model-equation">
+                a = (Pₓ - f)/m = <strong id="formulaAceleracion">0.00</strong> m/s²
+              </div>
+              <div class="model-equation">
+                v = √(2·a·d) = <strong id="formulaVelocidad">0.00</strong> m/s
+              </div>
+              <div class="model-equation">
+                t = √(2·d/a) = <strong id="formulaTiempo">0.00</strong> s
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -97,6 +125,7 @@
   <!-- Shared: Gráficos y UI -->
   <script src="../../shared/js/graphics/Canvas2DRenderer.js"></script>
   <script src="../../shared/js/ui/SliderControl.js"></script>
+  <script src="../../shared/components/MathematicalModelPanel/MathematicalModelPanel.js"></script>
 
   <!-- Shared: Matemática -->
   <script src="../../shared/js/math/Vector2D.js"></script>
@@ -184,16 +213,50 @@
     // 4. Crear instancia del Model
     const model = new PlanoInclinadoModel();
 
-    // 5. Crear instancia del Presenter
+    // 5. Crear instancia del Panel de Fórmulas
+    const formulasPanel = new MathematicalModelPanel({
+      formulas: [
+        { id: 'formulaPeso', digits: 2 },
+        { id: 'formulaParalela', digits: 2 },
+        { id: 'formulaNormal', digits: 2 },
+        { id: 'formulaFriccion', digits: 2 },
+        { id: 'formulaAceleracion', digits: 3 },
+        { id: 'formulaVelocidad', digits: 2 },
+        { id: 'formulaTiempo', digits: 2 },
+      ],
+      calculator: (state) => {
+        const g = 9.81;
+        const peso = state.mass * g;
+        const angleRad = (state.angleDeg * Math.PI) / 180;
+        const paralela = peso * Math.sin(angleRad);
+        const normal = peso * Math.cos(angleRad);
+        const friccion = state.mu * normal;
+        const aceleracion = (paralela - friccion) / state.mass;
+
+        // Usar valores reales del modelo si está en simulación
+        return {
+          formulaPeso: peso,
+          formulaParalela: paralela,
+          formulaNormal: normal,
+          formulaFriccion: friccion,
+          formulaAceleracion: aceleracion,
+          formulaVelocidad: state.velocity,
+          formulaTiempo: state.time,
+        };
+      }
+    });
+
+    // 6. Crear instancia del Presenter
     const presenter = new PlanoInclinadoPresenter(
       model,
       renderer,
       sliders,
       domElements,
-      CONSTANTS
+      CONSTANTS,
+      formulasPanel
     );
 
-    // 6. Inicializar UI y renderizar
+    // 7. Inicializar UI y renderizar
     presenter.updateUI();
     presenter.render();
   </script>
