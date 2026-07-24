@@ -23,11 +23,20 @@ class CinematicaPresenter {
     this.vectorRenderer = new VectorRenderer(dom.canvas, constants);
     this.formulasPanel = new FormulasPanel(dom);
 
+    // SimulationLifecycle para control de animación
+    this.lifecycle = new SimulationLifecycle(
+      () => {}, // onStep callback vacío
+      () => this._onReset(),
+      () => this.model.canStart()
+    );
+
     // Estado de animación
     this.animationId = null;
+    this.lastTimestamp = null;
 
     // Inicializar
     this.setupEventListeners();
+    this.setupLifecycleListeners();
     this.formulasPanel.reset();
     this.readControls();
     this.syncUI();
@@ -35,10 +44,38 @@ class CinematicaPresenter {
   }
 
   /**
-   * ===== SETUP: Conectar eventos =====
+   * ===== SETUP: Listeners de ciclo de simulación =====
+   */
+  setupLifecycleListeners() {
+    this.lifecycle.on('onStart', () => {
+      this.lastTimestamp = null;
+      if (!this.animationId) {
+        this.animationId = requestAnimationFrame((ts) => this.animate(ts));
+      }
+    });
+
+    this.lifecycle.on('onResume', () => {
+      this.lastTimestamp = null;
+      // Limpiar flag de pausa por hito para que no se re-pause inmediatamente
+      this.model.pausedByMilestone = false;
+    });
+
+    const pauseResult = this.lifecycle.on('onPause', () => {
+      this.syncUI();
+    });
+
+    this.lifecycle.on('onReset', () => {
+      this.syncUI();
+      this.render();
+    });
+  }
+
+  /**
+   * ===== SETUP: Conectar eventos de entrada =====
    */
 
   setupEventListeners() {
+
     // Preset: cambiar escenario predefinido (determina automáticamente el tipo de disparo)
     if (this.dom.presetSelect) {
       this.dom.presetSelect.addEventListener('change', () => this.onPresetChanged());
@@ -87,15 +124,21 @@ class CinematicaPresenter {
       });
     }
 
-    // Botones de control
+    // Botones de control: delegados a SimulationLifecycle
     if (this.dom.startBtn) {
-      this.dom.startBtn.addEventListener('click', () => this.onStart());
+      this.dom.startBtn.addEventListener('click', () => this.lifecycle.start());
     }
     if (this.dom.pauseBtn) {
-      this.dom.pauseBtn.addEventListener('click', () => this.onPause());
+      this.dom.pauseBtn.addEventListener('click', () => {
+        if (this.lifecycle.isRunning()) {
+          this.lifecycle.pause();
+        } else if (this.lifecycle.isPaused()) {
+          this.lifecycle.resume();
+        }
+      });
     }
     if (this.dom.resetBtn) {
-      this.dom.resetBtn.addEventListener('click', () => this.onReset());
+      this.dom.resetBtn.addEventListener('click', () => this.lifecycle.reset());
     }
 
     // Resize del canvas
@@ -125,30 +168,9 @@ class CinematicaPresenter {
   }
 
 
-  onStart() {
-    this.model.start();
-    this.animate(performance.now());
-    this.syncUI();
-  }
-
-  onPause() {
-    this.model.pause();
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
-    this.syncUI();
-  }
-
-  onReset() {
+  _onReset() {
     this.model.reset();
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
     this.formulasPanel.reset();
-    this.syncUI();
-    this.render();
   }
 
   /**
@@ -156,34 +178,38 @@ class CinematicaPresenter {
    */
 
   /**
-   * Loop de animación
+   * Loop de animación CONTINUO - nunca se detiene
+   * Solo avanza la simulación si lifecycle.isRunning() es true
    */
   animate(timestamp) {
-    if (!this.model.running) {
-      this.animationId = null;
-      return;
+    if (!this.lastTimestamp) {
+      this.lastTimestamp = timestamp;
     }
 
-    if (this.model.lastTimestamp === null) {
-      this.model.lastTimestamp = timestamp;
+    const deltaTimeMs = timestamp - this.lastTimestamp;
+    this.lastTimestamp = timestamp;
+
+    // Si está corriendo, avanzar la simulación
+    if (this.lifecycle.isRunning()) {
+      this.model.step(deltaTimeMs / 1000);
+
+      // Verificar si debe pausar por hito pedagógico
+      if (this.model.pausedByMilestone && this.lifecycle.isRunning()) {
+        this.lifecycle.pause();
+      }
+
+      // Verificar si la simulación terminó
+      if (this.model.finished && this.lifecycle.isRunning()) {
+        this.lifecycle.markFinished();
+      }
     }
 
-    const deltaTime = (timestamp - this.model.lastTimestamp) / 1000;
-    this.model.lastTimestamp = timestamp;
-
-    // Avanzar simulación
-    this.model.step(deltaTime);
-
-    // Actualizar UI
+    // Actualizar UI y renderizar siempre
     this.syncUI();
     this.render();
 
-    // Continuar animación si está corriendo
-    if (this.model.running) {
-      this.animationId = requestAnimationFrame((ts) => this.animate(ts));
-    } else {
-      this.animationId = null;
-    }
+    // SIEMPRE continuar el loop - es el responsable de sincronizar
+    this.animationId = requestAnimationFrame((ts) => this.animate(ts));
   }
 
   /**
@@ -228,7 +254,14 @@ class CinematicaPresenter {
       this.dom.startBtn.disabled = this.model.running || this.model.finished;
     }
     if (this.dom.pauseBtn) {
-      this.dom.pauseBtn.disabled = !this.model.running;
+      // Habilitar cuando está corriendo O pausado; deshabilitar cuando está terminado
+      this.dom.pauseBtn.disabled = this.model.finished;
+      // Cambiar texto del botón según estado
+      if (this.lifecycle.isPaused()) {
+        this.dom.pauseBtn.textContent = 'Continuar';
+      } else if (this.lifecycle.isRunning()) {
+        this.dom.pauseBtn.textContent = 'Pausar';
+      }
     }
 
     // Actualizar fórmulas y valores
