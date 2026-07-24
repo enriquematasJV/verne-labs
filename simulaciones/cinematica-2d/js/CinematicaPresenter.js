@@ -315,9 +315,62 @@ class CinematicaPresenter {
     // Renderizar escena
     this.sceneRenderer.render(this.model);
 
-    // Renderizar vectores
-    this.vectorRenderer.drawVectors(this.model, pos, vel, viewport);
-    this.vectorRenderer.drawMeasures(this.model, pos, th, viewport);
+    // Renderizar vectores (compartidos)
+    const ballX = viewport.xToPx(pos.x);
+    const ballY = viewport.yToPx(pos.y);
+
+    // Componentes de velocidad (vx, vy)
+    this.vectorRenderer.drawVelocityComponents(
+      { x: ballX, y: ballY },
+      vel,
+      {
+        scale: this.constants.VECTORS.velocityScale,
+        clamp: this.constants.VECTORS.velocityClamp,
+        colors: {
+          vx: this.constants.COLORS.velocityX,
+          vy: this.constants.COLORS.velocityY
+        }
+      }
+    );
+
+    // Aceleración (ay = -g)
+    this.vectorRenderer.drawAcceleration(
+      { x: ballX, y: ballY },
+      this.constants.VECTORS.accelerationFixed,
+      this.constants.COLORS.acceleration,
+      'aᵧ = -g'
+    );
+
+    // Medidas (cuando simulación termina)
+    if (this.model.finished) {
+      const impactX = viewport.xToPx(th.range);
+      const impactY = viewport.yToPx(0);
+
+      // Alcance horizontal
+      this.vectorRenderer.drawMeasure(
+        viewport.left, impactY - 30,
+        impactX, impactY - 30,
+        this.constants.COLORS.velocityX,
+        `alcance = ${CinematicaPhysics.format(th.range, 1)} m`
+      );
+
+      // Altura máxima
+      if (th.maxHeight > this.model.y0 + 0.05) {
+        this.vectorRenderer.drawMeasure(
+          viewport.left - 18, viewport.yToPx(0),
+          viewport.left - 18, viewport.yToPx(th.maxHeight),
+          this.constants.COLORS.velocityY,
+          `Hmáx = ${CinematicaPhysics.format(th.maxHeight, 1)} m`
+        );
+      } else if (this.model.y0 > 0) {
+        this.vectorRenderer.drawMeasure(
+          viewport.left - 18, viewport.yToPx(0),
+          viewport.left - 18, viewport.yToPx(this.model.y0),
+          this.constants.COLORS.velocityY,
+          `y₀ = ${CinematicaPhysics.format(this.model.y0, 1)} m`
+        );
+      }
+    }
   }
 
   /**
