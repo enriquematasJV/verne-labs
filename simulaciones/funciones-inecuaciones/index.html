@@ -29,17 +29,6 @@
           </div>
           <input id="viewRange" type="range" min="2" max="30" step="1" value="10" />
         </div>
-
-        <div class="slider-card">
-          <div class="slider-head">
-            <div>
-              <div class="slider-title">Escala vertical</div>
-              <div class="slider-subtitle">Ajusta valores grandes en Y</div>
-            </div>
-            <div id="yScaleLabel" class="slider-value">×1</div>
-          </div>
-          <input id="yScale" type="range" min="1" max="100" step="1" value="1" />
-        </div>
       </div>
 
       <div class="layout">
@@ -78,7 +67,7 @@ y = log(x) ; orange</textarea>
         </div>
 
         <div class="graph-panel">
-          <svg id="graph" viewBox="0 0 520 520" aria-label="Gráfico XY"></svg>
+          <canvas id="graph" width="700" height="520" aria-label="Gráfico XY"></canvas>
           <div style="margin-top:10px;color:#64748b;font-size:13px;">
             Arrastra el gráfico para desplazarte y usa la rueda del ratón (o el pellizco en pantalla táctil) para hacer zoom.
           </div>
@@ -117,9 +106,7 @@ y = log(x) ; orange</textarea>
       ineqStatus: document.getElementById('ineqStatus'),
       funcStatus: document.getElementById('funcStatus'),
       viewRangeInput: document.getElementById('viewRange'),
-      yScaleInput: document.getElementById('yScale'),
-      viewRangeLabel: document.getElementById('viewRangeLabel'),
-      yScaleLabel: document.getElementById('yScaleLabel')
+      viewRangeLabel: document.getElementById('viewRangeLabel')
     };
 
     // 3. Crear instancia del Model
