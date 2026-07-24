@@ -212,9 +212,7 @@ class CinematicaPresenter {
    * Sincronizar UI con estado actual del Model
    */
   syncUI() {
-    this.readControls();
-
-    // Actualizar sliders y etiquetas
+    // Actualizar sliders y etiquetas con valores del modelo (NO releer inputs)
     if (this.dom.heightInput) {
       this.dom.heightInput.value = this.model.y0;
       if (this.dom.heightValue) {
