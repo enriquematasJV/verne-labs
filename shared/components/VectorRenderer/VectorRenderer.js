@@ -150,6 +150,56 @@ class VectorRenderer {
   }
 
   /**
+   * Dibujar componentes de velocidad (vx, vy) desde un punto
+   * Utilizado en simulaciones de cinemática
+   *
+   * @param {Object} origin - Punto de origen en píxeles {x, y}
+   * @param {Object} velocity - Velocidad {vx, vy}
+   * @param {Object} config - Configuración {scale, clamp, colors: {vx, vy}}
+   */
+  drawVelocityComponents(origin, velocity, config) {
+    const { scale = 1, clamp = Infinity, colors = {} } = config;
+
+    // Clamp velocidad
+    const vxScaled = Math.max(-clamp, Math.min(clamp, velocity.vx * scale));
+    const vyScaled = Math.max(-clamp, Math.min(clamp, velocity.vy * scale));
+
+    // Vector vx
+    this.drawArrow(
+      origin.x, origin.y,
+      origin.x + vxScaled, origin.y,
+      colors.vx || '#0066ff',
+      'vₓ'
+    );
+
+    // Vector vy
+    this.drawArrow(
+      origin.x, origin.y,
+      origin.x, origin.y - vyScaled,
+      colors.vy || '#ff6600',
+      'vᵧ'
+    );
+  }
+
+  /**
+   * Dibujar aceleración (ay = -g)
+   * Utilizado en simulaciones de cinemática
+   *
+   * @param {Object} origin - Punto de origen en píxeles {x, y}
+   * @param {number} magnitude - Magnitud de la aceleración (píxeles)
+   * @param {string} color - Color de la flecha
+   * @param {string} label - Etiqueta (default 'aᵧ')
+   */
+  drawAcceleration(origin, magnitude, color = '#ff0000', label = 'aᵧ') {
+    this.drawArrow(
+      origin.x, origin.y,
+      origin.x, origin.y + magnitude,
+      color,
+      label
+    );
+  }
+
+  /**
    * Dibujar un campo vectorial (malla de vectores)
    *
    * @param {Function} vectorFunction - f(x, y) → Vector2D
