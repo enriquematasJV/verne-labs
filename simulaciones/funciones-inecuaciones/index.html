@@ -87,412 +87,53 @@ y = log(x) ; orange</textarea>
     </section>
   </main>
 
-  <script src="../../shared/js/math/math-parser.js"></script>
+  <!-- /shared: Módulos actualizados -->
   <script src="../../shared/components/VerneMath/VerneMath.js"></script>
-  <script src="../../shared/js/ui/graph-navigator.js"></script>
-  <script>
-    const WIDTH = 520;
-    const HEIGHT = 520;
-    const STEP = 4;
+  <script src="../../shared/components/GraphRenderer/GraphRenderer.js"></script>
+  <script src="../../shared/components/Graph2DEngine/Graph2DEngine.js"></script>
+  <script src="../../shared/components/GraphNavigator/GraphNavigator.js"></script>
 
-    const state = {
-      mode: "inequalities",
-      viewRange: 10,
-      yScale: 1,
-      centerX: 0,
-      centerY: 0,
-      manualView: false,
+  <!-- Módulos específicos: Funciones-Inecuaciones -->
+  <script src="./js/FuncionesInecuacionesConstants.js"></script>
+  <script src="./js/FuncionesInecuacionesModel.js"></script>
+  <script src="./components/InequalityRegionRenderer/InequalityRegionRenderer.js"></script>
+  <script src="./js/FuncionesInecuacionesPresenter.js"></script>
+
+  <script>
+    // ===== INICIALIZACIÓN MODULARIZADA: Funciones-Inecuaciones =====
+
+    // 1. Obtener referencia del canvas
+    const graph = document.getElementById('graph');
+
+    // 2. Recopilar referencias DOM
+    const dom = {
+      graph: graph,
+      btnInequalities: document.getElementById('btnInequalities'),
+      btnFunctions: document.getElementById('btnFunctions'),
+      inequalityPanel: document.getElementById('inequalityPanel'),
+      functionPanel: document.getElementById('functionPanel'),
+      ineqInput: document.getElementById('ineqInput'),
+      funcInput: document.getElementById('funcInput'),
+      ineqStatus: document.getElementById('ineqStatus'),
+      funcStatus: document.getElementById('funcStatus'),
+      viewRangeInput: document.getElementById('viewRange'),
+      yScaleInput: document.getElementById('yScale'),
+      viewRangeLabel: document.getElementById('viewRangeLabel'),
+      yScaleLabel: document.getElementById('yScaleLabel')
     };
 
-    const graph = document.getElementById("graph");
-    const btnInequalities = document.getElementById("btnInequalities");
-    const btnFunctions = document.getElementById("btnFunctions");
-    const inequalityPanel = document.getElementById("inequalityPanel");
-    const functionPanel = document.getElementById("functionPanel");
-    const ineqInput = document.getElementById("ineqInput");
-    const funcInput = document.getElementById("funcInput");
-    const ineqStatus = document.getElementById("ineqStatus");
-    const funcStatus = document.getElementById("funcStatus");
-    const viewRangeInput = document.getElementById("viewRange");
-    const yScaleInput = document.getElementById("yScale");
-    const viewRangeLabel = document.getElementById("viewRangeLabel");
-    const yScaleLabel = document.getElementById("yScaleLabel");
+    // 3. Crear instancia del Model
+    const model = new FuncionesInecuacionesModel();
 
-    function svgEl(tag, attrs = {}) {
-      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
-      for (const [key, value] of Object.entries(attrs)) {
-        el.setAttribute(key, String(value));
-      }
-      return el;
-    }
+    // 4. Crear instancia del Presenter (orquestador)
+    const presenter = new FuncionesInecuacionesPresenter(
+      model,
+      graph,
+      dom,
+      FuncionesInecuacionesConstants
+    );
 
-    function normalize(text) {
-      return text
-        .replace(/≤/g, "<=")
-        .replace(/≥/g, ">=")
-        .replace(/,/g, ".")
-        .trim();
-    }
-
-    function splitExpressionAndColor(line) {
-      const parts = line.split(";");
-      const expr = normalize(parts[0] || "");
-      const color = (parts[1] || "blue").trim() || "blue";
-      return { expr, color };
-    }
-
-    function buildFunction(expr) {
-      try {
-        const fn = VerneMath.compile(expr);
-        return (x) => VerneMath.safeEvaluate(fn, x);
-      } catch (error) {
-        return null;
-      }
-    }
-
-    function parseY(expr, color) {
-      const match = expr.match(/^y\s*(<=|>=|<|>)\s*(.+)$/i);
-      if (!match) return null;
-
-      const op = match[1];
-      const rhs = match[2].trim();
-      const fn = buildFunction(rhs);
-      if (!fn) return null;
-
-      return { kind: "y", op, fn, raw: expr, color };
-    }
-
-    function parseX(expr, color) {
-      const match = expr.match(/^x\s*(<=|>=|<|>)\s*(-?\d+(?:\.\d+)?)$/i);
-      if (!match) return null;
-
-      return {
-        kind: "x",
-        op: match[1],
-        value: Number(match[2]),
-        raw: expr,
-        color,
-      };
-    }
-
-    function parseInequalityLine(line) {
-      const { expr, color } = splitExpressionAndColor(line);
-      if (!expr) return null;
-      return parseY(expr, color) || parseX(expr, color);
-    }
-
-    function parseFunctionLine(line) {
-      const { expr, color } = splitExpressionAndColor(line);
-      if (!expr) return null;
-
-      const yEquals = expr.match(/^y\s*=\s*(.+)$/i);
-      const rawExpr = yEquals ? yEquals[1].trim() : expr;
-      const fn = buildFunction(rawExpr);
-      if (!fn) return null;
-
-      return { fn, raw: line.trim(), color };
-    }
-
-    function parseInequalities(text) {
-      const ok = [];
-      const errors = [];
-
-      for (const line of text.split("\n")) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        const parsed = parseInequalityLine(trimmed);
-        if (parsed) ok.push(parsed);
-        else errors.push(trimmed);
-      }
-
-      return { ok, errors };
-    }
-
-    function parseFunctions(text) {
-      const ok = [];
-      const errors = [];
-
-      for (const line of text.split("\n")) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        const parsed = parseFunctionLine(trimmed);
-        if (parsed) ok.push(parsed);
-        else errors.push(trimmed);
-      }
-
-      return { ok, errors };
-    }
-
-    function scaleX(x) {
-      return (((x - state.centerX) + state.viewRange) / (2 * state.viewRange)) * WIDTH;
-    }
-
-    function scaleY(y) {
-      const u = (y / state.yScale) - state.centerY;
-      return HEIGHT - ((u + state.viewRange) / (2 * state.viewRange)) * HEIGHT;
-    }
-
-    function pxToMathX(px) {
-      return (px / WIDTH) * (2 * state.viewRange) - state.viewRange + state.centerX;
-    }
-
-    function pxToMathY(py) {
-      const u = state.viewRange - (py / HEIGHT) * (2 * state.viewRange);
-      return u + state.centerY;
-    }
-
-    function satisfies(ineq, x, y) {
-      if (ineq.kind === "x") {
-        if (ineq.op === "<") return x < ineq.value;
-        if (ineq.op === "<=") return x <= ineq.value;
-        if (ineq.op === ">") return x > ineq.value;
-        return x >= ineq.value;
-      }
-
-      const fy = ineq.fn(x);
-      if (!Number.isFinite(fy)) return false;
-
-      if (ineq.op === "<") return y < fy;
-      if (ineq.op === "<=") return y <= fy;
-      if (ineq.op === ">") return y > fy;
-      return y >= fy;
-    }
-
-    function clearGraph() {
-      graph.innerHTML = "";
-    }
-
-    function drawGridAndAxes() {
-      const ticksX = [];
-      for (let i = Math.floor(state.centerX - state.viewRange); i <= Math.ceil(state.centerX + state.viewRange); i++) ticksX.push(i);
-      const ticksY = [];
-      for (let i = Math.floor(state.centerY - state.viewRange); i <= Math.ceil(state.centerY + state.viewRange); i++) ticksY.push(i);
-
-      for (const n of ticksX) {
-        graph.appendChild(svgEl("line", {
-          x1: scaleX(n),
-          y1: 0,
-          x2: scaleX(n),
-          y2: HEIGHT,
-          stroke: "#e5e7eb",
-          "stroke-width": 1,
-        }));
-      }
-
-      for (const n of ticksY) {
-        graph.appendChild(svgEl("line", {
-          x1: 0,
-          y1: scaleY(n),
-          x2: WIDTH,
-          y2: scaleY(n),
-          stroke: "#e5e7eb",
-          "stroke-width": 1,
-        }));
-      }
-
-      graph.appendChild(svgEl("line", {
-        x1: 0,
-        y1: scaleY(0),
-        x2: WIDTH,
-        y2: scaleY(0),
-        stroke: "#111827",
-        "stroke-width": 1.5,
-      }));
-
-      graph.appendChild(svgEl("line", {
-        x1: scaleX(0),
-        y1: 0,
-        x2: scaleX(0),
-        y2: HEIGHT,
-        stroke: "#111827",
-        "stroke-width": 1.5,
-      }));
-    }
-
-    function drawInequalityRegion(inequalities) {
-      for (let py = 0; py < HEIGHT; py += STEP) {
-        for (let px = 0; px < WIDTH; px += STEP) {
-          const cx = px + STEP / 2;
-          const cy = py + STEP / 2;
-          const mathX = pxToMathX(cx);
-          const mathY = pxToMathY(cy) * state.yScale;
-
-          const ok = inequalities.every((ineq) => satisfies(ineq, mathX, mathY));
-
-          if (ok) {
-            graph.appendChild(svgEl("rect", {
-              x: px,
-              y: py,
-              width: STEP,
-              height: STEP,
-              fill: "rgba(37, 99, 235, 0.18)",
-            }));
-          }
-        }
-      }
-    }
-
-    function drawFunctionCurve(fn, color, dashed = false) {
-      const step = Math.max(0.02, state.viewRange / 300);
-      const minX = state.centerX - state.viewRange;
-      const maxX = state.centerX + state.viewRange;
-      let points = [];
-      let lastPy = null;
-
-      for (let x = minX; x <= maxX; x += step) {
-        const y = fn(x);
-        if (!Number.isFinite(y)) {
-          if (points.length > 1) appendPolyline(points, color, dashed);
-          points = [];
-          lastPy = null;
-          continue;
-        }
-
-        const px = scaleX(x);
-        const py = scaleY(y);
-
-        // Corte simple para evitar uniones brutales en asíntotas.
-        if (lastPy !== null && Math.abs(py - lastPy) > HEIGHT * 0.8) {
-          if (points.length > 1) appendPolyline(points, color, dashed);
-          points = [];
-        }
-
-        points.push(`${px},${py}`);
-        lastPy = py;
-      }
-
-      if (points.length > 1) appendPolyline(points, color, dashed);
-    }
-
-    function appendPolyline(points, color, dashed) {
-      const attrs = {
-        points: points.join(" "),
-        fill: "none",
-        stroke: color,
-        "stroke-width": 2,
-      };
-
-      if (dashed) attrs["stroke-dasharray"] = "6 6";
-      graph.appendChild(svgEl("polyline", attrs));
-    }
-
-    function drawInequalityBoundaries(inequalities) {
-      for (const ineq of inequalities) {
-        const dashed = !ineq.op.includes("=");
-
-        if (ineq.kind === "x") {
-          const attrs = {
-            x1: scaleX(ineq.value),
-            y1: 0,
-            x2: scaleX(ineq.value),
-            y2: HEIGHT,
-            stroke: ineq.color,
-            "stroke-width": 2,
-          };
-          if (dashed) attrs["stroke-dasharray"] = "6 6";
-          graph.appendChild(svgEl("line", attrs));
-        } else {
-          drawFunctionCurve(ineq.fn, ineq.color, dashed);
-        }
-      }
-    }
-
-    function updateStatus(element, result, noun) {
-      if (result.errors.length > 0) {
-        element.className = "status error";
-        element.textContent = `Errores en ${result.errors.length} línea(s): ${result.errors.join(" | ")}`;
-      } else {
-        element.className = "status ok";
-        element.textContent = `${result.ok.length} ${noun} correcta(s)`;
-      }
-    }
-
-    function clampRange(value, min, max) {
-      return Math.max(min, Math.min(max, value));
-    }
-
-    function syncSlidersFromView() {
-      viewRangeInput.value = String(clampRange(Math.round(state.viewRange), 2, 30));
-    }
-
-    function formatRange(value) {
-      return Number.isInteger(value) ? String(value) : value.toFixed(2);
-    }
-
-    function render() {
-      if (!state.manualView) {
-        state.viewRange = Number(viewRangeInput.value);
-        state.yScale = Number(yScaleInput.value);
-        state.centerX = 0;
-        state.centerY = 0;
-      }
-      viewRangeLabel.textContent = `±${formatRange(state.viewRange)}`;
-      yScaleLabel.textContent = `×${state.yScale}`;
-
-      clearGraph();
-
-      if (state.mode === "inequalities") {
-        const result = parseInequalities(ineqInput.value);
-        updateStatus(ineqStatus, result, "inecuación(es)");
-        drawGridAndAxes();
-        drawInequalityRegion(result.ok);
-        drawInequalityBoundaries(result.ok);
-      } else {
-        const result = parseFunctions(funcInput.value);
-        updateStatus(funcStatus, result, "función(es)");
-        drawGridAndAxes();
-        for (const item of result.ok) {
-          drawFunctionCurve(item.fn, item.color, false);
-        }
-      }
-    }
-
-    function setMode(mode) {
-      state.mode = mode;
-      btnInequalities.classList.toggle("active", mode === "inequalities");
-      btnFunctions.classList.toggle("active", mode === "functions");
-      inequalityPanel.classList.toggle("hidden", mode !== "inequalities");
-      functionPanel.classList.toggle("hidden", mode !== "functions");
-      render();
-    }
-
-    btnInequalities.addEventListener("click", () => setMode("inequalities"));
-    btnFunctions.addEventListener("click", () => setMode("functions"));
-    viewRangeInput.addEventListener("input", () => {
-      state.manualView = false;
-      render();
-    });
-    yScaleInput.addEventListener("input", () => {
-      state.manualView = false;
-      render();
-    });
-    ineqInput.addEventListener("input", render);
-    funcInput.addEventListener("input", render);
-
-    VerneGraphNavigator.attach(graph, {
-      panAxis: "both",
-      zoomAxis: "both",
-      minSpanX: 0.2,
-      maxSpanX: 400,
-      minSpanY: 0.02,
-      maxSpanY: 400000,
-      getViewport: () => ({
-        xMin: state.centerX - state.viewRange,
-        xMax: state.centerX + state.viewRange,
-        yMin: (state.centerY - state.viewRange) * state.yScale,
-        yMax: (state.centerY + state.viewRange) * state.yScale,
-      }),
-      setViewport: (next) => {
-        state.manualView = true;
-        state.viewRange = (next.xMax - next.xMin) / 2;
-        state.centerX = (next.xMax + next.xMin) / 2;
-        state.centerY = ((next.yMax + next.yMin) / 2) / state.yScale;
-        syncSlidersFromView();
-        render();
-      },
-    });
-
-    render();
+    // 5. Todo delegado al Presenter - listo
   </script>
 </body>
 </html>
