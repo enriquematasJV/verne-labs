@@ -172,10 +172,12 @@ class DerivadaPresenter {
     const c = this.constants;
     const ctx = this.ctx;
     const m = c.RENDERING.margin;
+    const cw = this.canvas.offsetWidth;
+    const ch = this.canvas.offsetHeight;
 
     ctx.save();
     ctx.beginPath();
-    ctx.rect(m, m, this.canvas.width - 2 * m, this.canvas.height - 2 * m);
+    ctx.rect(m, m, cw - 2 * m, ch - 2 * m);
     ctx.clip();
 
     ctx.strokeStyle = c.COLORS.function;
