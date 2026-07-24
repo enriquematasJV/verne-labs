@@ -183,6 +183,44 @@ class VectorRenderer {
   }
 
   /**
+   * Dibujar una medida (línea con marcas en los extremos)
+   * Utilizado para mostrar dimensiones: alcance, altura máxima, etc.
+   *
+   * @param {number} x1 - X inicial
+   * @param {number} y1 - Y inicial
+   * @param {number} x2 - X final
+   * @param {number} y2 - Y final
+   * @param {string} color - Color de la medida
+   * @param {string} text - Etiqueta de la medida
+   * @param {number} markSize - Tamaño de las marcas en los extremos (default 7)
+   */
+  drawMeasure(x1, y1, x2, y2, color, text, markSize = 7) {
+    const ctx = this.ctx;
+
+    // Línea principal
+    ctx.strokeStyle = color;
+    ctx.lineWidth = this.config.arrowLineWidth;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+
+    // Marcas en los extremos
+    ctx.beginPath();
+    ctx.moveTo(x1, y1 - markSize);
+    ctx.lineTo(x1, y1 + markSize);
+    ctx.moveTo(x2, y2 - markSize);
+    ctx.lineTo(x2, y2 + markSize);
+    ctx.stroke();
+
+    // Etiqueta en el medio
+    ctx.fillStyle = color;
+    ctx.font = `${this.config.labelFontWeight} ${this.config.labelFontSize}px Arial`;
+    const textWidth = ctx.measureText(text).width;
+    ctx.fillText(text, (x1 + x2) / 2 - textWidth / 2, y1 - 10);
+  }
+
+  /**
    * Obtener contexto de canvas para operaciones personalizadas
    */
   getContext() {

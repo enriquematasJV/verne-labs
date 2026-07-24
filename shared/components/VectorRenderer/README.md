@@ -110,6 +110,29 @@ renderer.drawVectorField(
 
 ---
 
+### `drawMeasure(x1, y1, x2, y2, color, text, markSize)`
+Dibuja una medida (línea con marcas en los extremos y etiqueta).
+Útil para mostrar dimensiones como alcance, altura máxima, etc.
+
+**Parámetros:**
+- `x1, y1`: Punto inicial (píxeles)
+- `x2, y2`: Punto final (píxeles)
+- `color`: Color de la medida
+- `text`: Etiqueta (ej: "alcance = 50 m")
+- `markSize`: Tamaño de las marcas en los extremos (default 7)
+
+**Ejemplo (Cinemática 2D):**
+```javascript
+renderer.drawMeasure(
+  viewportLeftX, viewportBottomY,
+  impactX, viewportBottomY,
+  '#ff6600',
+  'alcance = 45.5 m'
+);
+```
+
+---
+
 ## Integración con labs
 
 ### Plano Inclinado
