@@ -18,7 +18,7 @@ const DerivadaConstants = {
     lineWidth: 2.6,              // Ancho línea función
     lineWidthSecant: 2.2,        // Ancho línea secante/tangente
     lineWidthTriangle: 2,        // Ancho línea triángulo
-    margin: 52,                  // Margen en pixels
+    margin: 10,                  // Margen en pixels (reducido para máximo espacio de gráfica)
     samples: 900,                // Muestras para dibujar función
     pointRadius: 5.5,            // Radio puntos P, Q
     dashPattern: [8, 7],         // Patrón línea punteada
