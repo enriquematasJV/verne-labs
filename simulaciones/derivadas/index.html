@@ -122,537 +122,64 @@
     </aside>
   </main>
 
-  <script src="../../shared/js/math/math-parser.js"></script>
-  <script src="../../shared/js/ui/graph-navigator.js"></script>
+  <!-- /shared: Módulos actualizados -->
+  <script src="../../shared/components/VerneMath/VerneMath.js"></script>
+  <script src="../../shared/js/graphics/GraphRenderer.js"></script>
+  <script src="../../shared/js/ui/GraphNavigator.js"></script>
+
+  <!-- Módulos específicos: Derivadas -->
+  <script src="./js/DerivadaConstants.js"></script>
+  <script src="./js/DerivadaModel.js"></script>
+  <script src="./js/DerivadaPresenter.js"></script>
+
   <script>
+    // ===== INICIALIZACIÓN MODULARIZADA: Derivadas =====
+
+    // 1. Obtener referencia del canvas
     const canvas = document.getElementById('graph');
-    const ctx = canvas.getContext('2d');
 
-    const functionInput = document.getElementById('functionInput');
-    const xPointInput = document.getElementById('xPoint');
-    const hSlider = document.getElementById('hSlider');
-    const hValue = document.getElementById('hValue');
-    const viewScale = document.getElementById('viewScale');
-    const zoomSlider = document.getElementById('zoomSlider');
-    const zoomValue = document.getElementById('zoomValue');
-    const originSlider = document.getElementById('originSlider');
-    const originValue = document.getElementById('originValue');
-    const errorBox = document.getElementById('errorBox');
-
-    const metricX = document.getElementById('metricX');
-    const metricXH = document.getElementById('metricXH');
-    const metricFX = document.getElementById('metricFX');
-    const metricFXH = document.getElementById('metricFXH');
-    const metricDX = document.getElementById('metricDX');
-    const metricDY = document.getElementById('metricDY');
-    const metricM = document.getElementById('metricM');
-    const metricTangent = document.getElementById('metricTangent');
-
-    const towardsZeroBtn = document.getElementById('towardsZeroBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-    const resetBtn = document.getElementById('resetBtn');
-
-    let animationId = null;
-    let animating = false;
-
-    const state = {
-      margin: 52,
-      xMin: -6,
-      xMax: 6,
-      yMin: -6,
-      yMax: 6,
-      compiled: null,
-      lastValidExpression: 'x^2',
-      manualView: false
+    // 2. Recopilar referencias DOM
+    const dom = {
+      canvas: canvas,
+      functionInput: document.getElementById('functionInput'),
+      xPoint: document.getElementById('xPoint'),
+      hSlider: document.getElementById('hSlider'),
+      hValue: document.getElementById('hValue'),
+      viewScale: document.getElementById('viewScale'),
+      zoomSlider: document.getElementById('zoomSlider'),
+      zoomValue: document.getElementById('zoomValue'),
+      originSlider: document.getElementById('originSlider'),
+      originValue: document.getElementById('originValue'),
+      errorBox: document.getElementById('errorBox'),
+      metricX: document.getElementById('metricX'),
+      metricXH: document.getElementById('metricXH'),
+      metricFX: document.getElementById('metricFX'),
+      metricFXH: document.getElementById('metricFXH'),
+      metricDX: document.getElementById('metricDX'),
+      metricDY: document.getElementById('metricDY'),
+      metricM: document.getElementById('metricM'),
+      metricTangent: document.getElementById('metricTangent'),
+      towardsZeroBtn: document.getElementById('towardsZeroBtn'),
+      pauseBtn: document.getElementById('pauseBtn'),
+      resetBtn: document.getElementById('resetBtn')
     };
 
-    function compileFunction() {
-      const raw = functionInput.value.trim() || 'x^2';
-      return VerneMath.compile(raw);
-    }
-
-    function safeEval(x) {
-      return VerneMath.safeEvaluate(state.compiled, x);
-    }
-
-    function resizeBackingCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = Math.round(rect.width * dpr);
-      canvas.height = Math.round(rect.height * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    function W() { return canvas.getBoundingClientRect().width; }
-    function H() { return canvas.getBoundingClientRect().height; }
-
-    function toScreenX(x) {
-      return state.margin + (x - state.xMin) / (state.xMax - state.xMin) * (W() - 2 * state.margin);
-    }
-
-    function toScreenY(y) {
-      return H() - state.margin - (y - state.yMin) / (state.yMax - state.yMin) * (H() - 2 * state.margin);
-    }
-
-    function toWorldX(px) {
-      return state.xMin + (px - state.margin) / (W() - 2 * state.margin) * (state.xMax - state.xMin);
-    }
-
-    function drawGrid() {
-      ctx.clearRect(0, 0, W(), H());
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, W(), H());
-
-      const xStep = niceStep((state.xMax - state.xMin) / 12);
-      const yStep = niceStep((state.yMax - state.yMin) / 10);
-
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = '#eef1f6';
-      ctx.fillStyle = '#8b95a7';
-      ctx.font = '12px system-ui';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-
-      for (let x = Math.ceil(state.xMin / xStep) * xStep; x <= state.xMax; x += xStep) {
-        const px = toScreenX(x);
-        ctx.beginPath();
-        ctx.moveTo(px, state.margin);
-        ctx.lineTo(px, H() - state.margin);
-        ctx.stroke();
-        if (Math.abs(x) > 1e-9) ctx.fillText(formatShort(x), px, H() - state.margin + 8);
-      }
-
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      for (let y = Math.ceil(state.yMin / yStep) * yStep; y <= state.yMax; y += yStep) {
-        const py = toScreenY(y);
-        ctx.beginPath();
-        ctx.moveTo(state.margin, py);
-        ctx.lineTo(W() - state.margin, py);
-        ctx.stroke();
-        if (Math.abs(y) > 1e-9) ctx.fillText(formatShort(y), state.margin - 8, py);
-      }
-
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 1.4;
-      if (state.yMin <= 0 && state.yMax >= 0) {
-        const y0 = toScreenY(0);
-        ctx.beginPath();
-        ctx.moveTo(state.margin, y0);
-        ctx.lineTo(W() - state.margin, y0);
-        ctx.stroke();
-      }
-
-      if (state.xMin <= 0 && state.xMax >= 0) {
-        const x0 = toScreenX(0);
-        ctx.beginPath();
-        ctx.moveTo(x0, state.margin);
-        ctx.lineTo(x0, H() - state.margin);
-        ctx.stroke();
-      }
-
-      ctx.fillStyle = '#64748b';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.fillText('x', W() - state.margin + 12, toScreenY(0) - 8);
-      ctx.fillText('y', toScreenX(0) + 8, state.margin - 26);
-    }
-
-    function niceStep(raw) {
-      const power = Math.pow(10, Math.floor(Math.log10(raw)));
-      const normalized = raw / power;
-      if (normalized < 1.5) return power;
-      if (normalized < 3.5) return 2 * power;
-      if (normalized < 7.5) return 5 * power;
-      return 10 * power;
-    }
-
-    function drawFunction() {
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(state.margin, state.margin, W() - 2 * state.margin, H() - 2 * state.margin);
-      ctx.clip();
-
-      ctx.strokeStyle = '#2563eb';
-      ctx.lineWidth = 2.6;
-      ctx.beginPath();
-
-      let drawing = false;
-      const samples = 900;
-      for (let i = 0; i <= samples; i++) {
-        const px = state.margin + i / samples * (W() - 2 * state.margin);
-        const x = toWorldX(px);
-        const y = safeEval(x);
-        const py = toScreenY(y);
-
-        const visible = Number.isFinite(y) && py > -10000 && py < 10000;
-        if (!visible) {
-          drawing = false;
-          continue;
-        }
-
-        if (!drawing) {
-          ctx.moveTo(px, py);
-          drawing = true;
-        } else {
-          ctx.lineTo(px, py);
-        }
-      }
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function derivativeApprox(x) {
-      const eps = Math.max(1e-5, (state.xMax - state.xMin) / 100000);
-      const y1 = safeEval(x + eps);
-      const y0 = safeEval(x - eps);
-      if (!Number.isFinite(y1) || !Number.isFinite(y0)) return NaN;
-      return (y1 - y0) / (2 * eps);
-    }
-
-    function drawLineThroughPoint(x, y, slope, color, dashed = false) {
-      if (!Number.isFinite(slope)) return;
-      const xA = state.xMin;
-      const xB = state.xMax;
-      const yA = y + slope * (xA - x);
-      const yB = y + slope * (xB - x);
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(state.margin, state.margin, W() - 2 * state.margin, H() - 2 * state.margin);
-      ctx.clip();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 2.2;
-      if (dashed) ctx.setLineDash([8, 7]);
-      ctx.beginPath();
-      ctx.moveTo(toScreenX(xA), toScreenY(yA));
-      ctx.lineTo(toScreenX(xB), toScreenY(yB));
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function drawPoint(x, y, color, label, dx = 8, dy = -12) {
-      const px = toScreenX(x);
-      const py = toScreenY(y);
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(px, py, 5.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.font = '13px system-ui';
-      ctx.fillStyle = color;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(label, px + dx, py + dy);
-    }
-
-    function drawTriangle(x, fx, xh, fxh) {
-      const px1 = toScreenX(x);
-      const py1 = toScreenY(fx);
-      const px2 = toScreenX(xh);
-      const py2 = toScreenY(fxh);
-      const pyHorizontal = py1;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(state.margin, state.margin, W() - 2 * state.margin, H() - 2 * state.margin);
-      ctx.clip();
-
-      ctx.fillStyle = 'rgba(234, 88, 12, 0.12)';
-      ctx.strokeStyle = '#ea580c';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([]);
-
-      ctx.beginPath();
-      ctx.moveTo(px1, py1);
-      ctx.lineTo(px2, pyHorizontal);
-      ctx.lineTo(px2, py2);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.strokeStyle = '#ea580c';
-      ctx.lineWidth = 2.4;
-      ctx.beginPath();
-      ctx.moveTo(px1, py1);
-      ctx.lineTo(px2, pyHorizontal);
-      ctx.stroke();
-
-      ctx.strokeStyle = '#7c3aed';
-      ctx.beginPath();
-      ctx.moveTo(px2, pyHorizontal);
-      ctx.lineTo(px2, py2);
-      ctx.stroke();
-
-      ctx.font = '13px system-ui';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillStyle = '#ea580c';
-      ctx.fillText('Δx = h', (px1 + px2) / 2, pyHorizontal - 7);
-
-      ctx.save();
-      ctx.translate(px2 + 13, (pyHorizontal + py2) / 2);
-      ctx.rotate(-Math.PI / 2);
-      ctx.fillStyle = '#7c3aed';
-      ctx.fillText('Δy = f(x+h) - f(x)', 0, 0);
-      ctx.restore();
-
-      ctx.restore();
-    }
-
-    function drawAnnotations(x, fx, h, fxh, secantSlope, tangentSlope) {
-      const xh = x + h;
-
-      drawLineThroughPoint(x, fx, tangentSlope, '#059669', true);
-      drawLineThroughPoint(x, fx, secantSlope, '#dc2626', false);
-      drawTriangle(x, fx, xh, fxh);
-
-      drawPoint(x, fx, '#111827', 'P = (x, f(x))');
-      drawPoint(xh, fxh, '#dc2626', 'Q = (x+h, f(x+h))', 8, 14);
-
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      ctx.strokeStyle = '#e5e7eb';
-      ctx.lineWidth = 1;
-      roundRect(ctx, 18, 18, 355, 108, 14);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = '#1f2937';
-      ctx.font = '14px system-ui';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.fillText(`m secante = Δy / Δx = ${formatNumber(secantSlope)}`, 36, 36);
-      ctx.fillStyle = '#059669';
-      ctx.fillText(`m tangente aprox. = ${formatNumber(tangentSlope)}`, 36, 62);
-      ctx.fillStyle = '#6b7280';
-      ctx.fillText(`Cuando h se acerca a 0, Q se acerca a P`, 36, 88);
-    }
-
-    function roundRect(ctx, x, y, w, h, r) {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r);
-      ctx.closePath();
-    }
-
-    function syncSlidersFromView() {
-      const scale = (state.xMax - state.xMin) / 2;
-      const origin = (state.xMax + state.xMin) / 2;
-      zoomSlider.value = String(clampRange(scale, 2, 30));
-      originSlider.value = String(clampRange(origin, -20, 20));
-      zoomValue.textContent = `±${formatNumber(scale)}`;
-      originValue.textContent = formatNumber(origin);
-    }
-
-    function clampRange(value, min, max) {
-      return Math.max(min, Math.min(max, value));
-    }
-
-    function autoFitY() {
-      if (state.manualView) return;
-
-      const scale = Number(zoomSlider.value);
-      const origin = Number(originSlider.value);
-      state.xMin = origin - scale;
-      state.xMax = origin + scale;
-      zoomValue.textContent = `±${formatNumber(scale)}`;
-      originValue.textContent = formatNumber(origin);
-
-      const values = [];
-      const samples = 420;
-      for (let i = 0; i <= samples; i++) {
-        const x = state.xMin + i / samples * (state.xMax - state.xMin);
-        const y = safeEval(x);
-        if (Number.isFinite(y) && Math.abs(y) < 1e6) values.push(y);
-      }
-
-      const x = Number(xPointInput.value);
-      const h = Number(hSlider.value);
-      [x, x + h].forEach(v => {
-        const y = safeEval(v);
-        if (Number.isFinite(y) && Math.abs(y) < 1e6) values.push(y);
-      });
-
-      if (!values.length) {
-        state.yMin = -scale;
-        state.yMax = scale;
-        return;
-      }
-
-      let min = Math.min(...values);
-      let max = Math.max(...values);
-      if (Math.abs(max - min) < 1e-6) {
-        min -= 1;
-        max += 1;
-      }
-      const pad = Math.max(1, (max - min) * 0.18);
-      state.yMin = min - pad;
-      state.yMax = max + pad;
-
-      const maxAbs = Math.max(Math.abs(state.yMin), Math.abs(state.yMax));
-      if (maxAbs < scale * 0.4) {
-        state.yMin = -scale * 0.4;
-        state.yMax = scale * 0.4;
-      }
-    }
-
-    function render() {
-      try {
-        state.compiled = compileFunction();
-        state.lastValidExpression = functionInput.value.trim();
-        errorBox.style.display = 'none';
-      } catch (error) {
-        errorBox.textContent = error.message || 'No se ha podido interpretar la función.';
-        errorBox.style.display = 'block';
-        return;
-      }
-
-      autoFitY();
-      drawGrid();
-      drawFunction();
-
-      const x = Number(xPointInput.value);
-      let h = Number(hSlider.value);
-
-      if (Math.abs(h) < 0.001) h = h >= 0 ? 0.001 : -0.001;
-      hSlider.value = String(h);
-      hValue.textContent = formatNumber(h);
-
-      const fx = safeEval(x);
-      const fxh = safeEval(x + h);
-      const dy = fxh - fx;
-      const secantSlope = dy / h;
-      const tangentSlope = derivativeApprox(x);
-
-      if (Number.isFinite(fx) && Number.isFinite(fxh)) {
-        drawAnnotations(x, fx, h, fxh, secantSlope, tangentSlope);
-      }
-
-      metricX.textContent = formatNumber(x);
-      metricXH.textContent = formatNumber(x + h);
-      metricFX.textContent = formatNumber(fx);
-      metricFXH.textContent = formatNumber(fxh);
-      metricDX.textContent = formatNumber(h);
-      metricDY.textContent = formatNumber(dy);
-      metricM.textContent = formatNumber(secantSlope);
-      metricTangent.textContent = formatNumber(tangentSlope);
-    }
-
-    function formatNumber(value) {
-      if (!Number.isFinite(value)) return '—';
-      if (Math.abs(value) >= 10000 || Math.abs(value) < 0.0001 && value !== 0) return value.toExponential(3);
-      return value.toFixed(4);
-    }
-
-    function formatShort(value) {
-      if (Math.abs(value) < 1e-9) return '0';
-      if (Math.abs(value) >= 10) return value.toFixed(0);
-      if (Math.abs(value) >= 1) return value.toFixed(1).replace(/\.0$/, '');
-      return value.toFixed(2).replace(/0$/, '').replace(/\.$/, '');
-    }
-
-    function animateTowardsZero() {
-      animating = true;
-      cancelAnimationFrame(animationId);
-
-      function step() {
-        let h = Number(hSlider.value);
-        if (Math.abs(h) <= 0.01) {
-          hSlider.value = h > 0 ? '0.001' : '-0.001';
-          animating = false;
-          render();
-          return;
-        }
-        h *= 0.94;
-        hSlider.value = String(h);
-        render();
-        animationId = requestAnimationFrame(step);
-      }
-
-      step();
-    }
-
-    function pauseAnimation() {
-      animating = false;
-      cancelAnimationFrame(animationId);
-    }
-
-    function reset() {
-      pauseAnimation();
-      state.manualView = false;
-      functionInput.value = 'x^2';
-      xPointInput.value = '1';
-      hSlider.value = '1.5';
-      viewScale.value = '6';
-      zoomSlider.value = '6';
-      originSlider.value = '0';
-      render();
-    }
-
-    function init() {
-      resizeBackingCanvas();
-      render();
-
-      VerneGraphNavigator.attach(canvas, {
-        margin: state.margin,
-        getViewport: () => ({ xMin: state.xMin, xMax: state.xMax, yMin: state.yMin, yMax: state.yMax }),
-        setViewport: (next) => {
-          state.manualView = true;
-          state.xMin = next.xMin;
-          state.xMax = next.xMax;
-          state.yMin = next.yMin;
-          state.yMax = next.yMax;
-          syncSlidersFromView();
-          render();
-        },
-        minSpanX: 0.2,
-        maxSpanX: 400,
-        minSpanY: 0.2,
-        maxSpanY: 400
-      });
-    }
-
-    functionInput.addEventListener('input', render);
-    xPointInput.addEventListener('input', render);
-    hSlider.addEventListener('input', () => {
-      pauseAnimation();
-      render();
-    });
-    viewScale.addEventListener('change', () => {
-      state.manualView = false;
-      zoomSlider.value = viewScale.value;
-      render();
-    });
-    zoomSlider.addEventListener('input', () => {
-      state.manualView = false;
-      render();
-    });
-    originSlider.addEventListener('input', () => {
-      state.manualView = false;
-      render();
-    });
-
-    towardsZeroBtn.addEventListener('click', animateTowardsZero);
-    pauseBtn.addEventListener('click', pauseAnimation);
-    resetBtn.addEventListener('click', reset);
-
-    document.querySelectorAll('[data-fn]').forEach(button => {
-      button.addEventListener('click', () => {
-        pauseAnimation();
-        functionInput.value = button.dataset.fn;
-        render();
-      });
-    });
-
-    window.addEventListener('resize', () => {
-      resizeBackingCanvas();
-      render();
-    });
-
-    init();
+    // 3. Crear GraphRenderer
+    const graphRenderer = new GraphRenderer(canvas);
+
+    // 4. Crear instancia del Model
+    const model = new DerivadaModel(DerivadaConstants);
+
+    // 5. Crear instancia del Presenter (orquestador)
+    const presenter = new DerivadaPresenter(
+      model,
+      canvas,
+      dom,
+      graphRenderer,
+      DerivadaConstants
+    );
+
+    // 6. Todo delegado al Presenter - listo
   </script>
 </body>
 </html>
