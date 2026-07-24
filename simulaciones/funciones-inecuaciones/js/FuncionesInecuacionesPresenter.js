@@ -1,9 +1,22 @@
+/**
+ * FuncionesInecuacionesPresenter — Orquesta Model, View y componentes gráficos
+ *
+ * Responsabilidades:
+ * - Escuchar eventos de la View
+ * - Actualizar el Model
+ * - Requerir rendering a la View
+ * - Manejar lógica de gráficos
+ */
+
 class FuncionesInecuacionesPresenter {
-  constructor(model, graph, dom, constants) {
+  constructor(model, graph, dom, constants, view = null) {
     this.model = model;
     this.graph = graph;
     this.dom = dom;
     this.constants = constants;
+
+    // Crear o usar View inyectada
+    this.view = view || new FuncionesInecuacionesView(dom, this);
 
     // Inicializar componentes gráficos
     this.graphEngine = new Graph2DEngine(graph, {
@@ -22,35 +35,29 @@ class FuncionesInecuacionesPresenter {
   }
 
   setupEventListeners() {
-    // Botones de modo
-    this.dom.btnInequalities.addEventListener("click", () => {
-      this.model.setMode("inequalities");
-      this.updateModeUI();
+    // Cambios de modo
+    this.view.onModeChanged((mode) => {
+      this.model.setMode(mode);
+      this.view.updateModeUI(mode);
       this.render();
     });
 
-    this.dom.btnFunctions.addEventListener("click", () => {
-      this.model.setMode("functions");
-      this.updateModeUI();
+    // Cambios de inecuaciones
+    this.view.onInequalityTextChanged((text) => {
+      this.model.setInequalityText(text);
       this.render();
     });
 
-    // Sliders
-    this.dom.viewRangeInput.addEventListener("input", () => {
+    // Cambios de funciones
+    this.view.onFunctionTextChanged((text) => {
+      this.model.setFunctionText(text);
+      this.render();
+    });
+
+    // Cambios de vista/zoom
+    this.view.onViewRangeChanged((range) => {
       this.model.setManualView(false);
-      this.model.setViewRange(Number(this.dom.viewRangeInput.value));
-      this.render();
-    });
-
-    // Textarea de inecuaciones
-    this.dom.ineqInput.addEventListener("input", () => {
-      this.model.setInequalityText(this.dom.ineqInput.value);
-      this.render();
-    });
-
-    // Textarea de funciones
-    this.dom.funcInput.addEventListener("input", () => {
-      this.model.setFunctionText(this.dom.funcInput.value);
+      this.model.setViewRange(range);
       this.render();
     });
 
@@ -82,40 +89,13 @@ class FuncionesInecuacionesPresenter {
     }
   }
 
-  updateModeUI() {
-    const isIneq = this.model.mode === "inequalities";
-    this.dom.btnInequalities.classList.toggle("active", isIneq);
-    this.dom.btnFunctions.classList.toggle("active", !isIneq);
-    this.dom.inequalityPanel.classList.toggle("hidden", !isIneq);
-    this.dom.functionPanel.classList.toggle("hidden", isIneq);
-  }
-
   syncSlidersFromView() {
-    const clamped = Math.max(2, Math.min(30, Math.round(this.model.viewRange)));
-    this.dom.viewRangeInput.value = String(clamped);
-  }
-
-  formatRange(value) {
-    return Number.isInteger(value)
-      ? String(value)
-      : value.toFixed(2);
-  }
-
-  updateStatus(element, result, noun) {
-    if (result.errors.length > 0) {
-      element.className = "status error";
-      const text = this.constants.TEXT;
-      element.textContent = `${text.ERROR_PREFIX} ${result.errors.length} ${text.ERROR_LINES_SUFFIX}: ${result.errors.join(" | ")}`;
-    } else {
-      element.className = "status ok";
-      const text = this.constants.TEXT;
-      element.textContent = `${result.ok.length} ${noun} ${text.CORRECT_SUFFIX}`;
-    }
+    this.view.setViewRange(this.model.viewRange);
   }
 
   render() {
-    // Actualizar labels
-    this.dom.viewRangeLabel.textContent = `±${this.formatRange(this.model.viewRange)}`;
+    // Actualizar vista
+    this.view.updateViewRangeLabel(this.model.viewRange);
 
     // Actualizar viewport del graphEngine
     const viewport = this.model.getViewport();
@@ -133,7 +113,7 @@ class FuncionesInecuacionesPresenter {
 
     if (this.model.mode === "inequalities") {
       const result = this.model.getInequalities();
-      this.updateStatus(this.dom.ineqStatus, result, "inecuación(es)");
+      this.view.updateInequalityStatus(result.errors, result.ok.length);
       inequalitiesForRegion = result.ok;
 
       // Dibujar límites de inecuaciones como funciones
@@ -147,7 +127,7 @@ class FuncionesInecuacionesPresenter {
       }
     } else {
       const result = this.model.getFunctions();
-      this.updateStatus(this.dom.funcStatus, result, "función(es)");
+      this.view.updateFunctionStatus(result.errors, result.ok.length);
 
       // Dibujar funciones
       for (const item of result.ok) {

@@ -85,6 +85,7 @@ y = log(x) ; orange</textarea>
   <!-- Módulos específicos: Funciones-Inecuaciones -->
   <script src="./js/FuncionesInecuacionesConstants.js"></script>
   <script src="./js/FuncionesInecuacionesModel.js"></script>
+  <script src="./js/FuncionesInecuacionesView.js"></script>
   <script src="./components/InequalityRegionRenderer/InequalityRegionRenderer.js"></script>
   <script src="./js/FuncionesInecuacionesPresenter.js"></script>
 
@@ -112,15 +113,19 @@ y = log(x) ; orange</textarea>
     // 3. Crear instancia del Model
     const model = new FuncionesInecuacionesModel();
 
-    // 4. Crear instancia del Presenter (orquestador)
+    // 4. Crear instancia de la View (MVP)
+    const view = new FuncionesInecuacionesView(dom);
+
+    // 5. Crear instancia del Presenter (orquestador MVP)
     const presenter = new FuncionesInecuacionesPresenter(
       model,
       graph,
       dom,
-      FuncionesInecuacionesConstants
+      FuncionesInecuacionesConstants,
+      view
     );
 
-    // 5. Todo delegado al Presenter - listo
+    // 6. MVP integrado - listo
   </script>
 </body>
 </html>
