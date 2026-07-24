@@ -210,21 +210,10 @@
       resetBtn: document.getElementById('resetBtn'),
     };
 
-    // 3.5 Preparar referencias para el panel de fórmulas
-    const formulaElements = {
-      formulaPeso: document.getElementById('formulaPeso'),
-      formulaParalela: document.getElementById('formulaParalela'),
-      formulaNormal: document.getElementById('formulaNormal'),
-      formulaFriccion: document.getElementById('formulaFriccion'),
-      formulaAceleracion: document.getElementById('formulaAceleracion'),
-      formulaVelocidad: document.getElementById('formulaVelocidad'),
-      formulaTiempo: document.getElementById('formulaTiempo'),
-    };
-
     // 4. Crear instancia del Model
     const model = new PlanoInclinadoModel();
 
-    // 4.5 Crear instancia del Panel de Fórmulas
+    // 5. Crear instancia del Panel de Fórmulas
     const formulasPanel = new MathematicalModelPanel({
       formulas: [
         { id: 'formulaPeso', digits: 2 },
@@ -257,7 +246,7 @@
       }
     });
 
-    // 5. Crear instancia del Presenter
+    // 6. Crear instancia del Presenter
     const presenter = new PlanoInclinadoPresenter(
       model,
       renderer,
@@ -267,7 +256,7 @@
       formulasPanel
     );
 
-    // 6. Inicializar UI y renderizar
+    // 7. Inicializar UI y renderizar
     presenter.updateUI();
     presenter.render();
   </script>
