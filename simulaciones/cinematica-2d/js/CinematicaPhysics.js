@@ -47,11 +47,11 @@ class CinematicaPhysics {
 
   /**
    * Posición vertical en función del tiempo
-   * y(t) = y0 + v0y·t + 0.5·g·t²
-   * Nota: g es negativo (aceleración hacia abajo)
+   * y(t) = y0 + v0y·t - 0.5·g·t²
+   * Nota: g es positivo (9.8), aceleración es -g
    */
   static yAt(t, y0, v0y, g) {
-    return y0 + v0y * t + 0.5 * g * t * t;
+    return y0 + v0y * t - 0.5 * g * t * t;
   }
 
   /**
@@ -64,11 +64,11 @@ class CinematicaPhysics {
 
   /**
    * Velocidad vertical en función del tiempo
-   * vy(t) = v0y + g·t
-   * Nota: g es negativo
+   * vy(t) = v0y - g·t
+   * Nota: g es positivo (9.8), aceleración es -g
    */
   static vyAt(t, v0y, g) {
-    return v0y + g * t;
+    return v0y - g * t;
   }
 
   /**
@@ -79,11 +79,11 @@ class CinematicaPhysics {
     const { v0x, v0y } = this.getInitialComponents(mode, v0, angleDeg);
 
     // Tiempo de vuelo: resolver y(t) = 0
-    // 0 = y0 + v0y·t + 0.5·g·t²
-    // 0.5·g·t² + v0y·t + y0 = 0
+    // 0 = y0 + v0y·t - 0.5·g·t² (g positivo, aceleración es -g)
+    // 0.5·g·t² - v0y·t - y0 = 0
     const A = 0.5 * g;
-    const B = v0y;
-    const C = y0;
+    const B = -v0y;
+    const C = -y0;
     const disc = B * B - 4 * A * C;
     let flightTime = 0;
 
@@ -97,12 +97,12 @@ class CinematicaPhysics {
     }
 
     // Tiempo de altura máxima (si existe)
-    // vy(t) = 0 => v0y + g·t = 0 => t = -v0y / g
+    // vy(t) = 0 => v0y - g·t = 0 => t = v0y / g
     let apexTime = 0;
     let maxHeight = y0;
     if (v0y > 0) {
-      apexTime = -v0y / g;
-      maxHeight = this.yAt(apexTime, y0, v0y, g);
+      apexTime = v0y / g;
+      maxHeight = this.yAt(apexTime, y0, v0y, -g);
     }
 
     // Alcance horizontal en tiempo de vuelo
