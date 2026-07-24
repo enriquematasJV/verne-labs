@@ -243,10 +243,6 @@ class CinematicaPresenter {
    * Leer valores actuales de los inputs
    */
   readControls() {
-    if (this.dom.modeSelect) {
-      this.model.setMode(this.dom.modeSelect.value);
-    }
-
     if (this.dom.heightInput) {
       this.model.setHeight(Number(this.dom.heightInput.value));
     }
