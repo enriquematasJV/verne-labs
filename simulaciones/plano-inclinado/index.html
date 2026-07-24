@@ -124,6 +124,7 @@
   <!-- MÓDULOS: Arquitectura MVP -->
   <!-- Shared: Gráficos y UI -->
   <script src="../../shared/js/graphics/Canvas2DRenderer.js"></script>
+  <script src="../../shared/components/VectorRenderer/VectorRenderer.js"></script>
   <script src="../../shared/js/ui/SliderControl.js"></script>
   <script src="../../shared/components/MathematicalModelPanel/MathematicalModelPanel.js"></script>
 
@@ -159,7 +160,7 @@
 
     // 1. Crear instancias de componentes base
     const canvas = document.getElementById('scene');
-    const renderer = new Canvas2DRenderer(canvas);
+    const renderer = new VectorRenderer(canvas, CONSTANTS);
 
     // 2. Crear instancias de SliderControl (sin callback, el Presenter los configurará)
     const angleSlider = new SliderControl(
