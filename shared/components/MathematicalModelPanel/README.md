@@ -1,72 +1,78 @@
-# MathematicalModelPanel — Panel para modelos matemáticos
+# MathematicalModelPanel — Panel dinámico para valores de fórmulas
 
-Componente UI para mostrar ecuaciones, parámetros y resultados de modelos matemáticos en laboratorios.
+Componente UI que vincula elementos HTML (con ecuaciones, fórmulas) a valores calculados dinámicamente.
 
 ## Uso
 
 ```html
-<!-- HTML -->
-<div id="modelPanel"></div>
+<!-- HTML: define elementos con IDs para cada fórmula -->
+<div id="formulasPanel">
+  <div>Energía: <span id="energy">0.0</span> J</div>
+  <div>Velocidad: <span id="velocity">0.0</span> m/s</div>
+</div>
 ```
 
 ```javascript
 <script src="../../shared/components/MathematicalModelPanel/MathematicalModelPanel.js"></script>
-<link rel="stylesheet" href="../../shared/components/MathematicalModelPanel/mathematical-model-panel.css" />
 
-const panel = new MathematicalModelPanel(
-  document.getElementById('modelPanel')
-);
-
-// Agregar ecuación
-panel.addEquation('v = v₀ + at');
-
-// Agregar parámetros actualizables
-panel.setParameters({
-  'v₀ (velocidad inicial)': '10 m/s',
-  'a (aceleración)': '2 m/s²',
-  't (tiempo)': '5 s'
+const panel = new MathematicalModelPanel({
+  container: document.getElementById('formulasPanel'),
+  formulas: [
+    { id: 'energy', digits: 2 },
+    { id: 'velocity', digits: 1 }
+  ],
+  calculator: (state) => ({
+    energy: state.mass * state.velocity ** 2 / 2,
+    velocity: state.velocity
+  })
 });
 
-// Actualizar valor durante simulación
-panel.updateValue('t', '5.5 s');
-
-// Agregar resultado
-panel.setResult('v = 21 m/s');
+// Actualizar valores cuando el modelo cambia
+panel.update({ mass: 2, velocity: 10 });
 ```
+
+## Constructor
+
+```javascript
+new MathematicalModelPanel(config)
+```
+
+**config:**
+- `container` — Elemento contenedor (opcional)
+- `formulas` — Array de `{id, digits}` donde:
+  - `id`: atributo HTML `id` del elemento que mostrará el valor
+  - `digits`: decimales de precisión (default: 2)
+- `calculator` — Función `(state) → {key: value, ...}`
+- `model` — Modelo (opcional, para referencia)
 
 ## Métodos principales
 
-**`addEquation(latex)`** — Muestra ecuación matemática
+**`update(state)`** — Calcula nuevos valores y actualiza elementos HTML
 
-**`setParameters(dict)`** — Muestra dict de parámetros con valores
+**`setCalculator(fn)`** — Reemplaza función calculadora
 
-**`updateValue(key, value)`** — Actualiza parámetro durante simulación
+**`setFormulas(array)`** — Define nuevas fórmulas y cachea elementos
 
-**`setResult(text)`** — Muestra resultado final
+**`format(value, digits)`** — Formatea número (interno, pero disponible)
 
-**`clear()`** — Limpia el panel
-
-## Ejemplo: Derivadas
+## Ejemplo: Cinemática
 
 ```javascript
-const panel = new MathematicalModelPanel(
-  document.getElementById('derivPanel')
-);
-
-panel.addEquation('f(x) = x²');
-panel.addEquation("f'(x) = 2x");
-
-panel.setParameters({
-  'x': '3',
-  'h': '0.1'
+const panel = new MathematicalModelPanel({
+  formulas: [
+    { id: 'posicion', digits: 2 },
+    { id: 'velocidad', digits: 2 },
+    { id: 'aceleracion', digits: 2 }
+  ],
+  calculator: (state) => ({
+    posicion: state.x0 + state.v0 * state.t + 0.5 * state.a * state.t ** 2,
+    velocidad: state.v0 + state.a * state.t,
+    aceleracion: state.a
+  })
 });
 
-// Cuando el usuario mueve h:
-slider.onChange = (h) => {
-  const fx = model.eval(x);
-  const fxh = model.eval(x + h);
-  const secante = (fxh - fx) / h;
-  panel.updateValue('h', h.toFixed(2));
-  panel.setResult(`Pendiente secante: ${secante.toFixed(2)}`);
-};
+// Cuando tiempo cambia:
+for (let t = 0; t <= 5; t += 0.1) {
+  panel.update({ x0: 0, v0: 10, a: -2, t });
+}
 ```

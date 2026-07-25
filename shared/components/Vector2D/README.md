@@ -1,10 +1,6 @@
 # Vector2D — Clase para cálculos vectoriales 2D
 
-Clase matemática para vectores bidimensionales con operaciones:
-- Suma, resta, multiplicación escalar
-- Producto punto, magnitud, normalización
-- Rotación, proyección
-- Representación en coordenadas polares
+Clase matemática para vectores bidimensionales con operaciones aritméticas, geometría y proyecciones.
 
 ## Operaciones básicas
 
@@ -33,31 +29,38 @@ const rotated = v1.rotate(Math.PI / 4);
 const xAxis = new Vector2D(1, 0);
 const yAxis = new Vector2D(0, 1);
 const decomp = v1.decompose(xAxis, yAxis);
-// {parallel: (3, 0), perpendicular: (0, 4), ...}
+// {parallel: Vector2D, perpendicular: Vector2D, parallelScalar: 3, ...}
 ```
 
-## Métodos completos
+## Métodos
 
 **Construcción:**
 - `new Vector2D(x, y)` — Constructor
 - `Vector2D.from(x, y)` — Alias para constructor
 - `Vector2D.zero()` — Vector cero (0, 0)
 - `copy()` — Copia profunda
+- `toString()` — Representación string
 
 **Aritmética:**
-- `add(other)` — Suma vectorial
-- `subtract(other)` — Resta vectorial
-- `scale(scalar)` — Multiplicación escalar
-- `dot(other)` — Producto punto
+- `add(other)` — Suma vectorial → Vector2D
+- `subtract(other)` — Resta vectorial → Vector2D
+- `scale(scalar)` — Multiplicación escalar → Vector2D
+- `dot(other)` — Producto punto → number
 
-**Norma:**
-- `magnitude()` — Longitud del vector
-- `normalize()` — Vector unitario en misma dirección
-- `distance(other)` — Distancia euclidiana a otro vector
+**Magnitud:**
+- `magnitude()` — Longitud del vector → number
+- `normalize()` — Vector unitario → Vector2D
 
 **Geometría:**
-- `rotate(angleRad)` — Rotación en radianes
-- `angleTo(other)` — Ángulo hacia otro vector
-- `projectScalar(axis)` — Componente en dirección de eje
-- `projectOntoAxis(axis)` — Vector proyectado sobre eje
-- `decompose(axisParallel, axisPerp)` — Descomposición en dos ejes
+- `rotate(angleRad)` — Rotación en radianes → Vector2D
+- `angleTo(other)` — Ángulo a otro vector → number (radianes)
+
+**Proyecciones:**
+- `projectScalar(axis)` — Componente escalar sobre eje → number
+- `projectOntoAxis(axis)` — Vector proyectado → Vector2D
+- `decompose(axisParallel, axisPerp)` — Retorna `{parallel, perpendicular, parallelScalar, perpendicularScalar}`
+
+**Operaciones de conjunto (static):**
+- `Vector2D.resultant(vectors)` — Suma vectorial de array → Vector2D
+- `Vector2D.sum(vectors)` — Alias de resultant
+- `Vector2D.average(vectors)` — Promedio vectorial → Vector2D

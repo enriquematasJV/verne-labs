@@ -4,17 +4,18 @@ Solucionador numérico para ecuaciones diferenciales ordinarias (EDOs) usando el
 
 ## Métodos
 
-**`constructor(derivativeFunc, initialCondition)`**
-- `derivativeFunc`: Función f(t, y) que retorna dy/dt
-- `initialCondition`: Valor inicial y(0)
+**`constructor(derivativeFunc, initialCondition = 0)`**
+- `derivativeFunc(t, y)` — Función que retorna dy/dt
+- `initialCondition` — Valor inicial y(t₀)
 
-**`step(dt)`** — Avanza un paso de tiempo Runge-Kutta 4
+**`step(dt)`** — Avanza un paso RK4 de tamaño dt
+- Retorna: nuevo valor de y
+- Actualiza internamente t y y
 
-**`getState()`** — Retorna valor actual de y
+**`getState()`** — Retorna estado actual como objeto
+- Retorna: `{t, y}`
 
-**`reset(newInitialCondition)`** — Reinicia a nuevo valor inicial
-
-**`getTime()`** — Retorna tiempo actual
+**`reset(initialCondition, t = 0)`** — Reinicia a nuevo valor inicial
 
 ## Ejemplo: Decaimiento exponencial
 
@@ -22,34 +23,17 @@ Solucionador numérico para ecuaciones diferenciales ordinarias (EDOs) usando el
 // dy/dt = -0.5y, y(0) = 100
 const solver = new OdeSolverRK4((t, y) => -0.5 * y, 100);
 
-const dt = 0.1;
 const results = [];
-
 for (let i = 0; i < 50; i++) {
-  results.push({
-    time: solver.getTime(),
-    value: solver.getState()
-  });
-  solver.step(dt);
+  const {t, y} = solver.getState();
+  results.push({t, y});
+  solver.step(0.1);
 }
 
 // results muestra decaimiento exponencial
+// Verificar: y(t) ≈ 100 * e^(-0.5*t)
 ```
 
-## Ejemplo: Oscilador amortiguado
+## Limitación
 
-```javascript
-// Segunda orden: x'' + 2·x' + 5·x = 0
-// Reducir a sistema 1D: y = x, z = x'
-// Luego: dy/dt = z, dz/dt = -5y - 2z
-
-// Aquí simplificado para una variable:
-const solver = new OdeSolverRK4((t, y) => {
-  // Ecuación específica
-  return -y - 0.5;  // Ejemplo simple
-}, 1);
-
-for (let t = 0; t < 10; t += 0.01) {
-  solver.step(0.01);
-}
-```
+Resuelve **sistemas escalares** de primer orden. Para orden superior, transformar a sistema 1D (p.ej. dy/dt = z, dz/dt = ...)

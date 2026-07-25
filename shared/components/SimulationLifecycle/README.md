@@ -8,7 +8,7 @@ Componente que gestiona el ciclo de vida de simulaciones: inicialización, pausa
 <script src="../../shared/components/SimulationLifecycle/SimulationLifecycle.js"></script>
 
 const lifecycle = new SimulationLifecycle(
-  (dt) => model.step(dt / 1000),  // onStep: avanza modelo
+  (dt) => model.step(dt / 1000),  // onStep: dt en ms, paso a segundos
   () => model.reset(),             // onReset: reinicia modelo
   () => !model.isFinished()        // canStart: puede iniciar?
 );
