@@ -1,16 +1,11 @@
 /* ChartRenderer Component Styles */
-svg[data-chart-renderer] {
+
+/* Canvas-based chart container */
+canvas[data-chart-renderer] {
   display: block;
-  overflow: visible;
-}
-
-.chart-axis {
-  stroke: var(--text-secondary, #64748b);
-  stroke-width: 1;
-}
-
-.chart-label {
-  font-family: system-ui, sans-serif;
-  font-size: 12px;
-  fill: var(--text-secondary, #64748b);
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
 }
