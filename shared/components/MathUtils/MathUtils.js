@@ -8,9 +8,8 @@ class MathUtils {
   }
 
   static wrap(value, size) {
-    if (value < 0) return value + size;
-    if (value >= size) return value - size;
-    return value;
+    // Envoltura toroidal robusta: funciona para cualquier distancia
+    return ((value % size) + size) % size;
   }
 
   static toroidalDelta(delta, size) {
