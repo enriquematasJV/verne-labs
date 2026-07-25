@@ -559,7 +559,7 @@ class Graph2DEngine {
       ticksY.push(i);
     }
 
-    this.ctx.strokeStyle = '#cbd5e1';
+    this.ctx.strokeStyle = this.config.gridColor;
     this.ctx.lineWidth = 1;
 
     // Grid vertical
@@ -593,7 +593,7 @@ class Graph2DEngine {
     const plotW = cssWidth - m.left - m.right;
     const plotH = cssHeight - m.top - m.bottom;
 
-    this.ctx.strokeStyle = '#334155';
+    this.ctx.strokeStyle = this.config.axisColor;
     this.ctx.lineWidth = 2;
 
     // Eje X: dibuja línea horizontal en y=0 (si está visible)
