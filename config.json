@@ -1,5 +1,7 @@
 {
-  "version": "1.0",
+  "version": "2.0",
+  "lastUpdated": "2026-07-25",
+  "nota": "Sincronizado con manifest.json. Rutas actualizadas a /shared/components/.",
 
   "etiquetas": [
     {
@@ -37,7 +39,7 @@
   "modulosCompartidos": {
     "physics": {
       "descripcion": "Motores de física (cinemática, dinámica, fuerzas)",
-      "ruta": "../../shared/js/physics",
+      "ruta": "../../shared/components/",
       "modulos": ["OdeSolverRK4", "KinematicsEngine", "PhysicsEngine"]
     },
     "graphics": {
@@ -166,13 +168,15 @@
       "nombre": "Plano XY: inecuaciones y funciones",
       "carpeta": "funciones-inecuaciones",
       "categoria": "matematicas",
-      "modulosRequeridos": ["graphics", "math"],
-      "estado": "en-construccion",
+      "modulosRequeridos": ["graphics", "math", "components"],
+      "estado": "publicado",
       "modularizacion": {
-        "estado": "parcial",
+        "estado": "completo",
         "modulosCreados": ["FuncionesInecuacionesModel", "FuncionesInecuacionesPresenter", "FuncionesInecuacionesConstants", "InequalityRegionRenderer"],
-        "modulosIntegrados": false,
-        "documentacion": false
+        "modulosIntegrados": true,
+        "documentacion": true,
+        "lineasReducidas": "498 → 110 (73%)",
+        "codigoInlineEliminado": "100%"
       },
       "detalleModulos": {
         "graphics": "Graph2DEngine (motor gráfico 2D), GraphRenderer (ejes y grid)",
