@@ -1,3 +1,5 @@
+> ⚠️ **DOCUMENTACIÓN HISTÓRICA** — Archivo de referencia pre-2026-07-24. Las rutas compartidas y procesos descritos pueden estar obsoletos. Consultar BLUEPRINT.md para información actual.
+
 # Refactorización MVP - Plano Inclinado
 
 ## Resumen
