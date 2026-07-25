@@ -1,3 +1,5 @@
+> ⚠️ **DOCUMENTACIÓN HISTÓRICA** — Este archivo refiere estructura shared/js/ eliminada (2026-07-25). Consultar BLUEPRINT.md para info actual (shared/components/).
+
 # Arquitectura de VerneLabs
 
 ## Estructura del proyecto
