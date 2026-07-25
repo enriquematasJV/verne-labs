@@ -9,15 +9,18 @@
 
 ### Nivel 0: CSS Globales (Raíz del proyecto)
 
-#### 1.1 `/css/theme.css` — Variables CSS compartidas
-**Ruta**: `/c/Users/Enrique/Desktop/DESARROLLO-IA/verne-labs/css/theme.css`  
+#### 1.1 `/shared/assets/css/verne-theme.css` — Variables CSS compartidas
+**Ruta**: `/shared/assets/css/verne-theme.css`  
 **Propósito**: Define variables CSS globales (colores, tipografía, espaciados)  
-**Usado por**: Todos los labs heredan estas variables
+**Usado por**: Importada por `/css/labs-common.css`, usada por todos los labs
 
-```bash
-Tamaño: (revisar)
-Líneas: (revisar)
-Variables definidas: --accent, --accent2, --grid-color, etc.
+```css
+Variables definidas:
+- Tipografía: --font-family
+- Colores base: --bg, --panel, --text, --muted, --soft, --border
+- Acentos: --accent, --accent-blue, --danger, --info, --ok, --warning
+- Espacios: --radius, --radius-sm
+- Gráficos: --grid-line-width, --grid-color, --axis-line-width, --axis-color
 ```
 
 #### 1.2 `/css/labs-common.css` — Estilos base para labs
