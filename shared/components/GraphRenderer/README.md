@@ -78,13 +78,13 @@ new GraphRenderer(element, options)
 
 El componente lee automáticamente estas variables de `verne-theme.css`:
 ```css
---grid-line-width: 0.5;     /* Ancho de línea del grid */
---grid-color: #e2e8f0;      /* Color del grid */
---axis-line-width: 1;       /* Ancho de línea de ejes */
---axis-color: #94a3b8;      /* Color de ejes */
+--grid-line-width: 1px;     /* Ancho de línea del grid */
+--grid-color: #e2e8f0;      /* Color del grid (gris claro) */
+--axis-line-width: 2px;     /* Ancho de línea de ejes */
+--axis-color: #0f172a;      /* Color de ejes (negro/azul oscuro) */
 ```
 
-Si cambias estas variables, **TODOS los gráficos cambian automáticamente**.
+Si cambias estas variables en `verne-theme.css`, **TODOS los gráficos cambian automáticamente**.
 
 ## Ventajas
 
