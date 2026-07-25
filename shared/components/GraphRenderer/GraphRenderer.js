@@ -22,14 +22,14 @@ class GraphRenderer {
     this.element = element;
     this.type = element.tagName === 'CANVAS' ? 'canvas' : 'svg';
 
-    // Coordenadas del sistema
-    this.xMin = options.xMin || -10;
-    this.xMax = options.xMax || 10;
-    this.yMin = options.yMin || -10;
-    this.yMax = options.yMax || 10;
+    // Coordenadas del sistema (usar ?? para permitir valores 0)
+    this.xMin = options.xMin ?? -10;
+    this.xMax = options.xMax ?? 10;
+    this.yMin = options.yMin ?? -10;
+    this.yMax = options.yMax ?? 10;
 
     // Margen (para labs que necesitan espacio para etiquetas)
-    this.margin = options.margin || 0;
+    this.margin = options.margin ?? 0;
 
     // Obtener dimensiones reales del elemento
     // Para Canvas: usar canvas.width/height (propiedades del elemento)
