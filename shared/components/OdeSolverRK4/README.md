@@ -13,4 +13,4 @@ const solution = solver.solve(initialState, timeSteps, stepSize);
 
 ## Documentación
 
-[Por completar]
+⚠️ Documentación pendiente (v2.0)

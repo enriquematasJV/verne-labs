@@ -20,4 +20,4 @@ const normalized = v1.normalize();
 
 ## Documentación
 
-[Por completar]
+⚠️ Documentación pendiente (v2.0)

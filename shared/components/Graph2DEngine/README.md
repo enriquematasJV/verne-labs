@@ -10,4 +10,4 @@ Motor para rendering de gráficos cartesianos 2D con ejes, grid y anotaciones.
 
 ## Documentación
 
-[Por completar]
+⚠️ Documentación pendiente (v2.0)

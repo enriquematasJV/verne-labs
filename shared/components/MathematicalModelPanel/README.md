@@ -11,4 +11,4 @@ Componente UI para mostrar ecuaciones, parámetros y resultados de modelos matem
 
 ## Documentación
 
-[Por completar]
+⚠️ Documentación pendiente (v2.0)

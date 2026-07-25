@@ -11,4 +11,4 @@ Componente para renderizar gráficos, charts y visualizaciones en SVG.
 
 ## Documentación
 
-[Por completar]
+⚠️ Documentación pendiente (v2.0)

@@ -10,4 +10,4 @@ Componente que gestiona el ciclo de vida de simulaciones: inicialización, pausa
 
 ## Documentación
 
-[Por completar]
+⚠️ Documentación pendiente (v2.0)

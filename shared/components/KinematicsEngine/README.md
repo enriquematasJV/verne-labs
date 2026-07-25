@@ -10,4 +10,4 @@ Motor que calcula posiciones, velocidades y aceleraciones en movimientos 2D y 3D
 
 ## Documentación
 
-[Por completar]
+⚠️ Documentación pendiente (v2.0)

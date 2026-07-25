@@ -10,4 +10,4 @@ Motor de física que calcula movimiento de objetos bajo fuerzas, gravedad y coli
 
 ## Documentación
 
-[Por completar]
+⚠️ Documentación pendiente (v2.0)

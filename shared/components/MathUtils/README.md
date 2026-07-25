@@ -14,4 +14,4 @@ Funciones utilitarias para cálculos matemáticos comunes:
 
 ## Documentación
 
-[Por completar]
+⚠️ Documentación pendiente (v2.0)

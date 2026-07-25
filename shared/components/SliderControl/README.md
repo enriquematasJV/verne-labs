@@ -11,4 +11,4 @@ Componente para gestionar sliders (input range) con estilos consistentes y funci
 
 ## Documentación
 
-[Por completar]
+⚠️ Documentación pendiente (v2.0)
