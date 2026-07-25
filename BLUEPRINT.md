@@ -36,15 +36,17 @@ verne-labs/
 │   ├── assets/
 │   │   └── css/
 │   │       └── verne-theme.css          ← Variables CSS globales
-│   ├── components/
-│   │   ├── VerneMath/
-│   │   │   ├── VerneMath.js             ← Compilador de expresiones
-│   │   │   ├── README.md
-│   │   │   └── verne-math.css
-│   │   ├── GraphRenderer/
-│   │   │   ├── GraphRenderer.js         ← ★ RENDERIZADOR MODULAR
-│   │   │   ├── README.md
-│   │   │   └── graph-renderer.css
+│   ├── components/                      ← ★ ÚNICO LUGAR PARA COMPONENTES
+│   │   ├── Canvas2DRenderer/
+│   │   │   ├── Canvas2DRenderer.js      ← Renderizador 2D con canvas
+│   │   │   ├── canvas-2d-renderer.css
+│   │   │   └── README.md
+│   │   ├── ChartRenderer/
+│   │   │   ├── ChartRenderer.js         ← Renderizador de gráficos
+│   │   │   └── README.md
+│   │   ├── Graph2DEngine/
+│   │   │   ├── Graph2DEngine.js         ← Motor gráfico 2D
+│   │   │   └── README.md
 │   │   ├── GraphDisplay/
 │   │   │   ├── graph-display.css        ← Estilos base para gráficos
 │   │   │   └── README.md
@@ -52,21 +54,102 @@ verne-labs/
 │   │   │   ├── GraphNavigator.js        ← Pan/zoom
 │   │   │   ├── graph-navigator.css
 │   │   │   └── README.md
-│   │   └── [otros componentes...]
+│   │   ├── GraphRenderer/
+│   │   │   ├── GraphRenderer.js         ← ★ RENDERIZADOR MODULAR
+│   │   │   ├── README.md
+│   │   │   └── graph-renderer.css
+│   │   ├── KinematicsEngine/
+│   │   │   ├── KinematicsEngine.js      ← Motor cinemático
+│   │   │   └── README.md
+│   │   ├── MathUtils/
+│   │   │   ├── MathUtils.js             ← Utilidades matemáticas
+│   │   │   └── README.md
+│   │   ├── MathematicalModelPanel/
+│   │   │   ├── MathematicalModelPanel.js ← Panel de modelos matemáticos
+│   │   │   ├── mathematical-model-panel.css
+│   │   │   └── README.md
+│   │   ├── OdeSolverRK4/
+│   │   │   ├── OdeSolverRK4.js          ← Solver ODE Runge-Kutta 4
+│   │   │   └── README.md
+│   │   ├── PhysicsEngine/
+│   │   │   ├── PhysicsEngine.js         ← Motor de física
+│   │   │   └── README.md
+│   │   ├── SimulationLifecycle/
+│   │   │   ├── SimulationLifecycle.js   ← Ciclo de vida de simulaciones
+│   │   │   ├── simulation-lifecycle.css
+│   │   │   └── README.md
+│   │   ├── SliderControl/
+│   │   │   ├── SliderControl.js         ← Control deslizante reutilizable
+│   │   │   ├── slider-control.css
+│   │   │   └── README.md
+│   │   ├── Vector2D/
+│   │   │   ├── Vector2D.js              ← Clase vector 2D
+│   │   │   └── README.md
+│   │   ├── VectorRenderer/
+│   │   │   ├── VectorRenderer.js        ← Renderizador de vectores
+│   │   │   └── README.md
+│   │   └── VerneMath/
+│   │       ├── VerneMath.js             ← ★ Compilador de expresiones
+│   │       ├── README.md
+│   │       └── verne-math.css
 │   └── css/
 │       └── labs-common.css
 ├── simulaciones/
 │   ├── funciones-inecuaciones/
-│   │   ├── index.html                   ← ★ REFACTORIZADO (usa GraphRenderer)
+│   │   ├── index.html                   ← ★ REFACTORIZADO (usa /components)
 │   │   ├── funciones-inecuaciones.css
 │   │   └── README.md
 │   ├── derivadas/
-│   │   ├── index.html                   ← ★ REFACTORIZADO (usa GraphRenderer)
+│   │   ├── index.html                   ← ★ REFACTORIZADO (usa /components)
 │   │   ├── derivadas.css
+│   │   └── README.md
+│   ├── cinematica-2d/
+│   │   ├── index.html                   ← ✅ REFACTORIZADO (usa /components)
+│   │   ├── cinematica-2d.css
+│   │   └── README.md
+│   ├── plano-inclinado/
+│   │   ├── index.html                   ← ✅ REFACTORIZADO (usa /components)
+│   │   ├── plano-inclinado.css
 │   │   └── README.md
 │   └── [otros labs...]
 └── index.html                           ← Portal principal
 ```
+
+## Consolidación de Componentes
+
+**ESTADO: ✅ COMPLETADO (2026-07-25)**
+
+Todos los componentes reutilizables están centralizados en `/shared/components/`. La carpeta legacy `/shared/js/` ha sido **eliminada completamente**.
+
+### Componentes Actuales (16 componentes)
+
+| Componente | Tipo | Descripción |
+|---|---|---|
+| **VerneMath** | Matemática | Compilador seguro de expresiones (2x, sin(x), etc.) |
+| **Vector2D** | Matemática | Clase vector 2D con operaciones básicas |
+| **MathUtils** | Matemática | Utilidades matemáticas generales |
+| **PhysicsEngine** | Física | Motor de física para simulaciones |
+| **OdeSolverRK4** | Física | Solver ODE Runge-Kutta orden 4 |
+| **KinematicsEngine** | Física | Motor cinemático para movimientos |
+| **SimulationLifecycle** | Simulación | Gestor del ciclo de vida de simulaciones |
+| **Canvas2DRenderer** | Renderización | Renderizador 2D con canvas |
+| **GraphRenderer** | Renderización | Renderizador modular de gráficos XY |
+| **Graph2DEngine** | Renderización | Motor completo para gráficos 2D |
+| **ChartRenderer** | Renderización | Renderizador de gráficos/charts |
+| **VectorRenderer** | Renderización | Renderizador de vectores |
+| **GraphDisplay** | UI | Estilos base para elementos gráficos |
+| **GraphNavigator** | UI | Control de pan y zoom para gráficos |
+| **SliderControl** | UI | Control deslizante reutilizable |
+| **MathematicalModelPanel** | UI | Panel para mostrar modelos matemáticos |
+
+### Labs Completamente Refactorizados (4/4)
+
+| Lab | Estado | Componentes |
+|---|---|---|
+| **Derivadas** | ✅ 100% | 4 componentes, todos en /components/ |
+| **Funciones-Inecuaciones** | ✅ 100% | 4 componentes, todos en /components/ |
+| **Cinemática 2D** | ✅ 100% | 6 componentes, todos en /components/ |
+| **Plano Inclinado** | ✅ 100% | 8 componentes, todos en /components/ |
 
 ## Componentes Clave
 
@@ -206,7 +289,9 @@ El margen se respeta en:
 - [x] Crear GraphRenderer como componente modular
 - [x] Refactorizar funciones-inecuaciones (SVG)
 - [x] Refactorizar derivadas (Canvas + margin)
-- [ ] Refactorizar labs restantes
-- [ ] Documentación de componentes
+- [x] Refactorizar labs restantes (Cinemática 2D, Plano Inclinado)
+- [x] Consolidar todos los componentes en /shared/components/
+- [x] Eliminar /shared/js/ (legacy)
+- [ ] Documentación de componentes (en progreso)
 - [ ] Tests unitarios para GraphRenderer
 - [ ] Temas de color (light/dark mode)
