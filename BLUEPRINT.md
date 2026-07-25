@@ -612,9 +612,13 @@ Obligatorio completar en `lab.manifest.json`:
 
 ## Limitaciones Actuales
 
-### Carencias que Requieren Trabajo Futuro
+### Carencias Resueltas
 
-1. **Código fuente autocontenido:** El blueprint describe los componentes pero no los incluye íntegros. Una IA sin acceso al repositorio no puede copiar/pegar componentes completos. Solución propuesta: Generar un `COMPONENTS_BUNDLE.md` con código fuente de referencia.
+1. **Código fuente autocontenido:** ✅ **RESUELTO**  
+   Ver documento separado: [`COMPONENTS_BUNDLE.md`](COMPONENTS_BUNDLE.md)  
+   Contiene código completo de 10 componentes core (~2000 líneas) con ejemplos de uso para IA sin acceso al repositorio.
+
+### Carencias que Requieren Trabajo Futuro
 
 2. **Bundler para versiones monolíticas:** No existe aún un script que genere automáticamente versiones standalone. Solución propuesta: Crear herramienta de bundling que mantenga sincronía entre modular y monolítico.
 
