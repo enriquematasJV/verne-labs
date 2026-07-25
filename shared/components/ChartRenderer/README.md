@@ -1,6 +1,6 @@
 # ChartRenderer — Renderizador de gráficos
 
-Componente para renderizar gráficos, charts y visualizaciones en SVG.
+Componente para renderizar gráficos y visualizaciones en Canvas2D.
 
 ## Uso
 

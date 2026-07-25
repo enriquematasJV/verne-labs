@@ -312,12 +312,4 @@ class VectorRenderer {
   drawText(text, x, y, color, fontSize, fontFamily) {
     return this.renderer.drawText(text, x, y, color, fontSize, fontFamily);
   }
-
-  setTransform(scaleX, scaleY, translateX, translateY) {
-    return this.renderer.setTransform(scaleX, scaleY, translateX, translateY);
-  }
-
-  resetTransform() {
-    return this.renderer.resetTransform();
-  }
 }

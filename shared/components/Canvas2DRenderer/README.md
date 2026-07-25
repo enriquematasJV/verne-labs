@@ -28,7 +28,4 @@ renderer.drawText('Hola', 10, 20, '14px Arial', '#000000');
 - `drawLine(x1, y1, x2, y2, color, lineWidth)`
 - `drawCircle(x, y, radius, fillColor, strokeColor, lineWidth)`
 - `drawArc(x, y, radius, startAngle, endAngle, fillColor, strokeColor, lineWidth)`
-- `drawText(text, x, y, font, fillColor, textAlign, textBaseline)`
-- `save()` / `restore()` - Guardar/restaurar estado
-- `translate(x, y)`, `rotate(angle)`, `scale(sx, sy)` - Transformaciones
-- `setClipRect(x, y, w, h)` - Establecer región de recorte
+- `drawText(text, x, y, fontSize, fontWeight, color, textAlign)` - Renderizar texto

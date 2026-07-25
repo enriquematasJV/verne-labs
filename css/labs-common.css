@@ -3,7 +3,7 @@
  * Compartido por todos los labs en simulaciones/
  */
 
-@import url('./theme.css');
+@import url('../shared/assets/css/verne-theme.css');
 
 /* ===== BODY Y ESTRUCTURA BASE ===== */
 body {

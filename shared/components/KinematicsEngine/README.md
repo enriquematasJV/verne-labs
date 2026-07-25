@@ -1,6 +1,6 @@
 # KinematicsEngine — Motor de cinemática
 
-Motor que calcula posiciones, velocidades y aceleraciones en movimientos 2D y 3D.
+Motor que calcula posiciones, velocidades y aceleraciones en movimientos 1D y 2D (tiro parabólico, movimiento circular).
 
 ## Uso
 

@@ -7,8 +7,11 @@ Solucionador numérico para ecuaciones diferenciales ordinarias (EDOs) usando el
 ```javascript
 <script src="../../shared/components/OdeSolverRK4/OdeSolverRK4.js"></script>
 
-const solver = new OdeSolverRK4();
-const solution = solver.solve(initialState, timeSteps, stepSize);
+// dy/dt = -y, y(0) = 1
+const solver = new OdeSolverRK4((t, y) => -y, 1);
+solver.step(0.01);  // Avanza dt = 0.01
+const state = solver.getState();  // Obtiene estado actual
+solver.reset(2);  // Reinicia con condición inicial = 2
 ```
 
 ## Documentación
