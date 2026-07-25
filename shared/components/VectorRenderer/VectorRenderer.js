@@ -309,7 +309,7 @@ class VectorRenderer {
     return this.renderer.drawPolygon(points, fillColor, strokeColor, lineWidth);
   }
 
-  drawText(text, x, y, color, fontSize, fontFamily) {
-    return this.renderer.drawText(text, x, y, color, fontSize, fontFamily);
+  drawText(text, x, y, fontSize, fontWeight, color, textAlign = 'left') {
+    return this.renderer.drawText(text, x, y, fontSize, fontWeight, color, textAlign);
   }
 }

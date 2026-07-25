@@ -52,7 +52,7 @@ class SimulationLifecycle {
    */
   start() {
     if (this.running) return false;
-    if (this.finished && !this.canStartFn()) return false;
+    if (this.finished && !this.canStart()) return false;
 
     this.running = true;
     this.paused = false;
