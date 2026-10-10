@@ -54,3 +54,6 @@ coverage/
 # Caché local
 .cache/
 .parcel-cache/
+
+# Versión autocontenida del laboratorio de acordes: solo local, no publicar
+simulaciones/laboratorio-de-acordes/laboratorio_acordes_auto.html
