@@ -243,9 +243,13 @@ h2 {
   color: #9d174d;
 }
 
-.tag.js {
-  background: var(--soft-blue);
-  color: #1e40af;
+.card-author {
+  display: block;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border, #d4d4d8);
+  font-size: 0.85rem;
+  color: var(--muted, #475569);
 }
 
 .simulation-card h3 {
