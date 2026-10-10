@@ -33,6 +33,12 @@
       "id": "geologia",
       "color": "#dbeafe",
       "tagClass": "geo"
+    },
+    {
+      "nombre": "Música",
+      "id": "musica",
+      "color": "#fce7f3",
+      "tagClass": "music"
     }
   ],
 

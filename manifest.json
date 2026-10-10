@@ -104,6 +104,20 @@
             "documentacion": [],
             "modulosShared": 0,
             "modulosEspecificos": 0
+        },
+        {
+            "id": "laboratorio-de-acordes",
+            "nombre": "Laboratorio de acordes",
+            "carpeta": "laboratorio-de-acordes",
+            "estado": "✅ COMPLETO",
+            "modularizacion": "✅ Módulos compartidos (MusicTheory, AudioEngine)",
+            "documentacion": [],
+            "modulosShared": 2,
+            "modulosEspecificos": 1,
+            "mejoras": [
+                "Piano, guitarra y explorador de bajo con reconocimiento de acordes",
+                "Versión modular y versión autocontenida"
+            ]
         }
     ],
     "resumen": {
